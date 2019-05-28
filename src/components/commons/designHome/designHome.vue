@@ -46,8 +46,11 @@ export default {
         $route(to) {
             this.buttonControl = false;
             this.drawerTrol();
-            if(to.name =='goodsLib' || to.name =='favorite')
-            this.isShowRNav = true;
+            if(to.name =='goodsLib' || to.name =='favorite'){
+                this.isShowRNav = true;
+            }else{
+                this.isShowRNav = false;
+            }
         }
     },
     data() {
