@@ -16,9 +16,9 @@
                 <MenuItem name="6" class="layout-user">
                     <Button shape="circle" icon="ios-search"></Button>
                 </MenuItem>
-                <MenuItem name="创建设计"  to="/designHome">
+                <MenuItem name="创建设计"  to="/designHome/materialLib">
                     <Button type="warning" shape="circle">
-                        <Icon type="ios-navigate"></Icon>
+                        <i  class="iconfont iconiconset0137"></i>
                         创建设计
                     </Button>  
                 </MenuItem>

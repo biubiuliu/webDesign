@@ -2,7 +2,6 @@
     <div class="layout">
         <Layout >
             <nav-bar class="nvabar"></nav-bar>
-            
             <Content :style="{marginTop:'60px', background: '#ccc', minHeight: '769px',minWidth:'800px'}" class="Content">
                 <router-view/>
             </Content>

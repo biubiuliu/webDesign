@@ -40,6 +40,33 @@ export default new Router({
             path: '/designHome',
             name: 'designHome',
             component: designHome,
+            children: [{
+                    path: 'materialLib',
+                    name: 'materialLib',
+                    component: () =>
+                        import ('@/view/materialLib/materialLib.vue')
+                },
+                {
+                    path: 'goodsLib',
+                    name: 'goodsLib',
+                    component: () =>
+                        import ('@/view/goodsLib/goodsLib.vue')
+                },
+                {
+                    path: 'favorite',
+                    name: 'favorite',
+                    component: () =>
+                        import ('@/view/favorite/favorite.vue')
+                },
+                {
+                    path: 'uploading',
+                    name: 'uploading',
+                    component: () =>
+                        import ('@/view/uploading/uploading.vue')
+                }
+
+
+            ]
 
         },
         {

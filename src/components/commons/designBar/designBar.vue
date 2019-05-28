@@ -3,7 +3,7 @@
         <Menu mode="horizontal" theme="dark" id="dark" active-name="1">
             <div class="layout-nav">
                 <MenuItem name="首页"  to="/home/discover">
-                    <Icon type="ios-navigate"></Icon>
+                    <i  class="iconfont iconzuo"></i>
                     首页
                 </MenuItem>
                 <MenuItem name="画布尺寸">
@@ -14,15 +14,15 @@
                     保存方案
                 </MenuItem>
                 <MenuItem name="撤销" class="layout-user">
-                    <Icon type="ios-navigate"></Icon>
+                    <i  class="iconfont icondaohangchexiao"></i>
                     撤销 
                 </MenuItem>
                 <MenuItem name="重置" >
-                    <Icon type="ios-navigate"></Icon>
+                    <i  class="iconfont iconzhongzhi"></i>
                     重置
                 </MenuItem>
                 <MenuItem name="导出清单" class="layout-user">
-                    <Icon type="ios-navigate"></Icon>
+                    <i  class="iconfont iconxiazai"></i>
                     导出清单 
                 </MenuItem>
             </div>
