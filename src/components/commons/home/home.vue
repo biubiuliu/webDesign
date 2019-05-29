@@ -15,17 +15,17 @@ import discover from '@/view/discover/discover'
 import mydesign from '@/view/mydesign/mydesign'
 import mycollect from '@/view/mycollect/mycollect'
 export default {
-    name: 'home',
+name: 'home',
     components: {
-      navBar,
-      discover,
-      mydesign,
-      mycollect
+        navBar,
+        discover,
+        mydesign,
+        mycollect
     },
     data(){
-       return{
-           aa: 'd'
-       }
+        return{
+            aa: 'd'
+        }
     }
 }
 </script>

@@ -1,23 +1,23 @@
 <template>
     <div class="leftBar">
-           <ul class="leftBar_box">
+            <ul class="leftBar_box">
                 <li>
                     <router-link to="/designHome/materialLib" tag="div">
                         <i  class="iconfont iconsucaiku"></i>
                         素材库
                     </router-link>
                 </li>
-               <li>
-                   <router-link to="/designHome/goodsLib" tag="div">
+                <li>
+                    <router-link to="/designHome/goodsLib" tag="div">
                         <i  class="iconfont iconshangpin"></i>
                         商品库
-                   </router-link>
+                    </router-link>
                 </li>
-               <li>
-                   <router-link to="/designHome/favorite" tag="div">
+                <li>
+                <router-link to="/designHome/favorite" tag="div">
                         <i  class="iconfont iconshoucang1"></i>
                         收藏
-                   </router-link>
+                </router-link>
                 </li>
                <li>
                    <router-link to="/designHome/uploading" tag="div">
@@ -43,13 +43,12 @@ export default {
 <style scoped>
     .leftBar{
         position: fixed;
-        z-index: -1;
+        z-index: 9;
         top: 60px;
         width: 60px;
         height: 100%;;
         background:  #515A6E;
         font-size: 14px;
-        z-index: 999;
     }
 
     .leftBar_box{

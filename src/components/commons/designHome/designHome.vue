@@ -1,9 +1,9 @@
 <template>
     <div>
-        <design-bar></design-bar>
+        <design-bar class="dseignBar"></design-bar>
         <left-bar></left-bar>
         <div class="conten-box">
-            <div class="block" id="routerV">           
+            <div class="block" id="routerV">
                 <div class="drawers_body" id="trol">
                     <router-view class="drawers_div" ></router-view>
                     <div class="drawes_trol">
@@ -12,9 +12,12 @@
                 </div>
             </div>
             <div class="canvas_body">
-               <div class="canvas_div">画布</div> 
+                <div class="canvas_div">
+                    <canvas :width="$store.state.app.cvsW" :height="$store.state.app.cvsH"></canvas>
+                </div>
+                
             </div>
-            <div class="block" id="routerVR" v-if="isShowRNav">           
+            <div class="block" id="routerVR" v-if="isShowRNav">
                 <div class="drawers_bodyR" id="trolR">
                     <router-view class="drawers_div" ></router-view>
                     <div class="drawes_trolR">
@@ -32,16 +35,17 @@ import materialLib from '@/view/materialLib/materialLib'
 import goodsLib from '@/view/goodsLib/goodsLib'
 import favorite from '@/view/favorite/favorite'
 import uploading from '@/view/uploading/uploading'
+
 export default {
-    name: 'designHome',
-    components: {
-      designBar,
-      leftBar,
-      materialLib,
-      goodsLib,
-      favorite,
-      uploading
-    },
+name: 'designHome',
+components: {
+    designBar,
+    leftBar,
+    materialLib,
+    goodsLib,
+    favorite,
+    uploading
+},
     watch: {
         $route(to) {
             this.buttonControl = false;
@@ -51,7 +55,7 @@ export default {
             }else{
                 this.isShowRNav = false;
             }
-        }
+        },
     },
     data() {
         return {
@@ -60,14 +64,16 @@ export default {
             buttonControlR: true,
             leftIcon: 'iconfont iconzuo',
             rightIcon: 'iconfont iconyou',
-            isShowRNav:false
+            isShowRNav:false,
+            cvsState:this.$store.state.app.cvsState,
+            cvsW:this.$store.state.app.cvsW,
+            cvsH:this.$store.state.app.cvsH
         }
     },
     created() {
         if(this.$route.name =='goodsLib' || this.$route.name =='favorite'){
             this.isShowRNav = true;
         }
-            
     },
     methods: {
         drawerTrol() {
@@ -90,19 +96,17 @@ export default {
             var trolR = document.getElementById('trolR')
             var routerVR = document.getElementById('routerVR')
             var AliconR = document.getElementById('AliconR')
-            if(this.buttonControlRs !==false){
+            if(this.buttonControlR !==false){
                 trolR.style.width = '400px';
                 routerVR.style.width = '400px';
                 this.rightIcon = 'iconfont iconyou '
             }else{
-                trolR.style.width = '0px';;
-                routerVR.style.width = '0px';;
-                this.rightIcon = 'iconfont iconzuo'
-            }        
-            
+                trolR.style.width = '0px';
+                routerVR.style.width = '0px';
+                this.rightIcon = 'iconfont iconzuo';
+            }
         }
     },
-    
 }
 </script>
 <style scoped>
@@ -116,7 +120,9 @@ export default {
 .conten-box{
     display: flex;
 }
-
+.dseignBar{
+    z-index: 999;
+}
 .drawers_body{
     background: #293039;
     margin: 60px 0 0 60px;
@@ -129,8 +135,9 @@ export default {
 }
 .drawers_bodyR{
     background: #293039;
-    margin: 60px  60px 0 0;
+    margin: 60px  0px 0 0;
     position: fixed;
+    right: 0px;
     width: 400px;
     height: 100%;
     transition-property:width;
@@ -151,7 +158,7 @@ export default {
 }
 .drawers_div{
     overflow:hidden;
-    height: 100%; 
+    height: 100%;
 }
 .btn_drawer,.btn_drawerR{
     width: 20px;
@@ -163,15 +170,14 @@ export default {
 .canvas_body{
     width: 100%;
     min-height:100vh;
+    background: #EDF0F2;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 .canvas_div{
-    width: 500px;
-    height: 500px;
     margin-top: 60px;
-    background: wheat;
+    background: white   ;
     color: black
 }
 </style>
