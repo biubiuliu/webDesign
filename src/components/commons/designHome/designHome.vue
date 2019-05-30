@@ -13,18 +13,18 @@
             </div>
             <div class="canvas_body">
                 <div class="canvas_div">
-                    <canvas :width="$store.state.app.cvsW" :height="$store.state.app.cvsH"></canvas>
+                    <canvas :width="cvsW" :height="cvsH"></canvas>
                 </div>
                 
             </div>
-            <div class="block" id="routerVR" v-if="isShowRNav">
+            <!-- <div class="block" id="routerVR" v-if="isShowRNav">
                 <div class="drawers_bodyR" id="trolR">
                     <router-view class="drawers_div" ></router-view>
                     <div class="drawes_trolR">
                         <div class="btn_drawerR" @click="drawerTrolR"><i id="AliconR" :class="rightIcon"></i></div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -36,8 +36,22 @@ import goodsLib from '@/view/goodsLib/goodsLib'
 import favorite from '@/view/favorite/favorite'
 import uploading from '@/view/uploading/uploading'
 
+import { mapState } from 'vuex'
 export default {
 name: 'designHome',
+computed: {
+    ...mapState({
+        cvsState: state =>{
+            return state.app.cvsState
+        },
+        cvsW: state =>{
+            return state.app.cvsW
+        },
+        cvsH: state =>{
+            return state.app.cvsH
+        }
+    })
+},
 components: {
     designBar,
     leftBar,
@@ -65,9 +79,6 @@ components: {
             leftIcon: 'iconfont iconzuo',
             rightIcon: 'iconfont iconyou',
             isShowRNav:false,
-            cvsState:this.$store.state.app.cvsState,
-            cvsW:this.$store.state.app.cvsW,
-            cvsH:this.$store.state.app.cvsH
         }
     },
     created() {
@@ -157,7 +168,7 @@ components: {
     cursor: pointer;
 }
 .drawers_div{
-    overflow:hidden;
+    overflow-x:hidden;
     height: 100%;
 }
 .btn_drawer,.btn_drawerR{

@@ -2,10 +2,9 @@
     <div class="layout">
         <Layout >
             <nav-bar class="nvabar"></nav-bar>
-            <Content :style="{marginTop:'60px', background: '#ccc', minHeight: '769px',minWidth:'800px'}" class="Content">
+            <Content :style="{marginTop:'60px'}" class="Content">
                 <router-view/>
             </Content>
-            <Footer class="layout-footer-center">2019-5-27 &copy; biubiuliu</Footer>
         </Layout>
     </div>
 </template>
@@ -41,15 +40,14 @@ name: 'home',
         overflow: hidden;
         
     }
-    .layout-footer-center{
-        min-width: 800px;
-        text-align: center;
-    }
     .discover{
         position: relative;
         top: 0;
         left: 0;
         z-index: 1;
+    }
+    .Content{
+        overflow-x: hidden
     }
 
 </style>

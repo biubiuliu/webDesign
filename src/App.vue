@@ -19,4 +19,7 @@ export default {
   text-align: center;
   color:rgba(255,255,255,.7)
 }
+li{
+  list-style: none;
+}
 </style>

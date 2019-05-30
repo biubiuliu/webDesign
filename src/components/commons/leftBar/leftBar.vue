@@ -14,10 +14,10 @@
                     </router-link>
                 </li>
                 <li>
-                <router-link to="/designHome/favorite" tag="div">
-                        <i  class="iconfont iconshoucang1"></i>
-                        收藏
-                </router-link>
+                    <router-link to="/designHome/favorite" tag="div">
+                            <i  class="iconfont iconshoucang1"></i>
+                            收藏
+                    </router-link>
                 </li>
                <li>
                    <router-link to="/designHome/uploading" tag="div">
