@@ -10,7 +10,7 @@ Vue.use(Router)
 export default new Router({
     routes: [{
             path: '/',
-            redirect: '/home'
+            redirect: '/home/discover'
         },
         {
             path: '/home',
@@ -33,6 +33,12 @@ export default new Router({
                     name: 'mycollect',
                     component: () =>
                         import ('@/view/mycollect/mycollect.vue')
+                },
+                {
+                    path: 'proDetail',
+                    name: 'proDetail',
+                    component: () =>
+                        import ('@/view/proDetail/proDetail.vue')
                 },
             ]
         },

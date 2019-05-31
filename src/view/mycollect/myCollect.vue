@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mycollect">
         <h1>{{msg}}</h1>
     </div>
 </template>
@@ -15,5 +15,7 @@ export default {
 }
 </script>
 <style scoped>
-
+.mycollect{
+    color: black
+}
 </style>

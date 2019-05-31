@@ -3,8 +3,10 @@ const app = {
         cvsState: 0,
         cvsW: 780,
         cvsH: 780,
+        proDetailVal: {}
     },
     mutations: {
+        // 画布大小
         changeCvsSizeFun(state, cvsW, cvsH) {
             if (state.cvsState == 0) {
                 console.log("vuex--0")
@@ -22,11 +24,17 @@ const app = {
                 state.cvsW = 1350
                 state.cvsH = 759
             }
+        },
+        SET_PRODETAIL(state, obj) {
+            state.proDetailVal = obj
         }
     },
     actions: {
         changeCvsSizeFun(ctx, cvsW, cvsH) {
             ctx.commit('changeCvsSizeFun', cvsW, cvsH)
+        },
+        updataProDetailVal(ctx, obj) {
+            ctx.commit('SET_PRODETAIL', obj)
         }
     }
 }

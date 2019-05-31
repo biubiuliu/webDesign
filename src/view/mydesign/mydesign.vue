@@ -18,7 +18,7 @@
         </div>
         
         <div>
-            <vue-waterfall-easy ref="waterfall" style="position:absolute;width:100%; height:85vh" :imgWidth="290" :imgsArr="imgsArr"  :enablePullDownEvent="true" @scrollReachBottom="getData" class="vueWaterfallEasy">
+            <vue-waterfall-easy ref="waterfall" style="position:absolute;width:100%; height:85vh" :imgWidth="290" :imgsArr="imgsArr"  :enablePullDownEvent="true" @scrollReachBottom="handleGetGoodsType" class="vueWaterfallEasy">
                 <div class="img-info" slot-scope="props">
                     <p class="some-info">第{{props.index+1}}张图片</p>
                     <p class="some-info">{{props.value.info}}</p>
@@ -30,7 +30,7 @@
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import axios from 'axios'
+import { getGoodsType } from '@/api/data.js'
 export default {
     name: 'mydesign',
     components: {
@@ -40,24 +40,34 @@ export default {
         return {
             msg: '这是我的设计ss',
             imgsArr: [],
-            group: 0, // request param
+            dataArr:[],
+            setDataArr:[]
+            
         }
     },
     created() {
-        this.getData()
+        this.handleGetGoodsType()
     },
     methods: {
-        getData() {
-        axios.get('../../../static/data-json.json?group=' + this.group) // 真实环境中，后端会根据参数group返回新的图片数组，这里我用一个惊呆json文件模拟
-            .then(res => {
-            if (this.group === 5) { // 模拟已经无新数据，显示 slot="waterfall-over"
-                this.$refs.waterfall.waterfallOver()
-                return
-            }
-            this.imgsArr = this.imgsArr.concat(res.data)
-            this.group++
-            })
-        },
+            //数据重组
+            handleGetGoodsType () {
+                getGoodsType().then(res => {
+                    this.indoor_list = res.data.message
+                    this.dataArr = this.indoor_list.category[1].goods;
+                    var _this = this;
+                    for (let i = 0; i < _this.dataArr.length; i++) {
+                      var   setDataObj = {src: "",href: "",info: "",id: ""};
+                        setDataObj.src = _this.dataArr[i]["goods_thumb"];
+                        setDataObj.href = _this.dataArr[i]["goods_thumb"];
+                        setDataObj.info = _this.dataArr[i]["goods_name"];
+                        setDataObj.id = _this.dataArr[i]["goods_id"];
+                        _this.setDataArr.push(setDataObj)
+                    }
+                    this.imgsArr = this.setDataArr
+                }).catch(err => {
+                    console.log(err)
+                })
+            },
     },
     
 }

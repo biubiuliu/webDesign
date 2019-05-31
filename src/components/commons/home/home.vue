@@ -13,13 +13,15 @@ import navBar from '@/components/commons/navBar/navBar'
 import discover from '@/view/discover/discover'
 import mydesign from '@/view/mydesign/mydesign'
 import mycollect from '@/view/mycollect/mycollect'
+import proDetail from '@/view/proDetail/proDetail'
 export default {
 name: 'home',
     components: {
         navBar,
         discover,
         mydesign,
-        mycollect
+        mycollect,
+        proDetail
     },
     data(){
         return{
