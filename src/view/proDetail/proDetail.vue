@@ -28,12 +28,15 @@
                     <div class="discoverTitle">
                         <div>单品列表</div>
                         <ul class="item_list">
-                            <li class="item_list_li" v-for="(item,index) in imgsArr" :key="index">
+                            <li class="item_list_li"
+                                
+                                @mouseenter="mouseenter(index,item)"
+                                v-for="(item,index) in imgsArr" :key="index">
                                 <img :src="item.src" alt="">
                                 <p>这是第{{index}}张单品</p>
                                 <p><Icon type="logo-yen" />500</p>
-                                <div class="iconBox flexLayout">
-                                    <i  class="iconfont iconshoucang1"></i>
+                                <div class="flexLayout" :class="{iconBox:changeblue==index}">
+                                    <i   class="iconfont iconshoucang1"></i>
                                 </div>
                             </li>
                         </ul>
@@ -80,6 +83,7 @@ export default {
             imgsArr: [],
             dataArr:[],
             setDataArr:[],
+            iconshoucang1:false,
         }
     },
     created() {
@@ -97,6 +101,7 @@ export default {
                 this.leftIcon = 'iconfont iconxiala-'
         },
         mouseenter(index, item) {
+            this.iconshoucang1 = true
             this.changeblue = index;
             
         },
@@ -123,6 +128,7 @@ export default {
                 }
                 this.imgsArr = this.setDataArr
                 console.log("详情",this.imgsArr)
+                console.log(' vuex', this.proDetailVal.src)
             }).catch(err => {
                 console.log(err)
             })
@@ -218,5 +224,8 @@ margin-top: 20px;;
     position: absolute;
     top: 10px;
     right: 10px;
+}
+.iconBox{
+    color: #f90
 }
 </style>

@@ -5,6 +5,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import getters from './getters'
 import app from './modules/app'
+import createPersistedState from "vuex-persistedstate"
 
 Vue.use(Vuex)
 
@@ -12,7 +13,16 @@ const store = new Vuex.Store({
     modules: {
         app,
     },
-    getters
+    getters,
+    plugins: [createPersistedState({
+        storage: window.sessionStorage,
+        updataProDetailVal(val) {
+            return {
+                // 只储存state中的user
+                proDetailVal: val.proDetailVal
+            }
+        }
+    })]
 })
 
 export default store

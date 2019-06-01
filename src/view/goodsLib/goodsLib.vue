@@ -58,7 +58,7 @@
         <div class="goodsModalBox">
             <Modal
                 title="下载的商品"
-                v-model="modal9"
+                v-model="goodsLibModal"
                 :styles="{left: '80px',top: '180px',margin:'0',width:'340px'}">
                 <ul class="flexLayout">
                     <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index">
@@ -88,7 +88,7 @@ export default {
                 {src:require("./images.jpg"),id:'6',isShowIcon:false},
             ],
             selsect:"brand",
-            modal9: false,
+            goodsLibModal: false,
             social:[]
         }
     },

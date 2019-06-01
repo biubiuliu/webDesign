@@ -23,3 +23,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 自定义颜色
 背景淡灰色------#EDF0F2
 橘黄色------#f90
+插件
+[存储vuex](https://github.com/robinvdvleuten/vuex-persistedstate "存储vuex")
+[瀑布流](https://github.com/lfyfly/vue-waterfall-easy "瀑布流")
+

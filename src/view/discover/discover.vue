@@ -82,12 +82,12 @@ export default {
         vueWaterfallEasy
     },
     computed: {
-    ...mapState({
-        proDetailVal: state =>{
-            return state.app.proDetailVal
-        },
-    })
-},
+        ...mapState({
+            proDetailVal: state =>{
+                return state.app.proDetailVal
+            },
+        })
+    },
     data() {
         return {
             msg: '创建精彩设计',
