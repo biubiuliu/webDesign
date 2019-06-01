@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import home from '@/components/commons/home/home'
+import login from '@/components/commons/login/login'
 import designHome from '@/components/commons/designHome/designHome'
 
 
@@ -11,6 +12,11 @@ export default new Router({
     routes: [{
             path: '/',
             redirect: '/home/discover'
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: login,
         },
         {
             path: '/home',
