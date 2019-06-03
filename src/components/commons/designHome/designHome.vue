@@ -12,10 +12,10 @@
                 </div>
             </div>
             <div class="canvas_body">
+                <action-bar></action-bar>
                 <div class="canvas_div">
-                    <canvas :width="cvsW" :height="cvsH"></canvas>
+                    <canvas-card></canvas-card>
                 </div>
-                
             </div>
             <!-- <div class="block" id="routerVR" v-if="isShowRNav">
                 <div class="drawers_bodyR" id="trolR">
@@ -31,30 +31,24 @@
 <script>
 import designBar from '@/components/commons/designBar/designBar'
 import leftBar from '@/components/commons/leftBar/leftBar'
+import actionBar from '@/components/commons/actionBar/actionBar'
+import canvasCard from '@/components/commons/canvasCard/canvasCard'
+
 import materialLib from '@/view/materialLib/materialLib'
 import goodsLib from '@/view/goodsLib/goodsLib'
 import favorite from '@/view/favorite/favorite'
 import uploading from '@/view/uploading/uploading'
 
-import { mapState } from 'vuex'
+
+
 export default {
 name: 'designHome',
-computed: {
-    ...mapState({
-        cvsState: state =>{
-            return state.app.cvsState
-        },
-        cvsW: state =>{
-            return state.app.cvsW
-        },
-        cvsH: state =>{
-            return state.app.cvsH
-        }
-    })
-},
+
 components: {
     designBar,
     leftBar,
+    actionBar,
+    canvasCard,
     materialLib,
     goodsLib,
     favorite,
@@ -140,6 +134,7 @@ components: {
     position: fixed;
     width: 400px;
     height: 100%;
+    z-index: 1;
     transition-property:width;
     transition-duration:.5s;
     transition-timing-function:ease;
@@ -183,12 +178,14 @@ components: {
     min-height:100vh;
     background: #EDF0F2;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+
 }
 .canvas_div{
     margin-top: 60px;
     background: white   ;
     color: black
 }
+
 </style>

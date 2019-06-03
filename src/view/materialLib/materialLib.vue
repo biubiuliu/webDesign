@@ -14,8 +14,8 @@
                     <span>全部 <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
-                    <li class="reuseLi" v-for="bgImg in backgroundImgArr" :key="bgImg.id">
-                        <img :src="bgImg.src" alt="图片丢失">
+                    <li class="reuseLi" v-for="bgImg in bgUrl" :key="bgImg.id">
+                        <img :src="bgImg.src" @click="selectDecorate" alt="图片丢失">
                     </li>
                 </ul>
             </div>
@@ -48,11 +48,39 @@
     </div>
 </template>
 <script>
+import { fabric } from 'fabric'
+import {mapGetters, mapActions} from 'vuex'
 export default {
     name: 'materialLib',
     data() {
         return {
             msg: '这是素材库',
+            bgUrl: [
+                {
+                'id': 5,
+                'src': 'https://mdproduct.oss-cn-shenzhen.aliyuncs.com/images/201807/source_img/2204_P_1531341193163.jpg'
+                },
+                {
+                'id': 6,
+                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/04/28/edc7426a73e5cc5fb717472194c5b7e6.jpg'
+                },
+                {
+                'id': 49,
+                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/14/3ef8d4df3ab739a99e361924e3c71319.jpg'
+                },
+                {
+                'id': 48,
+                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/06/382cc9c4ffb493704502b64130713b8f.jpg'
+                },
+                {
+                'id': 47,
+                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/06/a55f49a0a8c6ef14f5ddcbc99e1f8525.jpg'
+                },
+                {
+                'id': 59,
+                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/14/3ef8d4df3ab739a99e361924e3c71319.jpg'
+                },
+            ],
             isRoow: true,
             backgroundImgArr:[
                 {src:require('./images.jpg'),id:'1'},
@@ -64,7 +92,46 @@ export default {
             ]
         }
     },
+    computed: {
+        ...mapGetters([
+            'card',
+            'selectedObj',
+        ]),
+    },
+    watch: {
+    // 监听object选中变化
+    // 图层layer滚动到对应object
+    selectedObj() {
+        // console.log('selectedObj change');
+    }
+},
     methods: {
+        ...mapActions([
+            'saveState',
+        ]),
+        // 选择装饰
+        selectDecorate(e) {
+            console.log('装饰',e);
+            const card = this.card
+            console.log('card',card);
+            if (!card) return
+            fabric.Image.fromURL(e.target.src, (img) => {
+            img.set({
+                borderColor: '#f90',
+                cornerColor: '#f90',
+                cornerSize: 10,
+                transparentCorners: false,
+                cornerStyle: 'circle',
+                borderDashArray: [3,3],
+                angle: 0,
+                left: 100,
+                top: 100,
+            });
+            card.add(img).setActiveObject(img)
+
+            this.saveState()
+            })
+        },
         // 判断有class是否存在
         hasClass(obj, cls) {  
             return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));  
@@ -93,8 +160,7 @@ export default {
             let privateId = document.getElementById("privateId")
             this.removeClass(privateId,"active");  
             this.addClass(commonsId,"active"); 
-    },
-
+        },
     },
     
 }

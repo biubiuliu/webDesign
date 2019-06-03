@@ -57,7 +57,7 @@
     </div>
 </template>
 <script>
-import { mapState,mapMutations } from 'vuex';
+import { mapState, mapGetters, mapActions  } from 'vuex';
 export default {
     name: 'designBar',
     data() {
@@ -68,20 +68,64 @@ export default {
         }
     },
     computed: {
-        ...mapState(["cvsState"]),
-        ...mapMutations([
-            "changeCvsSizeFun"
-        ]),
+        ...mapState({
+            cvsState: state =>{
+            return state.app.cvsState
+            },
+            cvsW: state =>{
+                return state.app.cvsW
+            },
+            cvsH: state =>{
+                return state.app.cvsH
+            }
+        }),
+        ...mapGetters([
+            'card',
+            'selectedObj',
+        ])
     },
     methods: {
+        ...mapActions([
+            'setCanvasW',
+            'setCanvasH',
+            'setCanvasState',
+            'saveState'
+        ]),
+
        //控制画布尺寸弹出框
         isShowCvsFun() {
             this.isShowCvs = !this.isShowCvs
         },
         //改变画布大小
         CanvasSizeFun() {
-            this.$store.state.app.cvsState = this.vertical
-            this.changeCvsSizeFun
+            if (this.vertical == 0) {
+                this.setCanvasW(780)
+                this.setCanvasH(780)
+                this.setCanvasState(this.vertical)
+                this.changeCvsSize(this.cvsW,this.cvsH)
+            } else if (this.vertical == 1) {
+                this.setCanvasW(546)
+                this.setCanvasH(780)
+                this.setCanvasState(this.vertical)
+                this.changeCvsSize(this.cvsW,this.cvsH)
+            } else if (this.vertical == 2) {
+                this.setCanvasW(1100)
+                this.setCanvasH(780)
+                this.setCanvasState(this.vertical)
+                this.changeCvsSize(this.cvsW,this.cvsH)
+            } else {
+                this.setCanvasW(1350)
+                this.setCanvasH(759)
+                this.setCanvasState(this.vertical)
+                this.changeCvsSize(this.cvsW,this.cvsH)
+                
+            }
+        },
+        //动态改变初始化canvas 尺寸
+        changeCvsSize(w,h) {
+            this.card.renderAll()
+            this.card.setWidth(w,h)
+            this.saveState()
         },
         //closeMoudalFun 点击遮罩层关闭画布尺寸
         closeMoudalFun() {

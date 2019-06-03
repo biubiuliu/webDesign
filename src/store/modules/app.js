@@ -3,39 +3,98 @@ const app = {
         cvsState: 0,
         cvsW: 780,
         cvsH: 780,
-        proDetailVal: {}
+        proDetailVal: {},
+        // drag
+        cardType: 1,
+        frontCard: null,
+        behindCard: null,
+        undoList: [],
+        selectedObj: null,
+
+
     },
     mutations: {
-        // 画布大小
-        changeCvsSizeFun(state, cvsW, cvsH) {
-            if (state.cvsState == 0) {
-                console.log("vuex--0")
-                state.cvsW = 780
-                state.cvsH = 780
-            } else if (state.cvsState == 1) {
-                console.log("vuex--1")
-                state.cvsW = 546
-                state.cvsH = 780
-            } else if (state.cvsState == 2) {
-                console.log("vuex--2")
-                state.cvsW = 1100
-                state.cvsH = 780
-            } else {
-                state.cvsW = 1350
-                state.cvsH = 759
-            }
+        //设置画布大小
+        SET_CVS_W: (state, cvsW) => {
+            state.cvsW = cvsW
         },
-        SET_PRODETAIL(state, obj) {
-            state.proDetailVal = obj
-        }
+        SET_CVS_H: (state, cvsH) => {
+            state.cvsH = cvsH
+        },
+        SET_CVS_STATE: (state, cvsState) => {
+            state.cvsState = cvsState
+        },
+        // drag -s
+        SET_SELECTEDOBJ: (state, object) => {
+            state.selectedObj = object
+        },
+        INIT_FRONTCARD: (state, fCanvas) => {
+            state.frontCard = fCanvas
+        },
+        INIT_BEHINDCARD: (state, fCanvas) => {
+            state.behindCard = fCanvas
+        },
+        SET_REDOLIST: (state, list) => {
+            state.redoList = list
+        },
+        SET_CANVASSTATE: (state, canvasState) => {
+            state.canvasState = canvasState
+        },
+        ADD_UNDO: (state, canvasState) => {
+            state.undoList.push(canvasState)
+        },
+        // drag  -e
+
     },
     actions: {
-        changeCvsSizeFun(ctx, cvsW, cvsH) {
-            ctx.commit('changeCvsSizeFun', cvsW, cvsH)
-        },
         updataProDetailVal(ctx, obj) {
             ctx.commit('SET_PRODETAIL', obj)
+        },
+        setCanvasW({ commit }, cvsW) {
+            commit('SET_CVS_W', cvsW)
+        },
+        setCanvasH({ commit }, cvsH) {
+            commit('SET_CVS_H', cvsH)
+        },
+        setCanvasState({ commit }, cvsState) {
+            commit('SET_CVS_STATE', cvsState)
+        },
+        // darg
+        initFrontCard({ commit }, fCanvas) {
+            commit('INIT_FRONTCARD', fCanvas)
+        },
+        initBehindCard({ commit }, fCanvas) {
+            commit('INIT_BEHINDCARD', fCanvas)
+        },
+        setSelectedObj({ commit }, object) {
+            commit('SET_SELECTEDOBJ', object)
+        },
+        saveState({ commit, state }) {
+            // 清空恢复栈redoList
+            commit('SET_REDOLIST', [])
+
+            if (state.canvasState) {
+                commit('ADD_UNDO', state.canvasState)
+            }
+            console.log(state.frontCard.toJSON([
+                'hasControls',
+                'borderColor',
+            ]))
+            commit('SET_CANVASSTATE', state.frontCard.toJSON([
+                'hasControls',
+                'borderColor',
+                'scaleX',
+                'scaleY',
+                'angle',
+                'top',
+                'left',
+                'crossOrigin'
+            ]))
+
+            // console.log(state.canvasState)
         }
+
+
     }
 }
 export default app
