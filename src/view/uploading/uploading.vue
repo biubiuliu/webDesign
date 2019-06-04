@@ -5,7 +5,7 @@
                 id="upload"
                 class="uploading"
                 multiple
-                :show-upload-list="false"
+                :show-upload-list="true"
                 :before-upload="handleUpload"
                 :on-success="handleSuccess"
                 action="https://yy.mingdiao.com.cn/collocationServers/public/index.php/api/v1/upload/img">
@@ -32,7 +32,7 @@
                                             <DropdownMenu slot="list">
                                                 <DropdownItem>背景</DropdownItem>
                                                 <DropdownItem>素材</DropdownItem>
-                                                <DropdownItem>自定义</DropdownItem>
+                                                <DropdownItem @click="CustomGoodsRouter">自定义商品</DropdownItem>
                                             </DropdownMenu>
                                         </Dropdown>
                                         <Dropdown placement="right-start"  @click="movePrivate">
@@ -44,7 +44,7 @@
                                             <DropdownMenu slot="list">
                                                 <DropdownItem>背景</DropdownItem>
                                                 <DropdownItem>素材</DropdownItem>
-                                                <DropdownItem>自定义</DropdownItem>
+                                                <DropdownItem>自定义商品</DropdownItem>
                                             </DropdownMenu>
                                         </Dropdown>
                                     </DropdownMenu>
@@ -114,11 +114,14 @@ export default {
         handlecustomGoods (data) {
             customGoods(data).then(res => {
                 console.log(res)
-                
+                //注释  这里需先完成商品库
             }).catch(err => {
                 console.log(err)
             })
         },
+        CustomGoodsRouter(){
+            //带参跳转至商品页
+        }
 
     },
     

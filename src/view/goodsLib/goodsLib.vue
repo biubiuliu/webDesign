@@ -113,6 +113,18 @@ export default {
 }
 </script>
 <style scoped>
+.select_box  /deep/ .ivu-select-selection {
+    color: white;
+    background: #293039;
+    border: 0;
+  }
+.select_box  /deep/ .ivu-select-item-selected {
+    /* background: #f90; */
+    color: black
+  }
+.select_box  /deep/ .ivu-select-item:hover {
+    background: #f90;
+  }
 .select_box{
     margin-top: 10px
 }

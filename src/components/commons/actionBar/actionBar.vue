@@ -12,7 +12,7 @@
         <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
         <Tooltip class="aliIcon" content="锁定"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
         <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
-        <canvas style="visibility: hidden;" id="canvas_crop"></canvas>
+        <!-- <canvas style="visibility: hidden;" id="canvas_crop"></canvas> -->
     </div>
 </div>
     

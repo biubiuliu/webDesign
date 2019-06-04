@@ -26,8 +26,7 @@ export const backgroundImg = (data) => {
     return axios.request({
         url: '/api/v1/add/backgroundImg',
         data: {
-            goods_id,
-            goods_img,
+            img_url,
             is_personal
         },
         method: 'post',
