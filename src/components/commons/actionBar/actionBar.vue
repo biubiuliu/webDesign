@@ -1,18 +1,18 @@
 <template>
 <div class="action_body">
     <div  class="actionBar">
-        <Tooltip class="aliIcon" content="上移一层"><i class="iconfont iconshangyiyiceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="下移一层"><i class="iconfont iconxiayiyiceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="上移顶层"><i class="iconfont icondingceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="下移底层"><i class="iconfont icondiceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="水平翻转"><i class="iconfont iconjingxiang1"></i></Tooltip>
-        <Tooltip class="aliIcon" content="垂直翻转"><i class="iconfont iconjingxiang2"></i></Tooltip>
-        <Tooltip class="aliIcon" content="裁剪"><i class="iconfont iconjianqie"></i></Tooltip>
-        <Tooltip class="aliIcon" content="复制图层"><i class="iconfont iconfuzhi"></i></Tooltip>
+        <Tooltip class="aliIcon" content="上移一层"><i @click="frontObject" class="iconfont iconshangyiyiceng"></i></Tooltip>
+        <Tooltip class="aliIcon" content="下移一层"><i @click="behindObject" class="iconfont iconxiayiyiceng"></i></Tooltip>
+        <Tooltip class="aliIcon" content="上移顶层"><i @click="frontObjectTop" class="iconfont icondingceng"></i></Tooltip>
+        <Tooltip class="aliIcon" content="下移底层"><i @click="behindObjectBottom" class="iconfont icondiceng"></i></Tooltip>
+        <Tooltip class="aliIcon" content="水平翻转"><i @click="flipXObject" class="iconfont iconjingxiang1"></i></Tooltip>
+        <Tooltip class="aliIcon" content="垂直翻转"><i @click="flipYObject" class="iconfont iconjingxiang2"></i></Tooltip>
+        <Tooltip class="aliIcon" content="裁剪"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
+        <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
         <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
         <Tooltip class="aliIcon" content="锁定"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
         <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
-
+        <canvas style="visibility: hidden;" id="canvas_crop"></canvas>
     </div>
 </div>
     
@@ -36,12 +36,64 @@ export default {
         ...mapActions([
             'saveState',
         ]),
+        //导出json格式
+        toJson(){
+            console.log(JSON.stringify(this.card.toJSON()));
+        },
+        // 上移一层
+        frontObject() {
+            this.selectedObj.bringForward()
+            this.saveState()
+        },
+        // 下移一层
+        behindObject() {
+            this.selectedObj.sendBackwards()
+            this.saveState()
+        },
+         // 上移顶层
+        frontObjectTop() {
+            this.selectedObj.bringToFront()
+            this.saveState()
+        },
+        // 下移底层
+        behindObjectBottom() {
+            this.selectedObj.sendToBack()
+            this.saveState()
+        },
+        // 水平翻转
+        flipXObject() {
+            this.selectedObj.set({
+            scaleX: -this.selectedObj.scaleX,
+            })
+            this.card.renderAll()
+            this.saveState()
+        },
+        // 垂直翻转
+        flipYObject() {
+            this.selectedObj.set({
+            scaleY: -selectedObj.scaleY,
+            })
+            this.card.renderAll()
+            this.saveState()
+        },
+        //裁剪
+        cutObject(){
+             //生成一个和待裁剪元素相同大小的矩形用于框选裁剪区域
+            console.log("nidaye")
+        },
+
+        getObjLeft(objWidth) {
+            return this.card.width / 2 - objWidth / 2;
+        },
+
+        getObjTop(objHeight) {
+            return this.card.height / 2 - objHeight / 2;
+        },
         // 90°旋转
         rotateObject() {
             this.selectedObj.rotate(this.selectedObj.angle === 360 ? 90 : this.selectedObj.angle + 90)
             // console.log('this.selectobj',this.selectedObj)
             this.card.renderAll()
-            this.card.setWidth(200)
             this.saveState()
         },
         // 移除Object
@@ -52,6 +104,7 @@ export default {
             this.card.renderAll()
             this.$store.dispatch('setSelectedObj', null)
         },
+        //锁定
         lockObject() {
             if (!this.selectedObj) return
             // this.selectedObj.selectable=false
@@ -59,7 +112,51 @@ export default {
             this.saveState()
             // this.$store.dispatch('setSelectedObj', null)
             console.log("锁定");
-        }
+        },
+        //复制粘贴
+        paste(_clipboard){
+            // clone again, so you can do multiple copies.
+            let card = this.card;
+            _clipboard.clone(function(clonedObj) {
+                card.discardActiveObject();
+                clonedObj.set({
+                    borderColor: '#f90',
+                    cornerColor: '#f90',
+                    cornerSize: 10,
+                    transparentCorners: false,
+                    cornerStyle: 'circle',
+                    borderDashArray: [3,3],
+                    angle: 0,
+                    left: clonedObj.left + 20,
+                    top: clonedObj.top + 20,
+                    evented: true,
+                });
+                if (clonedObj.type === 'activeSelection') {
+                    // active selection needs a reference to the canvas.
+                    clonedObj.card = card;
+                    clonedObj.forEachObject(function(obj) {
+                        card.add(obj);
+                    });
+                    // this should solve the unselectability
+                    clonedObj.setCoords();
+                } else {
+                    card.add(clonedObj);
+                }
+                _clipboard.top += 20;
+                _clipboard.left += 20;
+                card.setActiveObject(clonedObj);
+                // canvas.requestRenderAll();
+            });
+        },
+        copy(){
+        let card = this.card;
+        var _self = this;
+            card.getActiveObject().clone(function(cloned){
+                // let _clipboard = cloned;
+                _self.paste(cloned);
+                
+            })
+        },
     },
     
 }

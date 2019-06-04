@@ -41,14 +41,14 @@ name: "CanvasCard",
         console.log('mounted card');
         // 会员卡尺寸 85.5*54毫米 (标准)
         const card = this.self = new fabric.Canvas('canvas', {
-            backgroundColor: 'pink',
+            backgroundColor: '#E3E0D5',
         })
         card.setWidth(this.cvsW)
         card.setHeight(this.cvsH)
         card.selection = false
         card.hasControls = false
         // card.borderColor = '#ff8d23'
-        card.preserveObjectStacking = false // 禁止选中图层时自定置于顶部
+        card.preserveObjectStacking = true // 禁止选中图层时自定置于顶部
 
         //设置比实际大的canvas,解决高清屏幕下图片模糊
         // card.setWidth(this.cW * this.dpr)
@@ -68,11 +68,11 @@ name: "CanvasCard",
         ]),
         addCardEventListener(card) {
             card.on('object:added', (e) => {
-            console.log('object:added')
+            console.log('object:added',e)
             // this.saveState()
             })
             card.on('object:modified', (e) => {
-            console.log('object:modified')
+            console.log('object:modified',e)
             this.saveState()
             })
             card.on('object:removed', (e) => {
@@ -95,6 +95,7 @@ name: "CanvasCard",
             console.log('selection:cleared')
             this.setSelectedObj(null)
             })
+
         },
     },
 

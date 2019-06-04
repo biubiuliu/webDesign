@@ -36,7 +36,7 @@ module.exports = {
         cssSourceMap: true
     },
     baseUrl: {
-        dev: 'https://mall.mingdiao.com.cn',
+        dev: 'https://yy.mingdiao.com.cn/collocationServers/public/index.php',
         pro: 'https://produce.com'
     },
     build: {

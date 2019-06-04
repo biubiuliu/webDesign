@@ -50,6 +50,7 @@
 <script>
 import { fabric } from 'fabric'
 import {mapGetters, mapActions} from 'vuex'
+import { getmaterial } from '@/api/material.js'
 export default {
     name: 'materialLib',
     data() {
@@ -101,10 +102,13 @@ export default {
     watch: {
     // 监听object选中变化
     // 图层layer滚动到对应object
-    selectedObj() {
-        // console.log('selectedObj change');
-    }
-},
+        selectedObj() {
+            // console.log('selectedObj change');
+        }
+    },
+    created() {
+        this.handleGetgetmaterial(0)
+    },
     methods: {
         ...mapActions([
             'saveState',
@@ -126,6 +130,7 @@ export default {
                 angle: 0,
                 left: 100,
                 top: 100,
+                src:e.target.src
             });
             card.add(img).setActiveObject(img)
 
@@ -160,6 +165,15 @@ export default {
             let privateId = document.getElementById("privateId")
             this.removeClass(privateId,"active");  
             this.addClass(commonsId,"active"); 
+        },
+        //请求素材库api
+        handleGetgetmaterial (is_personal) {
+            getmaterial(is_personal).then(res => {
+                console.log(res)
+                
+            }).catch(err => {
+                console.log(err)
+            })
         },
     },
     
