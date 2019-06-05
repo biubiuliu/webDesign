@@ -1,6 +1,5 @@
 import axios from 'axios'
 import store from '@/store'
-// import { Spin } from 'iview'
 const addErrorLog = errorInfo => {
     const { statusText, status, request: { responseURL } } = errorInfo
     let info = {
@@ -20,32 +19,24 @@ class HttpRequest {
     getInsideConfig() {
         const config = {
             baseURL: this.baseUrl,
-            headers: {
-                //
-            }
+            headers: {}
         }
         return config
     }
     destroy(url) {
         delete this.queue[url]
-        if (!Object.keys(this.queue).length) {
-            // Spin.hide()
-        }
     }
     interceptors(instance, url) {
         // 请求拦截
         instance.interceptors.request.use(config => {
-                // 添加全局的loading...
-                if (!Object.keys(this.queue).length) {
-                    // Spin.show() // 不建议开启，因为界面不友好
-                }
-                this.queue[url] = true
+                store.state.app.isShowSpin = true; //在请求发出之前进行一些操作
                 return config
             }, error => {
                 return Promise.reject(error)
             })
             // 响应拦截
         instance.interceptors.response.use(res => {
+            store.state.app.isShowSpin = false; //在这里对返回的数据进行处理
             this.destroy(url)
             const { data, status } = res
             return { data, status }

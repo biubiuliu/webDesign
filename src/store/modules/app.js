@@ -4,6 +4,7 @@ const app = {
         cvsW: 780,
         cvsH: 780,
         proDetailVal: {},
+        isShowSpin: false,
         // drag
         cardType: 1,
         frontCard: null,
