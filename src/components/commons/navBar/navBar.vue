@@ -1,7 +1,8 @@
 <template>
     <div :style="{position: 'fixed', width: '100%', minWidth:'800px'}">
         <Menu mode="horizontal" theme="dark" id="dark" active-name="1">
-            <div class="layout-logo"></div>
+            <div class="layout-logo">
+            </div>
             <div class="layout-nav">
                 <MenuItem name="我的设计" to="/home/mydesign">
                     我的设计
@@ -52,6 +53,7 @@ export default {
         position: relative;
         top: 15px;
         left: 20px;
+        
     }
     .layout-nav{
         margin-right: 50px;
