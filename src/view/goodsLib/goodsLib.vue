@@ -1,14 +1,14 @@
 <template>
     <div class="goodList_body">
         <Spin fix v-if="this.$store.state.app.isShowSpin">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
-            </Spin>
+            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+            <div>Loading</div>
+        </Spin>
         <div class="select_box">
             <Select v-model="selsectBrand" size="small"  style="width:100px" placeholder="品牌" clearable id="select1"
                     @on-change="ChangebrandOpt">
-                <Option v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.brandName" class="option">
-                    <span>{{item.brandName}}{{item.bid}}</span>
+                <Option v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name" class="option">
+                    <span>{{item.name}}</span>
                 </Option>
             </Select>
             <Select v-model="selsectStyle" size="small"  placeholder="风格" clearable style="width:100px" id="select2"
@@ -135,8 +135,6 @@ export default {
                 this.brandArr = res.data.message.brand
                 this.styleArr = res.data.message.style
                 this.classifyArr = res.data.message.category
-                // this.classifySonArr = res.data.message.category
-            console.log('------------------', res.data.message)
             }).catch(err=>{
                 console.log( err)
             })

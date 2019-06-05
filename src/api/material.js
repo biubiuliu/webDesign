@@ -9,6 +9,28 @@ export const getmaterial = (is_personal) => {
             method: 'get',
         })
     }
+    // 保存方案 添加/编辑 方案
+export const getSaveScheme = (data) => {
+        return axios.request({
+            url: '/api/v1/create/createScheme',
+            data: {
+                id,
+                done_img_url,
+                canvas_type,
+                is_personal,
+                scheme_name,
+                background_id,
+                space_type,
+                space_type,
+                style_type,
+                phone,
+                address,
+                goods_site_list,
+                material_site_list,
+            },
+            method: 'post',
+        })
+    }
     //上传图片
 export const customGoods = (data) => {
         return axios.request({
@@ -54,8 +76,15 @@ export const goodsList = (page, style_id, keywords, brand_id, category_id) => {
 
 //品牌-风格-分类列表
 export const category = () => {
+        return axios.request({
+            url: '/api/v1/get/goods/category',
+            method: 'get',
+        })
+    }
+    // 枚举列表（风格、空间）
+export const getEnumList = () => {
     return axios.request({
-        url: '/api/v1/get/goods/category',
+        url: 'api/v1/get/enumList',
         method: 'get',
     })
 }

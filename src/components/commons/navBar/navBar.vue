@@ -33,9 +33,9 @@
 export default {
     name: 'navBar',
     data(){
-       return{
-           aa: 'd'
-       }
+        return{
+            aa: 'd'
+        }
     },
     methods: {
     },

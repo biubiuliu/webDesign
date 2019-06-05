@@ -45,7 +45,7 @@ name: "CanvasCard",
         })
         card.setWidth(this.cvsW)
         card.setHeight(this.cvsH)
-        card.selection = false
+        card.selection = true  //选中一个组
         card.hasControls = false
         // card.borderColor = '#ff8d23'
         card.preserveObjectStacking = true // 禁止选中图层时自定置于顶部
@@ -65,6 +65,7 @@ name: "CanvasCard",
             'initFrontCard',
             'setSelectedObj',
             'saveState',
+            'setIsLocking',
         ]),
         addCardEventListener(card) {
             card.on('object:added', (e) => {
@@ -88,7 +89,8 @@ name: "CanvasCard",
             this.setSelectedObj(e.target)
             })
             card.on('selection:updated', (e) => {
-            console.log('selection:updated', e.target)
+            console.log('selection:updated', e.target.hasControls)
+            this.setIsLocking(e.target.hasControls)
             this.setSelectedObj(e.target)
             })
             card.on('selection:cleared', (e) => {

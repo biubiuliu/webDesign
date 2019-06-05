@@ -5,12 +5,14 @@ const app = {
         cvsH: 780,
         proDetailVal: {},
         isShowSpin: false,
+        isLocking: true,
         // drag
         cardType: 1,
         frontCard: null,
         behindCard: null,
         undoList: [],
         selectedObj: null,
+        previewImg: null,
 
 
     },
@@ -24,6 +26,9 @@ const app = {
         },
         SET_CVS_STATE: (state, cvsState) => {
             state.cvsState = cvsState
+        },
+        SET_LOCK: (state, isLocking) => {
+            state.isLocking = isLocking
         },
         // drag -s
         SET_SELECTEDOBJ: (state, object) => {
@@ -44,7 +49,10 @@ const app = {
         ADD_UNDO: (state, canvasState) => {
             state.undoList.push(canvasState)
         },
-        // drag  -e
+        SET_PREVIEW_IMG: (state, img) => {
+                state.previewImg = img
+            }
+            // drag  -e
 
     },
     actions: {
@@ -59,6 +67,9 @@ const app = {
         },
         setCanvasState({ commit }, cvsState) {
             commit('SET_CVS_STATE', cvsState)
+        },
+        setIsLocking({ commit }, isLocking) {
+            commit('SET_LOCK', isLocking)
         },
         // darg
         initFrontCard({ commit }, fCanvas) {
@@ -93,7 +104,11 @@ const app = {
             ]))
 
             // console.log(state.canvasState)
-        }
+        },
+        // 预览图片
+        setPreviewImg({ commit }, img) {
+            commit('SET_PREVIEW_IMG', img)
+        },
 
 
     }

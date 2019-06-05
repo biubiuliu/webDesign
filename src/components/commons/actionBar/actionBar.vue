@@ -7,26 +7,35 @@
         <Tooltip class="aliIcon" content="下移底层"><i @click="behindObjectBottom" class="iconfont icondiceng"></i></Tooltip>
         <Tooltip class="aliIcon" content="水平翻转"><i @click="flipXObject" class="iconfont iconjingxiang1"></i></Tooltip>
         <Tooltip class="aliIcon" content="垂直翻转"><i @click="flipYObject" class="iconfont iconjingxiang2"></i></Tooltip>
+        <Tooltip class="aliIcon" content="等比例缩放"><i @click="zoomObject" class="iconfont iconsuofang1"></i></Tooltip>
         <Tooltip class="aliIcon" content="裁剪"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
         <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
         <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
-        <Tooltip class="aliIcon" content="锁定"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
+        <Tooltip class="aliIcon" content="锁定" v-if="isLocking"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
+        <Tooltip class="aliIcon" content="取消锁定" v-else><i @click="cancellockObject" class="iconfont iconjiesuo1"></i></Tooltip>
         <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
+        <Tooltip class="aliIcon" content="保存"><i @click="toJson" class="iconfont iconshanchu"></i></Tooltip>
         <!-- <canvas style="visibility: hidden;" id="canvas_crop"></canvas> -->
     </div>
 </div>
     
 </template>
 <script>
-import {mapGetters, mapActions} from 'vuex'
+import {mapState, mapGetters, mapActions} from 'vuex'
 export default {
     name: 'actionBar',
     data() {
         return {
-            msg: '操作'
+            msg: '操作',
+            isLock:true,
         }
     },
     computed: {
+        ...mapState({
+            isLocking: state =>{
+            return state.app.isLocking
+            },
+        }),
         ...mapGetters([
             'card',
             'selectedObj',
@@ -63,7 +72,7 @@ export default {
         // 水平翻转
         flipXObject() {
             this.selectedObj.set({
-            scaleX: -this.selectedObj.scaleX,
+                scaleX: -this.selectedObj.scaleX,
             })
             this.card.renderAll()
             this.saveState()
@@ -71,7 +80,7 @@ export default {
         // 垂直翻转
         flipYObject() {
             this.selectedObj.set({
-            scaleY: -selectedObj.scaleY,
+                scaleY:-this.selectedObj.scaleY,
             })
             this.card.renderAll()
             this.saveState()
@@ -80,14 +89,6 @@ export default {
         cutObject(){
              //生成一个和待裁剪元素相同大小的矩形用于框选裁剪区域
             console.log("nidaye")
-        },
-
-        getObjLeft(objWidth) {
-            return this.card.width / 2 - objWidth / 2;
-        },
-
-        getObjTop(objHeight) {
-            return this.card.height / 2 - objHeight / 2;
         },
         // 90°旋转
         rotateObject() {
@@ -104,14 +105,46 @@ export default {
             this.card.renderAll()
             this.$store.dispatch('setSelectedObj', null)
         },
+        //等比例缩放
+        zoomObject() {
+            if(this.selectedObj.scaleX < 0.02 || this.selectedObj.scaleY < 0.03){
+                this.$Message.error({
+                    content: '图片已到最小,自动删除,如需要,请重新添加',
+                    duration: 10,
+                    closable: true
+                });
+                this.removeObject()
+                return;
+            }
+            this.selectedObj.scaleX -= 50/this.selectedObj.width, 
+            this.selectedObj.scaleY -= 50/this.selectedObj.height
+            this.card.renderAll()
+            this.saveState()
+        },
         //锁定
         lockObject() {
             if (!this.selectedObj) return
-            // this.selectedObj.selectable=false
+            this.selectedObj.hasControls = false;
+            this.selectedObj.lockScalingX = this.card.item(0).lockScalingY = true;
+            this.selectedObj.lockMovementX = true;
+            this.selectedObj.lockMovementY = true;
+            this.card.renderAll()
+            this.saveState()
+            this.$store.state.app.isLocking = this.selectedObj.hasControls
+            console.log("锁定",this.selectedObj);
+        },
+        //取消锁定
+        cancellockObject() {
+            if (!this.selectedObj) return
+            this.selectedObj.hasControls = true;
+            this.selectedObj.lockScalingX = this.selectedObj.lockScalingY = false;
+            this.selectedObj.lockMovementX = false;
+            this.selectedObj.lockMovementY = false;
+            this.$store.state.app.isLocking = this.selectedObj.hasControls
             this.card.renderAll()
             this.saveState()
             // this.$store.dispatch('setSelectedObj', null)
-            console.log("锁定");
+            console.log("取消锁定",this.selectedObj);
         },
         //复制粘贴
         paste(_clipboard){
