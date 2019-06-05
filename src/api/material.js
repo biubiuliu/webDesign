@@ -22,17 +22,14 @@ export const customGoods = (data) => {
         })
     }
     //上传背景图片
-export const backgroundImg = (data) => {
+export const backgroundImg = (params) => {
         return axios.request({
             url: '/api/v1/add/backgroundImg',
-            data: {
-                img_url,
-                is_personal
-            },
+            data: params,
             headers: {
-                'sessionKey': 'sessionKey ',
-                "sign": 'sign',
-                "timestamp": 'timestamp',
+                // 'sessionKey': 'sessionKey ',
+                // "sign": 'sign',
+                // "timestamp": 'timestamp',
             },
             method: 'post',
         })
@@ -57,5 +54,14 @@ export const category = () => {
     return axios.request({
         url: '/api/v1/get/goods/category',
         method: 'get',
+    })
+}
+
+// 添加素材
+export const addMaterial = (params) => {
+    return axios.request({
+        url: '/api/v1/add/materialInfo',
+        data: params,
+        method: 'post',
     })
 }
