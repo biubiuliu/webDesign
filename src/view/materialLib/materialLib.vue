@@ -15,7 +15,7 @@
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="bgImg in bgUrl" :key="bgImg.id">
-                        <img :src="bgImg.src" @click="selectDecorate" alt="图片丢失">
+                        <img :src="bgImg.img_url" @click="selectDecorate" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -25,8 +25,8 @@
                     <span>全部 <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
-                    <li class="reuseLi" v-for="bgImg in backgroundImgArr" :key="bgImg.id">
-                        <img :src="bgImg.src" alt="图片丢失">
+                    <li class="reuseLi" v-for="bgImg in materialBgImgArr" :key="bgImg.id">
+                        <img :src="bgImg.material_img"  @click="selectDecorate" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -36,8 +36,8 @@
                     <span>全部 <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
-                    <li class="reuseLi" v-for="bgImg in backgroundImgArr" :key="bgImg.id">
-                        <img :src="bgImg.src" alt="图片丢失">
+                    <li class="reuseLi" v-for="bgImg in goodsBgImgArr" :key="bgImg.goods_id">
+                        <img :src="bgImg.pic_image"  @click="selectDecorate" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -57,40 +57,26 @@ export default {
         return {
             msg: '这是素材库',
             bgUrl: [
-                {
-                'id': 5,
-                'src': 'https://mdproduct.oss-cn-shenzhen.aliyuncs.com/images/201807/source_img/2204_P_1531341193163.jpg'
-                },
-                {
-                'id': 6,
-                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/04/28/edc7426a73e5cc5fb717472194c5b7e6.jpg'
-                },
-                {
-                'id': 49,
-                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/14/3ef8d4df3ab739a99e361924e3c71319.jpg'
-                },
-                {
-                'id': 48,
-                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/06/382cc9c4ffb493704502b64130713b8f.jpg'
-                },
-                {
-                'id': 47,
-                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/06/a55f49a0a8c6ef14f5ddcbc99e1f8525.jpg'
-                },
-                {
-                'id': 59,
-                'src': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/14/3ef8d4df3ab739a99e361924e3c71319.jpg'
-                },
+                // {
+                // 'id': 5,
+                // 'img_url': 'https://mdproduct.oss-cn-shenzhen.aliyuncs.com/images/201807/source_img/2204_P_1531341193163.jpg'
+                // },
+                // {
+                // 'id': 6,
+                // 'img_url': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/04/28/edc7426a73e5cc5fb717472194c5b7e6.jpg'
+                // },
+                // {
+                // 'id': 49,
+                // 'img_url': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/14/3ef8d4df3ab739a99e361924e3c71319.jpg'
+                // },
+                // {
+                // 'id': 48,
+                // 'img_url': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/06/382cc9c4ffb493704502b64130713b8f.jpg'
+                // },
             ],
             isRoow: true,
-            backgroundImgArr:[
-                {src:require('./images.jpg'),id:'1'},
-                {src:require('./images.jpg'),id:'2'},
-                {src:require('./images.jpg'),id:'3'},
-                {src:require('./images.jpg'),id:'4'},
-                {src:require('./images.jpg'),id:'5'},
-                {src:require('./images.jpg'),id:'6'}
-            ]
+            goodsBgImgArr:[],
+            materialBgImgArr:[]
         }
     },
     computed: {
@@ -130,12 +116,14 @@ export default {
                 angle: 0,
                 left: 100,
                 top: 100,
+                scaleX: 200/img.width, 
+                scaleY: 200/img.height ,
                 src:e.target.src
-            });
+            }); 
             card.add(img).setActiveObject(img)
-
+            // img.crossOrigin = 'Anonymous';   
             this.saveState()
-            })
+            },{crossOrigin: 'anonymous'})
         },
         // 判断有class是否存在
         hasClass(obj, cls) {  
@@ -169,7 +157,10 @@ export default {
         //请求素材库api
         handleGetgetmaterial (is_personal) {
             getmaterial(is_personal).then(res => {
-                console.log(res)
+                this.bgUrl = res.data.message.backgroundImg
+                this.goodsBgImgArr = res.data.message.goods
+                this.materialBgImgArr = res.data.message.meater
+                console.log("素材库",res.data.message)
                 
             }).catch(err => {
                 console.log(err)
@@ -205,7 +196,7 @@ export default {
 
 }
 .comm_body{
-    padding: 20px 40px;
+    padding: 20px 30px;
     width: 400px;
 }
 .materialBg_title{
@@ -214,15 +205,18 @@ export default {
 }
 .reuseUl{
     width: 100%;
-    height: 200px;
+    height: auto;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    flex-wrap: wrap
+    justify-content: start;
+    flex-wrap: wrap;
 }
 .reuseLi{
+    width: 100px;
+    height: 100px;
+    background: white;
     list-style: none;
-    flex: 1
+    margin:10px 0 0 10px
 
 }
 .reuseLi>img{

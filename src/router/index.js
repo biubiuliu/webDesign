@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import home from '@/components/commons/home/home'
 import login from '@/components/commons/login/login'
 import designHome from '@/components/commons/designHome/designHome'
+import Preview from '@/view/Preview/Preview'
 
 
 Vue.use(Router)
@@ -80,6 +81,11 @@ export default new Router({
 
             ]
 
+        },
+        {
+            path: '/Preview',
+            name: 'Preview',
+            component: Preview
         },
         {
             path: '/HelloWorld',

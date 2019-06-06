@@ -5,6 +5,7 @@ const getters = {
     cardType: state => state.app.cardType,
     card: state => state.app.cardType === 1 ? state.app.frontCard : state.app.behindCard,
     selectedObj: state => state.app.selectedObj,
+    previewImg: state => state.app.previewImg,
 
 }
 export default getters;
