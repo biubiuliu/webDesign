@@ -1,5 +1,6 @@
 //素材库Api 点击素材库，获取素材库默认列表（包含素材，背景，自定义商品）
 import axios from '@/libs/api.request'
+import qs from 'qs'
 export const getmaterial = (is_personal) => {
         return axios.request({
             url: '/api/v1/get/materials',
@@ -10,28 +11,14 @@ export const getmaterial = (is_personal) => {
         })
     }
     // 保存方案 添加/编辑 方案
-export const getSaveScheme = (data) => {
+export const getSaveScheme = (imgObject) => {
         return axios.request({
             url: '/api/v1/create/createScheme',
-            data: {
-                id,
-                done_img_url,
-                canvas_type,
-                is_personal,
-                scheme_name,
-                background_id,
-                space_type,
-                space_type,
-                style_type,
-                phone,
-                address,
-                goods_site_list,
-                material_site_list,
-            },
+            data: qs.stringify(imgObject),
             method: 'post',
         })
     }
-    //上传图片
+    //上传自定义图片
 export const customGoods = (data) => {
         return axios.request({
             url: '/api/v1/add/customGoods',
@@ -40,6 +27,14 @@ export const customGoods = (data) => {
                 goods_img,
                 is_personal
             },
+            method: 'post',
+        })
+    }
+    //上传图片
+export const uploadImg = (file) => {
+        return axios.request({
+            url: '/api/v1/upload/img',
+            data: file,
             method: 'post',
         })
     }

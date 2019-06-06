@@ -41,12 +41,15 @@ name: "CanvasCard",
         console.log('mounted card');
         // 会员卡尺寸 85.5*54毫米 (标准)
         const card = this.self = new fabric.Canvas('canvas', {
-            backgroundColor: '#E3E0D5',
+            backgroundColor: 'white',
         })
         card.setWidth(this.cvsW)
         card.setHeight(this.cvsH)
         card.selection = true  //选中一个组
         card.hasControls = false
+        card.imgType1=null
+        card.imgType2=null
+        card.imgType3=null
         // card.borderColor = '#ff8d23'
         card.preserveObjectStacking = true // 禁止选中图层时自定置于顶部
 
@@ -55,9 +58,7 @@ name: "CanvasCard",
         // card.setHeight(this.cH * this.dpr)
         this.addCardEventListener(card)
         this.initFrontCard(card)
-        
         this.saveState()
-        console.log("test",card)
     },
 
     methods: {
@@ -69,15 +70,15 @@ name: "CanvasCard",
         ]),
         addCardEventListener(card) {
             card.on('object:added', (e) => {
-            console.log('object:added',e)
+            // console.log('object:added',e)
             // this.saveState()
             })
             card.on('object:modified', (e) => {
-            console.log('object:modified',e)
+            // console.log('object:modified',e)
             this.saveState()
             })
             card.on('object:removed', (e) => {
-            console.log('object:removed')
+            // console.log('object:removed')
             this.saveState()
             })
             // card.on('object:selected', (e) => {
@@ -85,16 +86,16 @@ name: "CanvasCard",
             //   this.setSelectedObj(e.target)
             // })
             card.on('selection:created', (e) => {
-            console.log('selection:created', e.target)
+            // console.log('selection:created', e.target)
             this.setSelectedObj(e.target)
             })
             card.on('selection:updated', (e) => {
-            console.log('selection:updated', e.target.hasControls)
+            // console.log('selection:updated', e.target.hasControls)
             this.setIsLocking(e.target.hasControls)
             this.setSelectedObj(e.target)
             })
             card.on('selection:cleared', (e) => {
-            console.log('selection:cleared')
+            // console.log('selection:cleared')
             this.setSelectedObj(null)
             })
 

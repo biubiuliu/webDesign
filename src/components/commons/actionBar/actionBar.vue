@@ -14,7 +14,6 @@
         <Tooltip class="aliIcon" content="锁定" v-if="isLocking"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
         <Tooltip class="aliIcon" content="取消锁定" v-else><i @click="cancellockObject" class="iconfont iconjiesuo1"></i></Tooltip>
         <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
-        <Tooltip class="aliIcon" content="保存"><i @click="toJson" class="iconfont iconshanchu"></i></Tooltip>
         <!-- <canvas style="visibility: hidden;" id="canvas_crop"></canvas> -->
     </div>
 </div>
@@ -46,9 +45,9 @@ export default {
             'saveState',
         ]),
         //导出json格式
-        toJson(){
-            console.log(JSON.stringify(this.card.toJSON()));
-        },
+        // toJson(){
+        //     console.log(JSON.stringify(this.card.toJSON()));
+        // },
         // 上移一层
         frontObject() {
             this.selectedObj.bringForward()

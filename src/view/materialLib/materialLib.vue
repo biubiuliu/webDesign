@@ -14,8 +14,8 @@
                     <span>全部 <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
-                    <li class="reuseLi" v-for="bgImg in bgUrl" :key="bgImg.id">
-                        <img :src="bgImg.img_url" @click="selectDecorate" alt="图片丢失"  crossorigin="anonymous">
+                    <li class="reuseLi" v-for="bgImg in bgUrl"  :key="bgImg.id" >
+                        <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -26,7 +26,7 @@
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="bgImg in materialBgImgArr" :key="bgImg.id">
-                        <img :src="bgImg.material_img"  @click="selectDecorate" alt="图片丢失"  crossorigin="anonymous">
+                        <img :src="bgImg.material_img"  @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -37,7 +37,7 @@
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="bgImg in goodsBgImgArr" :key="bgImg.goods_id">
-                        <img :src="bgImg.pic_image"  @click="selectDecorate" alt="图片丢失"  crossorigin="anonymous">
+                        <img :src="bgImg.pic_image"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -100,10 +100,34 @@ export default {
             'saveState',
         ]),
         // 选择装饰
+        // 将背景图片渲染到canvas
         selectDecorate(e) {
-            console.log('装饰',e);
             const card = this.card
-            console.log('card',card);
+            if (!card) return
+            fabric.Image.fromURL(e.target.src, (img) => {
+            img.set({
+                borderColor: '#f90',
+                cornerColor: '#f90',
+                cornerSize: 10,
+                transparentCorners: false,
+                cornerStyle: 'circle',
+                borderDashArray: [3,3],
+                angle: 0,
+                scaleX: card.width / img.width /2, 
+                scaleY: card.width / img.height /2,
+                left: 100,
+                top: 100,
+                src:e.target.src,
+                imgType:0, // imgType:0背景,1素材 2自定义商品
+                backgroundImgId:e.target.id
+            });  
+            card.add(img).setActiveObject(img)  
+            this.saveState()
+            },{crossOrigin: 'anonymous'})
+        },
+        // 将素材图片渲染到canvas
+        selectDecorateMaterial(e) {
+            const card = this.card
             if (!card) return
             fabric.Image.fromURL(e.target.src, (img) => {
             img.set({
@@ -118,7 +142,35 @@ export default {
                 top: 100,
                 scaleX: 200/img.width, 
                 scaleY: 200/img.height ,
-                src:e.target.src
+                src:e.target.src,
+                imgType:1,
+                backgroundImgId:e.target.id
+            }); 
+            card.add(img).setActiveObject(img)
+            // img.crossOrigin = 'Anonymous';   
+            this.saveState()
+            },{crossOrigin: 'anonymous'})
+        },
+        // 将自定义商品图片渲染到canvas
+        selectDecorateGoods(e) {
+            const card = this.card
+            if (!card) return
+            fabric.Image.fromURL(e.target.src, (img) => {
+            img.set({
+                borderColor: '#f90',
+                cornerColor: '#f90',
+                cornerSize: 10,
+                transparentCorners: false,
+                cornerStyle: 'circle',
+                borderDashArray: [3,3],
+                angle: 0,
+                left: 100,
+                top: 100,
+                scaleX: 200/img.width, 
+                scaleY: 200/img.height ,
+                src:e.target.src,
+                imgType:2,
+                backgroundImgId:e.target.id
             }); 
             card.add(img).setActiveObject(img)
             // img.crossOrigin = 'Anonymous';   
@@ -160,7 +212,6 @@ export default {
                 this.bgUrl = res.data.message.backgroundImg
                 this.goodsBgImgArr = res.data.message.goods
                 this.materialBgImgArr = res.data.message.meater
-                console.log("素材库",res.data.message)
                 
             }).catch(err => {
                 console.log(err)
@@ -172,7 +223,7 @@ export default {
 </script>
 <style scoped>
 .materialLib{
-
+    height: 95vh;
 }
 .tag{
     width: 400px;
@@ -185,7 +236,7 @@ export default {
     cursor: pointer;
 }
 .commons_room{
-    width: 100px
+    width: 100px;
 }
 .private_room{
     width: 100px

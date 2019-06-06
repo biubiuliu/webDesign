@@ -36,19 +36,19 @@
                 <Card shadow>
                     <p slot="title">选择画布尺寸</p>
                     <RadioGroup v-model="vertical" vertical @on-change="CanvasSizeFun">
-                        <Radio label="0">
+                        <Radio label="1">
                             <Icon type="social-apple"></Icon>
                             <span>1 : 1</span>
                         </Radio>
-                        <Radio label="1">
+                        <Radio label="2">
                             <Icon type="social-android"></Icon>
                             <span>A3 竖排</span>
                         </Radio>
-                        <Radio label="2">
+                        <Radio label="3">
                             <Icon type="social-windows"></Icon>
                             <span>A3 横排</span>
                         </Radio>
-                        <Radio label="3">
+                        <Radio label="4">
                             <Icon type="social-windows"></Icon>
                             <span>16 : 9</span>
                         </Radio>
@@ -64,40 +64,40 @@
             @on-ok="shemeInfoModalok"
             @on-cancel="shemeInfoModalcancel">
             <div>
-                <Form :model="formItem" >
+                <Form :model="imgObject" >
                     <FormItem>
-                        <Input v-model="formItem.input" placeholder="填写方案名称"></Input>
+                        <Input v-model="imgObject.scheme_name" placeholder="填写方案名称"></Input>
                     </FormItem>
                     <FormItem>
                         <Row>
                             <Col span="10">
                             <!-- @on-open-change ="handleGetEnumList(1)" -->
-                                <Select v-model="formItem.selectRoom"  placeholder="#选择空间#">
+                                <Select v-model="imgObject.space_type"  placeholder="#选择空间#">
                                     <Option v-for="(item,index) in selectRoomArr" :key="index" :value="item.id" >{{item.name}}</Option>
 
                                 </Select>
                             </Col>
                             <Col span="10" offset="4">
-                                <Select v-model="formItem.selectStyle"  placeholder="#选择风格#">
+                                <Select v-model="imgObject.style_type"  placeholder="#选择风格#">
                                     <Option v-for="(item,index) in selectStyleArr" :key="index" :value="item.id" >{{item.name}}</Option>
                                 </Select>
                             </Col>
                         </Row>
                     </FormItem>
                     <FormItem>
-                        <Input v-model="formItem.input" placeholder="填写客户名称"></Input>
+                        <Input v-model="imgObject.customer_name" placeholder="填写客户名称"></Input>
                     </FormItem>
                     <FormItem>
-                        <Input v-model="formItem.input" placeholder="填写客户手机号"></Input>
+                        <Input v-model="imgObject.phone" placeholder="填写客户手机号"></Input>
                     </FormItem>
                     <FormItem label="是否公开">
-                        <i-switch v-model="formItem.switch" @on-change="isOpenFun"  size="large">
+                        <i-switch v-model="imgObject.is_personal" true-value="true" false-value="false"  @on-change="isOpenFun"  size="large">
                             <span slot="open" >公开</span>
-                            <span slot="close">个人</span>
+                            <span slot="close" >个人</span>
                         </i-switch>
                     </FormItem>
                     <FormItem>
-                        <Input v-model="formItem.textarea" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="填写客户楼盘地址"></Input>
+                        <Input v-model="imgObject.address" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="填写客户楼盘地址"></Input>
                     </FormItem>
                 </Form>
             </div>
@@ -106,7 +106,8 @@
 </template>
 <script>
 import { mapState, mapGetters, mapActions  } from 'vuex';
-import { getEnumList } from '@/api/material.js'
+import { getEnumList, getSaveScheme,uploadImg } from '@/api/material.js'
+import qs from 'qs'
 export default {
     name: 'designBar',
     data() {
@@ -115,30 +116,47 @@ export default {
             vertical: '0',
             isShowCvs: false,
             shemeInfoModal:false,
-            formItem: {
-                    input: '',
-                    selectRoom: '',
-                    selectStyle: '',
-                    switch: true,
-                    textarea: ''
-                },
             imgObject:{
-                id:"",//方案id（编辑方案使用）
-                done_img_url:"",//方案大图url
-                canvas_type:"",//方案id（编辑方案使用）
-                canvas_type:"",//画布类型（1：1:1，2：A3横排，3：A3竖排，4：16:9）
-                is_personal:"",//	公开类型（0：公共（默认）， 1：个人）
-                scheme_name:"",//方案名称
-                background_id:"",//背景图id
-                space_type:"",//空间类型
-                style_type:"",//风格类型
-                phone:"",//手机
-                address:"",//	地址
-                goods_site_list:"",//单品信息
-                material_site_list:"",//素材信息
+                id: null, // 方案id（编辑方案使用）
+                done_img_url: '', // 方案大图url 1
+                canvas_type: null, // 方案id（编辑方案使用）1
+                canvas_type: null, // 画布类型（1：1:1，2：A3横排，3：A3竖排，4：16:9）1
+                is_personal: true,//	公开类型（0：公共（默认）， 1：个人）1
+                scheme_name: "", // 方案名称1
+                background_id: null, // 背景图id1
+                space_type: null, // 空间类型1
+                style_type: null, // 风格类型1
+                phone: "", // 手机1
+                address: "", //	地址1
+                goods_site_list:[
+                    {
+                        "goods_id":123,  					//商品（包括自定义商品）id
+                        "img_id":272,    					//商品图片id
+                        "coordinate_luper":"23,35",		//左上角坐标
+                        "coordinate_ruper":"23,35",		//右上角坐标
+                        "coordinate_rdown":"23,35",		//右下角坐标
+                        "coordinate_ldown":"23,35",		//左下角坐标
+                        "cut_image":"http=>jfajdlfa",		//裁剪图片url (没有为空)
+                        "is_mirror":0						//是否镜像翻转（默认0：不翻转，1：翻转）
+                    },
+                ],
+                material_site_list:[
+                    {
+                        "material_id":123,				//素材id
+                        "coordinate_luper":"23,35",		//左上角坐标
+                        "coordinate_ruper":"23,35",		//右上角坐标
+                        "coordinate_rdown":"23,35",		//右下角坐标
+                        "coordinate_ldown":"23,35",		//左下角坐标
+                        "cut_image":"http=>jfajdlfa",		//裁剪图片url (没有为空)
+                        "is_mirror":0						//是否镜像翻转（默认0：不翻转，1：翻转）
+                    },
+                ],
+                customer_name:""
             },
+            imgFile:{},
             selectRoomArr:[],
-            selectStyleArr:[]
+            selectStyleArr:[],
+            canvasDataArr:[] //画布数据
         }
     },
     computed: {
@@ -151,15 +169,20 @@ export default {
             },
             cvsH: state =>{
                 return state.app.cvsH
+            },
+            canvasInfo: state =>{
+                return state.app.canvasInfo
             }
         }),
         ...mapGetters([
             'card',
             'selectedObj',
+            'selectedBgObj',
         ])
     },
     mounted() {
         this.handleGetEnumList()
+        
     },
     methods: {
         ...mapActions([
@@ -167,10 +190,17 @@ export default {
             'setCanvasH',
             'setCanvasState',
             'setPreviewImg',
-            'saveState'
+            'saveState',
         ]),
         shemeInfoModalok () {
+                this.toJson()
+                this.imgObject.is_personal = this.imgObject.is_personal?0:1
+                this.imgObject.canvas_type = parseInt(this.vertical) 
+                this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
+                // this.imgObject = qs.stringify(this.imgObject)
                 this.$Message.info('Clicked ok');
+                this.handleGetSaveScheme(this.imgObject)
+                console.log("bgid",this.selectedObj.backgroundImgId)
             },
         shemeInfoModalcancel () {
             this.$Message.info('Clicked cancel');
@@ -182,12 +212,52 @@ export default {
         //保存方案
         saveScheme(){
             this.shemeInfoModal = true;
-            console.log("保存方案")
-            this.toJson()
+            // this.toJson()
+            this.canvasDataArr = JSON.stringify(this.card.toObject())
+
+            //通过toJson数据获取背景素材自定义商品图片
+            for (let i = 0; i < this.canvasDataArr.length; i++) {
+                var element = this.canvasDataArr[i];
+                console.log("------------------",this.canvasDataArr)
+            }
+            console.log("------------------selectedObj",this.selectedObj)
+            this.useBase64Fun()
+            let formData = new FormData();
+            // 向 formData 对象中添加文件
+            formData.append('file',this.imgFile);
+            this.handleGetUploadImg(formData)
         },
         //导出json格式
         toJson(){
-            console.log(JSON.stringify(this.card.toJSON()));
+            // this.imgObject.goods_site_list = JSON.stringify(this.card.toJSON())
+            // this.imgObject.material_site_list = JSON.stringify(this.card.toJSON())
+            
+            // console.log("画布对象",this.canvasDataArr);
+        },
+        //将base64转成文件
+        dataURLtoBlob (dataurl, filename = 'Img') {
+            let arr = dataurl.split(',')
+            let mime = arr[0].match(/:(.*?);/)[1]
+            let suffix = mime.split('/')[1]
+            let bstr = atob(arr[1])
+            let n = bstr.length
+            let u8arr = new Uint8Array(n)
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n)
+            }
+                return new File([u8arr], `${filename}.${suffix}`, {type: mime})
+        },
+        //调用方法
+        useBase64Fun() {
+            //调用
+            const card = this.card
+            var imgName = 'image'
+            if (!card) return;
+            const base64Data = card.toDataURL({
+                    multiplier: 1,
+                    format: 'jpeg'
+            });
+            this.imgFile = this.dataURLtoBlob(base64Data, imgName);
         },
         //清空画布
         clearAll() {
@@ -205,12 +275,6 @@ export default {
         preview() {
             const card = this.card
             if (!card) return
-            console.log(card.toDataURL({
-                multiplier: 1,
-                format: 'jpeg'
-            })
-            )
-            console.log("------------------------",card.toDataURL)
             const result = card.toDataURL({
                 multiplier: 1,
                 format: 'jpeg'
@@ -225,27 +289,32 @@ export default {
         },
         //改变画布大小
         CanvasSizeFun() {
-            if (this.vertical == 0) {
+            if (this.vertical == 1) {
                 this.setCanvasW(780)
                 this.setCanvasH(780)
                 this.setCanvasState(this.vertical)
                 this.changeCvsSize(this.cvsW,this.cvsH)
-            } else if (this.vertical == 1) {
+            } else if (this.vertical == 2) {
                 this.setCanvasW(546)
                 this.setCanvasH(780)
                 this.setCanvasState(this.vertical)
                 this.changeCvsSize(this.cvsW,this.cvsH)
-            } else if (this.vertical == 2) {
+            } else if (this.vertical == 3) {
                 this.setCanvasW(1100)
                 this.setCanvasH(780)
                 this.setCanvasState(this.vertical)
                 this.changeCvsSize(this.cvsW,this.cvsH)
-            } else {
+            } else if(this.vertical == 4) {
                 this.setCanvasW(1350)
                 this.setCanvasH(759)
                 this.setCanvasState(this.vertical)
                 this.changeCvsSize(this.cvsW,this.cvsH)
                 
+            }else{
+                this.setCanvasW(546)
+                this.setCanvasH(546)
+                this.setCanvasState(this.vertical)
+                this.changeCvsSize(this.cvsW,this.cvsH)
             }
         },
         //动态改变初始化canvas 尺寸
@@ -258,16 +327,39 @@ export default {
         closeMoudalFun() {
             this.isShowCvs = false
         },
+        /** 
+         * start API
+         */
         //品牌列表
         handleGetEnumList() {
             getEnumList().then(res=>{
                 this.selectRoomArr = res.data.message.space_list
                 this.selectStyleArr = res.data.message.style_list
-            console.log('------------------', res.data.message)
             }).catch(err=>{
                 console.log( err)
             })
         },
+        //添加,保存方案
+        handleGetSaveScheme(data) {
+            getSaveScheme(data).then(res => {
+                console.log('添加,保存方案', res.data)
+            }).catch(err =>{
+                console.log(err)
+            })
+        },
+        //上传方案图片
+        handleGetUploadImg(file) {
+            uploadImg(file).then(res => {
+                this.imgObject.done_img_url = res.data.message
+                // console.log('上传方案图片', res)
+            }).catch(err =>{
+                console.log(err)
+            })
+        }
+
+        /**
+         * end API
+         */
     },
 }
 </script>
