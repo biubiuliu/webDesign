@@ -33,3 +33,28 @@ export const addSchemeDir = (dir_name) => {
         },
     })
 }
+
+// 枚举列表（风格、空间）
+export const getEnumList = () => {
+    return axios.request({
+        url:'/api/v1/get/enumList',
+        method:'get',       
+    })
+}
+
+// 获取品牌列表
+export const getBrandList = () => {
+    return axios.request({
+        url:'/api/v1/get/brandList',
+        method:'get',       
+    })
+}
+
+// 获取商品列表
+export const getGoodsList = (params) => {
+    return axios.request({
+        url:'/api/v1/get/goods',
+        method:'get',
+        params: params,
+    })
+}
