@@ -47,9 +47,6 @@ name: "CanvasCard",
         card.setHeight(this.cvsH)
         card.selection = true  //选中一个组
         card.hasControls = false
-        card.imgType1=null
-        card.imgType2=null
-        card.imgType3=null
         // card.borderColor = '#ff8d23'
         card.preserveObjectStacking = true // 禁止选中图层时自定置于顶部
 

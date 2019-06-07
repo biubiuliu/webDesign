@@ -25,8 +25,8 @@
                     <span>全部 <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
-                    <li class="reuseLi" v-for="bgImg in materialBgImgArr" :key="bgImg.id">
-                        <img :src="bgImg.material_img"  @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
+                    <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
+                        <img :src="item.material_img" :id="item.id"  @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -36,8 +36,8 @@
                     <span>全部 <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
-                    <li class="reuseLi" v-for="bgImg in goodsBgImgArr" :key="bgImg.goods_id">
-                        <img :src="bgImg.pic_image"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
+                    <li class="reuseLi" v-for="item in goodsBgImgArr" :key="item.goods_id">
+                        <img :src="item.pic_image" :id="item.goods_id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -144,6 +144,10 @@ export default {
                 scaleY: 200/img.height ,
                 src:e.target.src,
                 imgType:1,
+                goods_id: null,
+                goodsImg_id:null,
+                material_id:null,
+                materialImg_id: e.target.id,
                 backgroundImgId:e.target.id
             }); 
             card.add(img).setActiveObject(img)

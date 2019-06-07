@@ -1,20 +1,23 @@
 <template>
 <div class="action_body">
     <div  class="actionBar">
-        <Tooltip class="aliIcon" content="上移一层"><i @click="frontObject" class="iconfont iconshangyiyiceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="下移一层"><i @click="behindObject" class="iconfont iconxiayiyiceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="上移顶层"><i @click="frontObjectTop" class="iconfont icondingceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="下移底层"><i @click="behindObjectBottom" class="iconfont icondiceng"></i></Tooltip>
-        <Tooltip class="aliIcon" content="水平翻转"><i @click="flipXObject" class="iconfont iconjingxiang1"></i></Tooltip>
-        <Tooltip class="aliIcon" content="垂直翻转"><i @click="flipYObject" class="iconfont iconjingxiang2"></i></Tooltip>
-        <Tooltip class="aliIcon" content="等比例缩放"><i @click="zoomObject" class="iconfont iconsuofang1"></i></Tooltip>
-        <Tooltip class="aliIcon" content="裁剪"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
-        <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
-        <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
-        <Tooltip class="aliIcon" content="锁定" v-if="isLocking"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
-        <Tooltip class="aliIcon" content="取消锁定" v-else><i @click="cancellockObject" class="iconfont iconjiesuo1"></i></Tooltip>
-        <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
-        <!-- <canvas style="visibility: hidden;" id="canvas_crop"></canvas> -->
+        <div  v-if="this.selectedObj">
+            <Tooltip class="aliIcon" content="上移一层"><i @click="frontObject" class="iconfont iconshangyiyiceng"></i></Tooltip>
+            <Tooltip class="aliIcon" content="下移一层"><i @click="behindObject" class="iconfont iconxiayiyiceng"></i></Tooltip>
+            <Tooltip class="aliIcon" content="上移顶层"><i @click="frontObjectTop" class="iconfont icondingceng"></i></Tooltip>
+            <Tooltip class="aliIcon" content="下移底层"><i @click="behindObjectBottom" class="iconfont icondiceng"></i></Tooltip>
+            <Tooltip class="aliIcon" content="水平翻转"><i @click="flipXObject" class="iconfont iconjingxiang1"></i></Tooltip>
+            <Tooltip class="aliIcon" content="垂直翻转"><i @click="flipYObject" class="iconfont iconjingxiang2"></i></Tooltip>
+            <Tooltip class="aliIcon" content="等比例缩放"><i @click="zoomObject" class="iconfont iconsuofang1"></i></Tooltip>
+            <Tooltip class="aliIcon" content="裁剪"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
+            <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
+            <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
+            <Tooltip class="aliIcon" content="锁定" v-if="isLocking"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
+            <Tooltip class="aliIcon" content="取消锁定" v-else><i @click="cancellockObject" class="iconfont iconjiesuo1"></i></Tooltip>
+            <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
+            <!-- <canvas style="visibility: hidden;" id="canvas_crop"></canvas> -->
+        </div>
+        
     </div>
 </div>
     
@@ -28,6 +31,9 @@ export default {
             msg: '操作',
             isLock:true,
         }
+    },
+    created() {
+        console.log("0.0",this.selectedObj)
     },
     computed: {
         ...mapState({

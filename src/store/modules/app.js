@@ -13,6 +13,7 @@ const app = {
         undoList: [],
         selectedObj: null,
         previewImg: null,
+        objJSON: null
     },
     mutations: {
         //设置画布大小
@@ -85,15 +86,23 @@ const app = {
 
             if (state.canvasState) {
                 commit('ADD_UNDO', state.canvasState)
-            }
-            let aa = state.frontCard.toJSON([
+            } 
+            state.objJSON = state.frontCard.toJSON([
                 'hasControls',
                 'borderColor',
-                'imgType1',
-                'imgType2',
-                'imgType3'
-            ]).objects
-            console.log(aa)
+                'imgType'
+
+            ]),
+            console.log(state.frontCard.toJSON([
+                'hasControls',
+                'borderColor',
+                'imgType',
+                'goods_id',
+                'goodsImg_id',
+                'material_id',
+                'materialImg_id'
+
+            ]))
             commit('SET_CANVASSTATE', state.frontCard.toJSON([
                 'hasControls',
                 'borderColor',
@@ -103,9 +112,11 @@ const app = {
                 'top',
                 'left',
                 'crossOrigin',
-                'imgType1',
-                'imgType2',
-                'imgType3'
+                'imgType',
+                'goods_id',
+                'goodsImg_id',
+                'material_id',
+                'materialImg_id'
             ]))
 
             // console.log(state.canvasState)
