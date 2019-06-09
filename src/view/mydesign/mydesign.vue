@@ -1,59 +1,121 @@
 <template style="overflow: hidden">
     <div class="mydesignBody">
-            <div class="header_select flex" slot="waterfall-head">
-                <div class="flex selectCusBox">
-                    <a class="sort"  href="javascript:;" @mouseenter="selectEnter('sort')" @mouseleave="selectLeave('sort')">
-                        {{sortSelectList[sortLi].title}}
-                        <i class="iconfont iconxiala-"></i>
-                        <ul class="sort-ul">
-                            <li  v-for="(item, index) in sortSelectList" :key="index"
-                                :class="{sortSelect:sortLi==index}" @click="changeSelect(index,item,'sort')">
-                                {{item.title}}
-                            </li>                       
-                        </ul>
-                    </a>
-                    <a class="file"  href="javascript:;" @mouseenter="selectEnter('dir')" @mouseleave="selectLeave('dir')">
-                        {{dirSelectList[dirLi].dir_name}}
-                        <i class="iconfont iconxiala-"></i>
-                        <ul class="dir-ul">
-                            <li  v-for="(item, index) in dirSelectList" :key="index"
-                                :class="{dirSelect:dirLi==index}" @click="changeSelect(index,item,'dir')">
-                                {{item.dir_name}}
-                            </li>                       
-                        </ul>
-                    </a>
-                </div>
-                <Button type="warning" @click="handleRender">
-                    <i  class="iconfont iconjia"></i>
-                    新建文件
-                </Button>
+        <div class="header_select flex" slot="waterfall-head">
+            <div class="flex selectCusBox">
+                <a class="sort"  href="javascript:;" @mouseenter="selectEnter('sort')" @mouseleave="selectLeave('sort')">
+                    {{sortSelectList[sortLi].title}}
+                    <i class="iconfont iconxiala-"></i>
+                    <ul class="sort-ul">
+                        <li  v-for="(item, index) in sortSelectList" :key="index"
+                            :class="{sortSelect:sortLi==index}" @click="changeSelect(index,item,'sort')">
+                            {{item.title}}
+                        </li>                       
+                    </ul>
+                </a>
+                <a class="file"  href="javascript:;" @mouseenter="selectEnter('dir')" @mouseleave="selectLeave('dir')">
+                    {{dirSelectList[dirLi].dir_name}}
+                    <i class="iconfont iconxiala-"></i>
+                    <ul class="dir-ul">
+                        <li  v-for="(item, index) in dirSelectList" :key="index"
+                            :class="{dirSelect:dirLi==index}" @click="changeSelect(index,item,'dir')">
+                            {{item.dir_name}}
+                        </li>                       
+                    </ul>
+                </a>
             </div>
-            <div>
-            <vue-waterfall-easy                   
-                    ref="waterfall"
-                    style="width:100%;height:93vh"
-                    :imgWidth="340" :imgsArr="imgsArr"
-                    :enablePullDownEvent="true"
-                    @scrollReachBottom="handleGetList"
-                    @click="linkDetailFun"
-                    class="vueWaterfallEasy">
-            
-            <div class="scheme-img-info" slot-scope="props">
-                <p class="some-info">{{props.value.name}}</p>
-                <p class="some-info">{{props.value.updated_at}}</p>
-            </div>
-            <div slot="waterfall-over">暂无更多数据</div>
-        </vue-waterfall-easy>
-        <!-- <div v-else class="no-scheme">
-            抱歉 没有找到匹配的结果
-        </div> -->
+            <Button type="warning" @click="handleRender" class="add-dir">
+                <i  class="iconfont iconjia"></i>
+                新建文件
+            </Button>
         </div>
-        
-    </div>
+        <div style="z-index:99;padding-top: 0px;">
+            <div class="parent"  v-if="imgsArr.length">
+                <div  class="child" v-for="(item, index) in imgsArr" :key="index">
+                    <!-- <div class="img"> -->
+                        <img :src="item.src" alt="" onerror="this.src='https://run.mockplus.cn/assets/logo.png'">
+                    <!-- </div>                         -->
+                    <div  class="scheme-img-info">
+                        <p class="some-info">{{item.name}}</p>
+                        <p class="some-info">{{item.updated_at}}</p>
+                    </div>
+                    <div class="mask">
+                        <div style="position:relative">
+                            <a class="midify" href="javascript:;" @click="toDetail(item.id)">
+                                <i class="iconfont iconiconset0137"></i>
+                            </a>
+                            <a href="javascript:;"  @click="del(item.id)">
+                                <i class="iconfont iconshanchu"></i>
+                            </a>
+                            <a href="javascript:;" @click="copy(item.id)">
+                                <i class="iconfont iconfuzhi1"></i>
+                            </a>                                 
+                            <Dropdown trigger="click"  @on-click="operation" style=" position: absolute;right: 63px;top: 100px;z-index:99">
+                                <a href="javascript:;">
+                                    <i class="iconfont icongengduo"></i>
+                                </a>
+                                <DropdownMenu slot="list">
+                                    <Dropdown placement="left-start"  v-if='moveDirList.length'>
+                                        <DropdownItem>
+                                            <i class="iconfont iconzuo"></i>
+                                            移动到
+                                        </DropdownItem>
+                                        <DropdownMenu slot="list">
+                                            <DropdownItem  v-for="(m,n) in moveDirList"  :key="n" :name="`${item.id}`+'_'+`${m.id}`" >
+                                                {{m.dir_name}}
+                                            </DropdownItem>                                             
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                    <DropdownItem :name="'download-'+item.id">导出高清图</DropdownItem>
+                                    <DropdownItem :name="'modify-'+item.id">修改信息</DropdownItem>
+                                    <DropdownItem :name="'checkList-'+item.id">查看清单</DropdownItem>
+                                    <DropdownItem :name="'isOpen-'+item.id+'-'+item.is_personal">{{item.is_personal==1?'公开':'取消公开'}}</DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>                              
+                        </div>
+                    </div>   
+                </div> 
+            </div>
+            <div v-else class="no-scheme">
+                抱歉 没有找到匹配的结果
+            </div>
+        </div>
+        <Modal
+            v-model="shemeInfoModal"
+            title="修改方案"
+            @on-ok="shemeInfoModalok">
+           <Form :model="shemeInfo" >
+                <FormItem>
+                    <Input v-model="shemeInfo.scheme_name" placeholder="填写方案名称"></Input>
+                </FormItem>
+                <FormItem>
+                    <Row>
+                        <Col span="10">
+                            <Select v-model="shemeInfo.space_type"  placeholder="#选择空间#">
+                                <Option v-for="(item,index) in selectRoomArr" :key="index" :value="item.id" >{{item.name}}</Option>
+                            </Select>
+                        </Col>
+                        <Col span="10" offset="4">
+                            <Select v-model="shemeInfo.style_type"  placeholder="#选择风格#">
+                                <Option v-for="(item,index) in selectStyleArr" :key="index" :value="item.id" >{{item.name}}</Option>
+                            </Select>
+                        </Col>
+                    </Row>
+                </FormItem>
+                <FormItem>
+                    <Input v-model="shemeInfo.phone" placeholder="填写客户手机号"></Input>
+                </FormItem>
+                <FormItem>
+                    <Input v-model="shemeInfo.address" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="填写客户楼盘地址"></Input>
+                </FormItem>
+            </Form>
+        </Modal>
+     </div>
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getMeals,getDirList,addSchemeDir } from '@/api/data.js'
+import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList } from '@/api/data.js'
+import { getEnumList } from  '@/api/material.js'
+
 export default {
     name: 'mydesign',
     components: {
@@ -63,24 +125,37 @@ export default {
         return {
             msg: '这是我的设计ss',
             sortSelectList:[
-                {title:"排序",id:""},
+                {title:"排序",id:0},
                 {title:"最新修改",id:"updated_at|desc"},
                 {title:"最新创建",id:"created_at|desc"},
             ],
-            dirSelectList:[{dir_name:"文件",id:""}],            
+            dirSelectList:[{dir_name:"文件",id:''}],      
+            moveDirList:[],      
             sortLi:0, // 排序筛选
             dirLi:0, // 文件夹筛选
             modal:false,// 新建文件弹框
             add_dir_name:'',
             imgsArr: [],
             page:1, 
-            total:0         
+            total:0,
+            shemeInfoModal:false,
+            selectRoomArr:[],
+            selectStyleArr:[],
+            shemeInfo:{
+                id: null, // 方案id（编辑方案使用）
+                scheme_name: "", // 方案名称1
+                space_type: null, // 空间类型
+                style_type: null, // 风格类型
+                phone: "", // 手机
+                address: "", //	地址
+            }       
         }
     },
     created() {
         // 获取文件夹列表
         this.getDir();
         this.handleGetList();
+        this.handleGetEnumList();
     },
     methods: {
         // 排序顺序
@@ -109,15 +184,24 @@ export default {
             ul[0].style.display = 'none';
         },
 
-        //数据重组
+        // 获取空间
+        handleGetEnumList() {
+            getEnumList().then(res=>{
+                this.selectRoomArr = res.data.message.space_list
+                this.selectStyleArr = res.data.message.style_list
+            }).catch(err=>{
+                console.log( err)
+            })
+        },
+
+        // 数据重组
         handleGetList () {
             if(this.page!=1&&this.page> Math.ceil(this.total/30)){
                 this.$refs.waterfall.waterfallOver()
                 return
             }  
             let params = {
-                user_id:'',                
-                is_personal:1,              
+                user_id:'111',                            
                 page:this.page,
                 sorter:this.sortSelectList[this.sortLi].id,
                 dir_id:this.dirSelectList[this.dirLi].id,
@@ -128,18 +212,21 @@ export default {
                     if(this.page==1){
                         this.imgsArr=[];
                     }
-                    this.total = res.data.message.total;                 
-                    res.data.message.data.map((item,i)=>{
+                    this.total = res.data.message.total;  
+                    if(res.data.message.data.length){
+                        res.data.message.data.map((item,i)=>{
                         var  setDataObj = {
                             src: item.done_img_url,
                             href: item.done_img_url,  
                             name: item.scheme_name,
-                            canvas_type:item.canvas_type,
+                            is_personal:item.is_personal,
                             updated_at:item.updated_at,                                                   
                             id: item.id,
                         };
                         this.imgsArr.push(setDataObj);                      
                     });
+                    }             
+                   
                     this.page=this.page +1;                
                 }
             }).catch(err => {
@@ -147,23 +234,13 @@ export default {
             })
         },
 
-        linkDetailFun(event, { index, value }) {
-            event.preventDefault()
-                // 只有当点击到图片时才进行操作
-            if (event.target.tagName.toLowerCase() == 'img') {
-                this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({name:'proDetail'})
-                console.log('img clicked', value)
-                console.log(' vuex', this.proDetailVal)
-                }
-        },
-
         // 获取文件列表
         getDir () {
             getDirList().then(res=>{
                 if(res.data.success){  
-                    this.dirSelectList = [{dir_name:"文件",id:""}],                         
-                    this.dirSelectList =this.dirSelectList.concat(res.data.message);                                   
+                    this.dirSelectList = [{dir_name:"文件",id:''}],                         
+                    this.dirSelectList = this.dirSelectList.concat(res.data.message);   
+                    this.moveDirList =  res.data.message                      
                 }
             })
         },
@@ -180,6 +257,158 @@ export default {
                     this.add_dir_name = ''
                 }
             })
+        },
+
+        // 修改方案
+        toDetail (id){
+            this.$Message.info('修改'+id);
+            this.$router.push({name:'proDetail'})
+        },
+
+        // 修改方案信息确定
+        shemeInfoModalok () {         
+            console.log(this.shemeInfo) 
+            let params = {
+                id:this.shemeInfo.id,
+                scheme_name:this.shemeInfo.scheme_name,
+                space_type:this.shemeInfo.space_type,
+                style_type:this.shemeInfo.style_type,
+                phone:this.shemeInfo.phone,
+                address:this.shemeInfo.address
+            } 
+            modifySchemeInfo(params).then(res=>{
+                if(res.data.success){
+                    this.$Message.success(res.data.message);
+                    this.imgsArr.map((item) => {
+                        item.name = item.id == this.shemeInfo.id? 
+                        this.shemeInfo.scheme_name:item.name
+                    })                 
+                }else{
+                    this.$Message.error(res.data.message);
+                }
+                this.shemeInfoModal = false
+            })         
+        },
+
+        // 删除方案
+        del (id) {
+            this.$Modal.confirm({
+                    title: '提示',
+                    content: '<p>是否删除该方案'+id+'</p>',
+                    onOk: () => {
+                        this.$Message.info('Clicked ok');
+                    },
+                    onCancel: () => {
+                        this.$Message.info('Clicked cancel');
+                    }
+            });
+        },
+
+        // 拷贝
+        copy (id) {
+             this.$Message.info('拷贝');
+        },
+
+        // 移动到文件夹
+        moveToDir (name) {
+            console.log(name)
+        },
+
+        // 下载图片
+        down (name){
+            var a = document.createElement('a')
+            var event = new MouseEvent('click') 
+            a.download = name || '下载图片名称'  
+            this.imgsArr.forEach((item)=>{
+                if(item.id==parseInt(name.split("-")[1])){
+                    a.href=item.src
+                }
+            })                 
+            a.dispatchEvent(event)            
+        },
+
+        // 修改信息
+        modifyInfo (name) {
+            var id = name.split("-")[1];
+            getSchemeInfo(id).then(res => {
+                if(res.data.success){
+                    this.shemeInfoModal = true;
+                    this.shemeInfo = res.data.message
+                }
+            })
+        },
+
+        // 获取商品清单
+        getGoodsList (name) {
+            var id = name.split("-")[1];
+            getSchemeGoodsList(id).then(res => {
+                if(res.data.success){                  
+                   
+                }
+            })
+        },
+
+        // 是否公开
+        modifyIsOpen(name){
+            console.log(name.split("-"))
+            let params = {
+                id: parseInt(name.split("-")[1]),
+                is_personal: parseInt(name.split("-")[2])==1?0:1
+            }
+            let info = params.is_personal ==1?'取消公开':"公开"
+            this.$Modal.confirm({
+                    title: '提示',
+                    content: '<p>是否'+info+'该方案</p>',
+                    onOk: () => {
+                        modifySchemeInfo(params).then(res=>{
+                            if(res.data.success){
+                                this.$Message.success(res.data.message);
+                                this.imgsArr.map((item) => {
+                                    console.log(item.id)
+                                    item.is_personal = item.id == params.id? 
+                                    params.is_personal:item.is_personal
+                                })                 
+                            }else{
+                                this.$Message.error(res.data.message);
+                            }
+                        }) 
+                    },
+                    onCancel: () => {
+                        
+                    }
+            });
+             
+        },
+
+        operation (name) {
+            if(name.indexOf('-')>-1){
+                if(name.indexOf('download')>-1){
+                    this.down(name);
+                }else if(name.indexOf('modify')>-1){
+                    this.modifyInfo(name)
+                }else if(name.indexOf('checkList')>-1){
+                    this.getGoodsList(name)
+                }else{
+                    this.modifyIsOpen(name)
+                }
+
+            }else{
+                var reg=/^[\d]+/g;
+                var params = {
+                    id: parseInt(name.split("_")[0]),
+                    dir_id:name.split("_")[1]
+                }
+                modifySchemeInfo(params).then( res=> {
+                    if(res.data.success){
+                        this.$Message.info(res.data.message);
+                        if(this.dirLi!=0){
+                            this.imgsArr = this.imgsArr.filter((obj) =>obj.id !== params.id)
+                        }
+                    }else{
+                        this.$Message.error(res.data.message)
+                    }
+                })
+            }
         },
 
         // 弹框
@@ -212,31 +441,32 @@ export default {
 </script>
 <style scoped>
 .mydesignBody{
-    background: #fff;
+    background: #f2f2f4;
     color: black;
-    /* padding: 40px; */
-    /* height: 93vh;  */
+    height: 93vh; 
     font-size: 14px;
     position: relative;
 }
 .header_select{
-    /* margin: 0 10%; */
-    margin-top:40px;
-    position: fixed;
+    /* position: fixed;
     left: 0;
     right: 0;
-    z-index: 1;
+    z-index: 1; */
+    background: #f2f2f4;
 }
 .flex{
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
     flex-direction: row;
-    padding:0 50px 0 20px;
+    padding: 20px 50px 20px 20px;
 }
 .selectCusBox{
     /* width: 150px; */
     /* position: relative; */
+}
+.add-dir{
+    height:40px;
 }
 .selectCusDiv{
     position: absolute;
@@ -267,19 +497,19 @@ export default {
     transform:rotate(180deg)
 }
 .sort-ul,.dir-ul{
-    min-width: 80px;
+    min-width: 100px;
     background: #fff; 
-    margin-top: 10px;
+    /* margin-top: 10px; */
     position: absolute;
     box-shadow:0 0 1px #000 inset;
     z-index: 1;
     display: none;
 }
 .sort-ul{
-    left: 10px;
+    left: -10px;
 }
 .dir-ul{
-    left: -6px;
+    left: -24px;
 }
 .sort-ul li,.dir-ul li{
     line-height: 28px;
@@ -288,12 +518,12 @@ export default {
     color: #666;
 }
 .sort-ul li:hover,.dir-ul li:hover{
-    background: #f2f2f2;
+    background: #f2f2f2!important;
     color: #666!important;
 }
 .sortSelect,.dirSelect{
     background: #ff9a00;
-    color: #fff!important;
+    color: #f2f2f4!important;
 }
 .add-dir-input{
     width: 300px;
@@ -304,9 +534,10 @@ export default {
     padding:0 10px;
 }
 .scheme-img-info{
-    padding:10px;
+    padding:14px 25px;
     display: flex;
     align-items: center;
+    background: #fff;
 }
 .scheme-img-info .some-info:nth-child(1) {
     flex: 1;
@@ -330,4 +561,74 @@ export default {
     color: #7e8e98;
     line-height: 400px;
 }
+.parent { 
+    width:100%;
+    -moz-column-count: 5;
+    -webkit-column-count: 5;
+    column-count: 5;
+    padding:0 60px;
+    margin-top: 20px;
+}
+.child {
+    margin-bottom:20px;	 
+    -moz-page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    break-inside: avoid;
+    color:#f2f2f4;
+    /* width: 340px; */
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 10px;
+    transform: scaleX(1) scaleY(1);
+    position: relative;
+    box-shadow: 0 1px 4px rgba(6,31,50,.12);
+}
+.child img{
+    width: 100%;
+}
+.mask{
+    display:none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0,0,0,0.1)
+}
+.child:hover .mask{
+   display:block;
+}
+.midify{
+    background: #ff9a00;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 5px;
+    text-align: center;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+.iconshanchu{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 20px;
+}
+.mask a i{
+    color: #fff;
+}
+.iconfuzhi1{
+    position: absolute;
+    right: 10px;
+    top: 60px;
+    font-size: 17px;
+}
+.icongengduo{  
+    font-size: 22px;
+    position: absolute;
+    right: -54px;
+    top: -1px;
+}
+
 </style>

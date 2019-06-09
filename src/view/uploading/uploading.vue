@@ -97,7 +97,6 @@ export default {
 
         // 点击移入素材
         moveToMaterial(name){
-            console.log(name)
             var img = this.uploadSrcArr[this.changehide];
             switch (name) {
                 case 'background':
