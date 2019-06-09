@@ -86,38 +86,39 @@ const app = {
 
             if (state.canvasState) {
                 commit('ADD_UNDO', state.canvasState)
-            } 
+            }
             state.objJSON = state.frontCard.toJSON([
-                'hasControls',
-                'borderColor',
-                'imgType'
+                    'hasControls',
+                    'borderColor',
+                    'imgType',
+                    'goods_id',
+                    'goodsImg_id',
+                    'material_id',
 
-            ]),
-            console.log(state.frontCard.toJSON([
-                'hasControls',
-                'borderColor',
-                'imgType',
-                'goods_id',
-                'goodsImg_id',
-                'material_id',
-                'materialImg_id'
+                ]),
+                // console.log(state.frontCard.toJSON([
+                //     'hasControls',
+                //     'borderColor',
+                //     'imgType',
+                //     'goods_id',
+                //     'goodsImg_id',
+                //     'material_id',
 
-            ]))
-            commit('SET_CANVASSTATE', state.frontCard.toJSON([
-                'hasControls',
-                'borderColor',
-                'scaleX',
-                'scaleY',
-                'angle',
-                'top',
-                'left',
-                'crossOrigin',
-                'imgType',
-                'goods_id',
-                'goodsImg_id',
-                'material_id',
-                'materialImg_id'
-            ]))
+                // ]))
+                commit('SET_CANVASSTATE', state.frontCard.toJSON([
+                    'hasControls',
+                    'borderColor',
+                    'scaleX',
+                    'scaleY',
+                    'angle',
+                    'top',
+                    'left',
+                    'crossOrigin',
+                    'imgType',
+                    'goods_id',
+                    'goodsImg_id',
+                    'material_id',
+                ]))
 
             // console.log(state.canvasState)
         },

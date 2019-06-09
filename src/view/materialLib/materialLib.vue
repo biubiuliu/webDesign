@@ -26,7 +26,7 @@
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
-                        <img :src="item.material_img" :id="item.id"  @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
+                        <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -37,7 +37,7 @@
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="item in goodsBgImgArr" :key="item.goods_id">
-                        <img :src="item.pic_image" :id="item.goods_id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
+                        <img :src="item.pic_image" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
             </div>
@@ -56,24 +56,7 @@ export default {
     data() {
         return {
             msg: '这是素材库',
-            bgUrl: [
-                // {
-                // 'id': 5,
-                // 'img_url': 'https://mdproduct.oss-cn-shenzhen.aliyuncs.com/images/201807/source_img/2204_P_1531341193163.jpg'
-                // },
-                // {
-                // 'id': 6,
-                // 'img_url': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/04/28/edc7426a73e5cc5fb717472194c5b7e6.jpg'
-                // },
-                // {
-                // 'id': 49,
-                // 'img_url': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/14/3ef8d4df3ab739a99e361924e3c71319.jpg'
-                // },
-                // {
-                // 'id': 48,
-                // 'img_url': 'https://mdzs.oss-cn-shenzhen.aliyuncs.com/collocation/2019/05/06/382cc9c4ffb493704502b64130713b8f.jpg'
-                // },
-            ],
+            bgUrl: [],
             isRoow: true,
             goodsBgImgArr:[],
             materialBgImgArr:[]
@@ -119,7 +102,10 @@ export default {
                 top: 100,
                 src:e.target.src,
                 imgType:0, // imgType:0背景,1素材 2自定义商品
-                backgroundImgId:e.target.id
+                goods_id: null,
+                goodsImg_id:null,
+                material_id: null,
+                // backgroundImgId:e.target.id
             });  
             card.add(img).setActiveObject(img)  
             this.saveState()
@@ -146,9 +132,8 @@ export default {
                 imgType:1,
                 goods_id: null,
                 goodsImg_id:null,
-                material_id:null,
-                materialImg_id: e.target.id,
-                backgroundImgId:e.target.id
+                material_id: e.target.id,
+                // backgroundImgId:e.target.id
             }); 
             card.add(img).setActiveObject(img)
             // img.crossOrigin = 'Anonymous';   
@@ -174,7 +159,10 @@ export default {
                 scaleY: 200/img.height ,
                 src:e.target.src,
                 imgType:2,
-                backgroundImgId:e.target.id
+                goods_id: e.target.name,
+                goodsImg_id:e.target.id,
+                material_id: e.target.id,
+                // backgroundImgId:e.target.id
             }); 
             card.add(img).setActiveObject(img)
             // img.crossOrigin = 'Anonymous';   

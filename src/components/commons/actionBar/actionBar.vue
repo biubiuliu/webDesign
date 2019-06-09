@@ -10,6 +10,7 @@
             <Tooltip class="aliIcon" content="垂直翻转"><i @click="flipYObject" class="iconfont iconjingxiang2"></i></Tooltip>
             <Tooltip class="aliIcon" content="等比例缩放"><i @click="zoomObject" class="iconfont iconsuofang1"></i></Tooltip>
             <Tooltip class="aliIcon" content="裁剪"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
+            <Tooltip class="aliIcon" content="变形"><i @click="skewControl" class="iconfont iconbianxing"></i></Tooltip>
             <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
             <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
             <Tooltip class="aliIcon" content="锁定" v-if="isLocking"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
@@ -19,6 +20,19 @@
         </div>
         
     </div>
+    <Modal
+        v-model="skewModel"
+        title="偏移"
+        draggable
+        width="300"
+        :closable="false"
+        slot="footer">
+        <Slider v-model="skewXModelValue" input-size='small' @on-change="skewXControl" @on-input="skewXControl" :min='-100' :max='200' show-input></Slider>
+        <Slider v-model="skewYModelValue" input-size='small' @on-change="skewYControl" @on-input="skewYControl" :min='-100' :max='200' show-input></Slider>
+        <div slot="footer">
+            <Button type="primary" @click="skewModelOk">确定</Button>
+        </div>
+    </Modal>
 </div>
     
 </template>
@@ -30,10 +44,21 @@ export default {
         return {
             msg: '操作',
             isLock:true,
+            skewXModelValue: 0,
+            skewYModelValue: 0,
+            skewModel:false,
         }
     },
     created() {
         console.log("0.0",this.selectedObj)
+    },
+    updated() {
+        if(this.selectedObj == null){
+            this.skewModel = false;
+            return
+        }
+        this.skewXModelValue = this.selectedObj.skewX,
+        this.skewYModelValue = this.selectedObj.skewY
     },
     computed: {
         ...mapState({
@@ -85,16 +110,53 @@ export default {
         // 垂直翻转
         flipYObject() {
             this.selectedObj.set({
-                scaleY:-this.selectedObj.scaleY,
+                scaleY: -this.selectedObj.scaleY,
             })
             this.card.renderAll()
             this.saveState()
         },
         //裁剪
         cutObject(){
+            // this.selectedObj
              //生成一个和待裁剪元素相同大小的矩形用于框选裁剪区域
             console.log("nidaye")
         },
+        //变形
+        skewControl (){
+            console.log("小姐姐+++++++++++",this.selectedObj)
+            if(this.selectedObj == null){
+                console.log("小姐姐-----------")
+                this.skewModel = false;
+                return
+            }
+            this.skewModel = true
+            // this.card.requestRenderAll();
+            console.log("selectedObj",this.selectedObj)
+        },
+        //变形modal
+        skewModelOk(){
+            this.skewXControl();
+            this.skewYControl();
+            this.skewModel = false;
+        },
+        skewModelCancel(){
+            
+        },
+        skewXControl(){
+            this.selectedObj.set({
+                skewX: this.skewXModelValue
+            })
+            this.card.renderAll()
+            this.saveState()
+        },
+        skewYControl(){
+            this.selectedObj.set({
+                skewY: this.skewYModelValue
+            })
+            this.saveState()
+            this.card.renderAll()
+        },
+
         // 90°旋转
         rotateObject() {
             this.selectedObj.rotate(this.selectedObj.angle === 360 ? 90 : this.selectedObj.angle + 90)
@@ -226,5 +288,6 @@ export default {
     background: white;
     margin-top: 60px;
     color: rgba(0, 0, 0, 0.561);
+    position: relative;
 }
 </style>

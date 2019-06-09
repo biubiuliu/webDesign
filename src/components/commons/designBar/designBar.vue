@@ -91,7 +91,7 @@
                         <Input v-model="imgObject.phone" placeholder="填写客户手机号"></Input>
                     </FormItem>
                     <FormItem label="是否公开">
-                        <i-switch v-model="imgObject.is_personal" true-value="true" false-value="false"  @on-change="isOpenFun"  size="large">
+                        <i-switch v-model="imgObject.is_personal" :true-value='true'  :false-value='false'  @on-change="isOpenFun"  size="large">
                             <span slot="open" >公开</span>
                             <span slot="close" >个人</span>
                         </i-switch>
@@ -128,30 +128,9 @@ export default {
                 style_type: null, // 风格类型1
                 phone: "", // 手机1
                 address: "", //	地址1
-                goods_site_list:[
-                //     {
-                //         "goods_id":123,  					//商品（包括自定义商品）id
-                //         "img_id":272,    					//商品图片id
-                //         "coordinate_luper":"23,35",		//左上角坐标
-                //         "coordinate_ruper":"23,35",		//右上角坐标
-                //         "coordinate_rdown":"23,35",		//右下角坐标
-                //         "coordinate_ldown":"23,35",		//左下角坐标
-                //         "cut_image":"http=>jfajdlfa",		//裁剪图片url (没有为空)
-                //         "is_mirror":0						//是否镜像翻转（默认0：不翻转，1：翻转）
-                //     },
-                ],
-                material_site_list:[
-                //     {
-                //         "material_id":123,				//素材id
-                //         "coordinate_luper":"23,35",		//左上角坐标
-                //         "coordinate_ruper":"23,35",		//右上角坐标
-                //         "coordinate_rdown":"23,35",		//右下角坐标
-                //         "coordinate_ldown":"23,35",		//左下角坐标
-                //         "cut_image":"http=>jfajdlfa",		//裁剪图片url (没有为空)
-                //         "is_mirror":0						//是否镜像翻转（默认0：不翻转，1：翻转）
-                //     },
-                ],
-                customer_name:""
+                customer_name: null,
+                img_site_json:null
+                
             },
             imgFile:{},
             selectRoomArr:[],
@@ -195,11 +174,10 @@ export default {
                 this.toJson()
                 this.imgObject.is_personal = this.imgObject.is_personal?0:1
                 this.imgObject.canvas_type = parseInt(this.vertical) 
-                this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
+                // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
                 // this.imgObject = qs.stringify(this.imgObject)
                 this.$Message.info('Clicked ok');
                 this.handleGetSaveScheme(this.imgObject)
-                console.log("bgid",this.selectedObj.backgroundImgId)
             },
         shemeInfoModalcancel () {
             this.$Message.info('Clicked cancel');
@@ -213,22 +191,10 @@ export default {
             this.shemeInfoModal = true;
             // this.toJson()
             this.canvasDataArr = this.objJSON.objects
-            this.imgObject.material_site_list =[],
-            this.imgObject.goods_site_list =[]
+            this.imgObject.img_site_json =  JSON.stringify(this.objJSON)
             //通过toJson数据获取背景素材自定义商品图片
-            for(let i = 0; i < this.canvasDataArr.length; i++) {
-                console.log("____________",this.canvasDataArr[i])
-                if(this.canvasDataArr[i].imgType == 1){
-                    this.imgObject.material_site_list.push(this.canvasDataArr[i]) 
-                    console.log("material_site_list",this.imgObject.material_site_list)
-                }else if(this.canvasDataArr[i].imgType == 2){
-                    this.imgObject.goods_site_list.push(this.canvasDataArr[i]) 
-                    console.log("goods_site_list",this.imgObject.goods_site_list)
-                }
-                 
-            }
-            // console.log("material_site_list",this.imgObject.material_site_list)
-            // console.log("goods_site_list",this.imgObject.goods_site_list)
+            console.log("____________",this.objJSON)
+
             this.useBase64Fun()
             let formData = new FormData();
             // 向 formData 对象中添加文件
