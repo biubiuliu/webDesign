@@ -1,46 +1,63 @@
 <template>
     <div class="mycollect">
         <vue-waterfall-easy ref="waterfall"
-                                style="width:100%; height:90vh; overflow: hidden"
-                                :imgWidth="290" :imgsArr="imgsArr"
-                                :enablePullDownEvent="true"
-                                @scrollReachBottom="handleGetGoodsType"
-                                @click="linkDetailFun"
-                                class="vueWaterfallEasy">
-                <div slot="waterfall-head">
-                    <div class="collectTitle">
-                        <div class="Item_collection collecttion">单品收藏</div>
-                        <div class="scheme_collection collecttion">方案收藏</div>
-                        <div @click="filtrateFun" class="filtrate_collection collecttion">筛选<i class="iconfont iconxiala-"></i></div>
-                        <div>
-                            <Modal
-                                v-model="mycollectModel"
-                                :closable="false"
-                                :styles="{top: '120px',marginRight:'5%',width:'240px'}">
-                                <div class="filtrate_model flexLayout">
-                                    <div class="styles">风格</div>
-                                    <div class="classify">分类</div>
-                                </div>
-                                <ul class="col_checkbox">
-                                    <li><Checkbox v-model="single">椅子</Checkbox></li>
-                                    <li><Checkbox v-model="single">桌子</Checkbox></li>
-                                    <li><Checkbox v-model="single">沙发</Checkbox></li>
-                                </ul>
-                            </Modal>
-                        </div>
+            style="width:100%; height:90vh; overflow: hidden"
+            :imgWidth="290" :imgsArr="imgsArr"
+            :enablePullDownEvent="true"
+            @scrollReachBottom="handleGetGoodsType"
+            @click="linkDetailFun"
+            class="vueWaterfallEasy">
+            <div slot="waterfall-head">
+                <div class="collectTitle">
+                    <a class="Item_collection collecttion" :class="{'isSelect':isSelect==2}" href="javascript:;" @click="changeSelect(2)">
+                        商品收藏
+                    </a>
+                    <a class="scheme_collection collecttion" :class="{'isSelect':isSelect==1}" href="javascript:;"  @click="changeSelect(1)">
+                        方案收藏
+                    </a>
+                    <a @click="filtrateFun" v-if='isSelect==2' class="filtrate_collection collecttion">
+                        筛选<i class="iconfont iconxiala-"></i>
+                    </a>
+                    <div>
+                        <Modal
+                            v-model="mycollectModel"
+                            :closable="false"
+                            :styles="{top: '120px',marginRight:'5%',width:'240px'}">
+                            <div class="filtrate_model flexLayout">
+                                <a class="styles" :class="{'isSelectChoose':type=='style'}" @click="changeChoose('style')">风格</a>
+                                <a class="classify" :class="{'isSelectChoose':type=='classify'}" @click="changeChoose('classify')">分类</a>
+                            </div>
+                            <ul class="col_checkbox">
+                                <CheckboxGroup v-model="selectStyle" v-if="type=='style'" @on-change="changeSelectStyle">
+                                    <Checkbox  size='large' v-for="(item,index) in selectStyleArr" :key="index" :label="item.id">
+                                        {{item.style_name}}
+                                    </Checkbox>
+                                </CheckboxGroup>
+                                    <CheckboxGroup v-model="selectRoom" v-else  @on-change="changeSelectRoom">
+                                    <Checkbox  size='large' v-for="(item,index) in selectRoomArr" :key="index" :label="item.cat_id">
+                                        {{item.cat_name}}
+                                    </Checkbox>
+                                </CheckboxGroup>                                   
+                            </ul>
+                        </Modal>
                     </div>
                 </div>
-                <div class="img-info" slot-scope="props">
-                    <p class="some-info">第{{props.index+1}}张图片</p>
-                    <p class="some-info">{{props.value.info}}</p>
-                </div>
-                <div slot="waterfall-over">waterfall-over</div>
+            </div>
+            <div class="img-info" slot-scope="props">
+                <p class="some-info">第{{props.index+1}}张图片</p>
+                <p class="some-info">{{props.value.info}}</p>
+            </div>
+            <div slot="waterfall-over">waterfall-over</div>
         </vue-waterfall-easy>
+        <div v-if="!imgsArr.length" class="no-scheme">
+                抱歉 没有找到匹配的结果
+        </div>
     </div>
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getGoodsType } from '@/api/data.js'
+import { getCollectList } from '@/api/data.js'
+import { getEnumList,category } from  '@/api/material.js'
 
 import { mapState } from 'vuex'
 export default {
@@ -58,17 +75,30 @@ export default {
     data() {
         return {
             msg: '这是收藏',
+            isSelect:2,
             single:false,
             imgsArr: [],
             dataArr:[],
             setDataArr:[],
-            mycollectModel:false
+            mycollectModel:false,
+            selectRoomArr:[],
+            selectStyleArr:[],
+            selectStyle:[],
+            selectRoom:[],
+            type:'style'
         }
     },
-        created() {
+    created() {
         this.handleGetGoodsType()
+        this.handleGetEnumList()
     },
     methods: {
+        changeSelectStyle(data){
+            console.log(data)//拿到的就是选中的数组。。默认是label的值，可以自定义
+        },
+        changeSelectRoom(data){
+            console.log(data)//拿到的就是选中的数组。。默认是label的值，可以自定义
+        },
         selectTrol() {
             var project = document.getElementById('project')
                 project.style.display = 'block';
@@ -90,21 +120,46 @@ export default {
                 project.style.display = 'none';
                 this.leftIcon = 'iconfont iconxiala-'
         },
+
+        changeSelect(id){
+            this.isSelect = id;
+            this.page=1;
+            this.handleGetGoodsType();
+        },
+
+        changeChoose(type){
+            this.type = type;
+        },
+
+        // 获取分类风格
+        handleGetEnumList() {
+              category().then(res => {
+                if(res.data.success){
+                    this.selectRoomArr = res.data.message.category;
+                    this.selectStyleArr = res.data.message.style;
+                    this.brandLabelArr = res.data.message.brand;
+                }
+            })
+        },
+
         //数据重组
         handleGetGoodsType () {
-            getGoodsType().then(res => {
-                this.indoor_list = res.data.message
-                this.dataArr = this.indoor_list.category[1].goods;
-                var _this = this;
-                for (let i = 0; i < _this.dataArr.length; i++) {
-                var   setDataObj = {src: "",href: "",info: "",id: ""};
-                    setDataObj.src = _this.dataArr[i]["goods_thumb"];
-                    setDataObj.href = _this.dataArr[i]["goods_thumb"];
-                    setDataObj.info = _this.dataArr[i]["goods_name"];
-                    setDataObj.id = _this.dataArr[i]["goods_id"];
-                    _this.setDataArr.push(setDataObj)
-                }
-                this.imgsArr = this.setDataArr
+            getCollectList(this.isSelect).then(res => {
+                 if(this.page==1){
+                        this.imgsArr=[];
+                    }
+                    this.total = res.data.message.total;                 
+                    res.data.message.data.map((item,i)=>{
+                        var  setDataObj = {
+                            src: item.done_img_url,
+                            href: item.done_img_url,  
+                            name: item.scheme_name,
+                            canvas_type:item.canvas_type,
+                            updated_at:item.updated_at,                                                   
+                            id: item.id,
+                        };
+                        this.imgsArr.push(setDataObj);                      
+                    });
             }).catch(err => {
                 console.log(err)
             })
@@ -121,11 +176,11 @@ export default {
         },
         //筛选
         filtrateFun(){
-            this.mycollectModel = !this.mycollectModel
+            this.mycollectModel = !this.mycollectModel;
+            //this.selectStyle = [];
+            //this.selectRoom = [];
         }
-
-    }
-    
+    }  
 }
 </script>
 <style scoped>
@@ -141,9 +196,12 @@ export default {
     font-size: 16px;
     padding: 0 60px;
     position: relative;
+    background: #fff;
 }
 .collecttion{
-    width: 200px;
+    width: 80px;
+    color: #666;
+    margin-right: 90px;
 }
 .scheme_collection{
     /* margin-left: auto; */
@@ -183,13 +241,34 @@ export default {
     border-bottom: 1px solid #c0c0c0;
 }
 .classify{
-    width: 50%
+    width: 50%;
+    color: #666;
 }
 .styles{
-    width: 50%
+    width: 50%;
+    color: #666;
 }
-.col_checkbox >li{
-    padding: 0 20px;
+.col_checkbox{ 
     margin-top: 10px;
+}
+.col_checkbox label{ 
+    margin-right: 10px;
+}
+.isSelect{
+    color: #f90;
+    border-bottom: 3px solid #f90;
+    width: 80px
+}
+.isSelectChoose{
+    color: #f90;
+}
+.no-scheme{
+    width: 100%;
+    margin-top: 20px;
+    font-size: 24px;
+    color: #7e8e98;
+    line-height: 400px;
+    position: absolute;
+    top: 120px;
 }
 </style>

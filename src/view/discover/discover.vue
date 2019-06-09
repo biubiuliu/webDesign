@@ -76,13 +76,16 @@
                 </div>
                 <div slot="waterfall-over">暂无更多数据</div>
             </vue-waterfall-easy>
+            <div v-if="!imgsArr.length" class="no-scheme">
+                抱歉 没有找到匹配的结果
+            </div>
         </div>
     </div>
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getGoodsType, getEnumList, getBrandList, getMeals, getGoodsList } from '@/api/data.js'
-import { category } from '@/api/material.js'
+import { getGoodsType,  getBrandList, getMeals, getGoodsList } from '@/api/data.js'
+import { category,getEnumList } from '@/api/material.js'
 
 import { mapState } from 'vuex'
 export default {
@@ -464,5 +467,14 @@ export default {
     text-align: left;
     color: #666;
     font-size: 16px;
+}
+.no-scheme{
+    width: 100%;
+    margin-top: 20px;
+    font-size: 24px;
+    color: #7e8e98;
+    line-height: 400px;
+    position: absolute;
+    bottom: 0px;
 }
 </style>

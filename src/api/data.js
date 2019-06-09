@@ -34,14 +34,6 @@ export const addSchemeDir = (dir_name) => {
     })
 }
 
-// 枚举列表（风格、空间）
-export const getEnumList = () => {
-    return axios.request({
-        url:'/api/v1/get/enumList',
-        method:'get',       
-    })
-}
-
 // 获取品牌列表
 export const getBrandList = () => {
     return axios.request({
@@ -56,5 +48,38 @@ export const getGoodsList = (params) => {
         url:'/api/v1/get/goods',
         method:'get',
         params: params,
+    })
+}
+
+// 修改方案基本信息（移动文件夹，是否公开，修改信息）
+export const modifySchemeInfo = (params) => {
+    return axios.request({
+        url:'/api/v1/editor/schemeInfo',
+        method:'post',
+        data: params
+    })
+}
+
+// 获取方案基本信息
+export const getSchemeInfo = (id) => {
+    return axios.request({
+        url:'/api/v1/get/schemeDetail?id=' + id,
+        method:'get',
+    })
+}
+
+// 获取方案清单
+export const getSchemeGoodsList = (id) => {
+    return axios.request({
+        url:'/api/v1/get/educe/goods?id=' + id,
+        method:'get',
+    })
+}
+
+// 获取收藏列表
+export const  getCollectList = (type) => {
+    return axios.request({
+        url:'/api/v1/get/collectList?type=' + type,
+        method:'get',
     })
 }
