@@ -91,7 +91,7 @@
                         <Input v-model="imgObject.phone" placeholder="填写客户手机号"></Input>
                     </FormItem>
                     <FormItem label="是否公开">
-                        <i-switch v-model="imgObject.is_personal" :true-value='true'  :false-value='false'  @on-change="isOpenFun"  size="large">
+                        <i-switch v-model="switchVal" :true-value="true"  :false-value="false"  @on-change="isOpenFun"  size="large">
                             <span slot="open" >公开</span>
                             <span slot="close" >个人</span>
                         </i-switch>
@@ -107,6 +107,7 @@
 <script>
 import { mapState, mapGetters, mapActions  } from 'vuex';
 import { getEnumList, getSaveScheme,uploadImg } from '@/api/material.js'
+import { getSchemeInfo } from '@/api/data.js'
 import qs from 'qs'
 export default {
     name: 'designBar',
@@ -121,7 +122,7 @@ export default {
                 done_img_url: '', // 方案大图url 1
                 canvas_type: null, // 方案id（编辑方案使用）1
                 canvas_type: null, // 画布类型（1：1:1，2：A3横排，3：A3竖排，4：16:9）1
-                is_personal: true,//	公开类型（0：公共（默认）， 1：个人）1
+                is_personal: 0,//	公开类型（0：公共（默认）， 1：个人）1
                 scheme_name: "", // 方案名称1
                 background_id: null, // 背景图id1
                 space_type: null, // 空间类型1
@@ -132,10 +133,13 @@ export default {
                 img_site_json:null
                 
             },
+            switchVal:true, //控制switch
             imgFile:{},
             selectRoomArr:[],
             selectStyleArr:[],
-            canvasDataArr:[] //画布数据
+            canvasDataArr:[], //画布数据
+            proId:  null, // 方案id
+            loadObj: null
         }
     },
     computed: {
@@ -151,15 +155,23 @@ export default {
             },
             objJSON: state =>{
                 return state.app.objJSON
-            }
+            },
+            proDetailVal: state =>{
+                return state.app.proDetailVal
+            },
         }),
         ...mapGetters([
             'card',
             'selectedObj',
         ])
     },
+    beforeCreate() {
+        
+    },
     mounted() {
+        this.proId = this.proDetailVal.id
         this.handleGetEnumList()
+        this.isProIdfun()
         
     },
     methods: {
@@ -170,21 +182,30 @@ export default {
             'setPreviewImg',
             'saveState',
         ]),
+        //判断存在id 调取接口 渲染画布 赋值
+        isProIdfun(){
+            if( this.$route.query.id){
+                this.handleGetSchemeInfo(this.proId)
+            }
+            
+        },
         shemeInfoModalok () {
                 this.toJson()
-                this.imgObject.is_personal = this.imgObject.is_personal?0:1
+                this.imgObject.id = this.$route.query.id?this.$route.query.id:null
+                
                 this.imgObject.canvas_type = parseInt(this.vertical) 
                 // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
                 // this.imgObject = qs.stringify(this.imgObject)
-                this.$Message.info('Clicked ok');
+                this.$Message.info('添加方案成功');
                 this.handleGetSaveScheme(this.imgObject)
             },
         shemeInfoModalcancel () {
-            this.$Message.info('Clicked cancel');
+            this.$Message.info('你点击了取消');
         },
         //是否公开
         isOpenFun(ev) {
-            console.log("是否公开",ev)
+            this.imgObject.is_personal = this.switchVal?0:1
+            console.log("是否公开",this.imgObject.is_personal)
         },
         //保存方案
         saveScheme(){
@@ -329,7 +350,34 @@ export default {
             }).catch(err =>{
                 console.log(err)
             })
-        }
+        },
+        // 数据反序列化  获取后台方案数据 准备渲染
+        handleGetSchemeInfo (proId) {
+            getSchemeInfo(proId).then(res => {
+                this.loadObj = res.data.message.img_site_json
+                console.log("这是素材库",this.loadObj)
+                // this.card.loadFromJSON( JSON.stringify(this.loadObj) )
+                this.imgObject = res.data.message
+                // this.setCanvasState(res.data.message.canvas_type)
+                this.card.loadFromJSON(JSON.stringify(this.loadObj), this.card.renderAll(), function(o, object) {
+                    console.log("o",o)
+                    console.log("object",object)
+                    // `o` = json object
+                    // `object` = fabric.Object instance
+                    // ... do some stuff ...
+
+                });
+                this.card.item(0).set({
+                    borderColor: 'red',
+                    cornerColor: 'green',
+                    cornerSize: 6,
+                    transparentCorners: false
+                });
+                this.card.setActiveObject(this.card.item(0));
+            }).catch(err => {
+                console.log(err)
+            })
+        },
 
         /**
          * end API
