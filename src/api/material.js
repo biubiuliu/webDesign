@@ -4,9 +4,15 @@ import qs from 'qs'
 export const getmaterial = (is_personal) => {
         return axios.request({
             url: '/api/v1/get/materials',
-            params: {
-                is_personal
-            },
+            params: is_personal,
+            method: 'get',
+        })
+    }
+    //获取素材/自定义商品/背景图列表
+export const getmaterialList = (getmaterialData) => {
+        return axios.request({
+            url: '/api/v1/get/material/list',
+            params: getmaterialData,
             method: 'get',
         })
     }

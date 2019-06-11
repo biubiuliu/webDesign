@@ -7,11 +7,11 @@
             </div>
             <div id="privateId" class="private_room" @click="privateRFun">私人库</div>
         </div>
-        <div v-if="isRoow">
-            <div class="comm_body">
+        <div>
+            <div class="comm_body" v-if="this.bgUrl">
                 <div class="materialBg_title">
                     <span>背景</span>
-                    <span>全部 <i class="iconfont iconyou"></i> </span>
+                    <span @click="bgAll" class="allCursor">{{isAll?'全部':'取消'}} <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="bgImg in bgUrl"  :key="bgImg.id" >
@@ -19,10 +19,10 @@
                     </li>
                 </ul>
             </div>
-            <div class="comm_body">
+            <div class="comm_body" v-if="this.materialBgImgArr">
                 <div class="materialBg_title">
                     <span>素材</span>
-                    <span>全部 <i class="iconfont iconyou"></i> </span>
+                    <span @click="bgMateial"  class="allCursor">{{isAll?'全部':'取消'}}  <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
@@ -30,10 +30,10 @@
                     </li>
                 </ul>
             </div>
-            <div class="comm_body">
+            <div class="comm_body" v-if="this.goodsBgImgArr">
                 <div class="materialBg_title">
                     <span>自定义商品</span>
-                    <span>全部 <i class="iconfont iconyou"></i> </span>
+                    <span @click="bgCustom"  class="allCursor">{{isAll?'全部':'取消'}}  <i class="iconfont iconyou"></i> </span>
                 </div>
                 <ul class="reuseUl">
                     <li class="reuseLi" v-for="item in goodsBgImgArr" :key="item.goods_id">
@@ -42,15 +42,17 @@
                 </ul>
             </div>
         </div>
-        <div v-else>
-            <h1>私人库</h1>
-        </div>
+        <Spin fix v-if="isShowSpin">
+                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div>
+        </Spin>
+        <Page v-if="!this.isAll" class="pages" :total="this.pages.total" :page-size="this.pages.per_page" show-elevator size='small' @on-change="nextPage" />
     </div>
 </template>
 <script>
 import { fabric } from 'fabric'
-import {mapGetters, mapActions} from 'vuex'
-import { getmaterial } from '@/api/material.js'
+import {mapState, mapGetters, mapActions} from 'vuex'
+import { getmaterial, getmaterialList } from '@/api/material.js'
 
 export default {
     name: 'materialLib',
@@ -61,10 +63,27 @@ export default {
             isRoow: true,
             goodsBgImgArr:[],
             materialBgImgArr:[],
+            isAll:true,
+            getmaterialData:{
+                is_personal: 0,
+                page: 1,
+                type: null 	//1代表素材列表，2代表背景图列表，3代表自定义商品列表
+            },
+            // 分页
+            pages: {
+                total: null, 	      // 总条数
+                per_page: 40,       // 每页多少条
+                current_page: 1 ,  // 当前第几页
+            }
             
         }
     },
     computed: {
+        ...mapState({
+            isShowSpin: state =>{
+            return state.app.isShowSpin
+            },
+        }),
         ...mapGetters([
             'card',
             'selectedObj',
@@ -186,20 +205,63 @@ export default {
                 obj.className = obj.className.replace(reg, ' ');  
             }  
         },
-        privateRFun(){  
-            this.isRoow = false
+        //bgAll 全部背景
+        bgAll(){
+            window.event? window.event.cancelBubble = true : e.stopPropagation();
+            this.isAll = !this.isAll
+            if(!this.isAll){
+                this.getmaterialData.type = 2
+                this.handleGetmaterialList(this.getmaterialData)
+                return;
+            }
+            this.handleGetgetmaterial(0)
+        },
+        //bgMateial 全部素材
+        bgMateial(){
+            window.event? window.event.cancelBubble = true : e.stopPropagation();
+            this.isAll = !this.isAll
+            if(!this.isAll){
+                this.getmaterialData.type = 1
+                this.handleGetmaterialList(this.getmaterialData)
+                return;
+            }
+            this.handleGetgetmaterial(0)
+        },
+        //bgAll 全部自定义
+        bgCustom(){
+            window.event? window.event.cancelBubble = true : e.stopPropagation();
+            this.isAll = !this.isAll
+            if(!this.isAll){
+                this.getmaterialData.type = 3
+                this.handleGetmaterialList(this.getmaterialData)
+                return;
+            }
+            this.handleGetgetmaterial(0)
+        },
+        privateRFun(){
+            this.isAll = true
+            this.getmaterialData.is_personal = 1
+            this.handleGetgetmaterial(this.getmaterialData.is_personal)
             var commonsId = document.getElementById("commonsId")  
             let privateId = document.getElementById("privateId")
             this.addClass(privateId,"active");  
             this.removeClass(commonsId,"active");  
         },
         commonsRFun() {
-            this.isRoow = true
+            this.isAll = true
+            this.getmaterialData.is_personal = 0
+            this.handleGetgetmaterial(this.getmaterialData.is_personal)
             var commonsId = document.getElementById("commonsId")  
             let privateId = document.getElementById("privateId")
             this.removeClass(privateId,"active");  
             this.addClass(commonsId,"active"); 
         },
+        // 分页
+        nextPage(e) {
+            this.getmaterialData.page = e
+            this.handleGetmaterialList(this.getmaterialData)
+        },
+    
         //请求素材库api
         handleGetgetmaterial (is_personal) {
             getmaterial(is_personal).then(res => {
@@ -211,14 +273,51 @@ export default {
                 console.log(err)
             })
         },
+        //请求素材库更多
+        handleGetmaterialList (getmaterialData) {
+            getmaterialList(getmaterialData).then(res => {
+                switch (this.getmaterialData.type) {
+                    case 1:
+                        this.materialBgImgArr = res.data.message.meater.data
+                        this.pages.total = res.data.message.meater.total
+                        this.pages.per_page = res.data.message.meater.per_page
+                        this.bgUrl = null
+                        this.goodsBgImgArr = null
+                        break;
+                    case 2:
+                        this.bgUrl = res.data.message.backgroundImg.data
+                        this.pages.total = res.data.message.backgroundImg.total
+                        this.pages.per_page = res.data.message.backgroundImg.per_page
+                        this.materialBgImgArr = null
+                        this.goodsBgImgArr = null
+                        break;
+                    case 3:
+                        this.goodsBgImgArr = res.data.message.goods.data
+                        this.pages.total = res.data.message.goods.total
+                        this.pages.per_page = res.data.message.goods.per_page
+                        this.materialBgImgArr = null
+                        this.bgUrl = null
+                        break;
+                
+                    default:
+                        break;
+                }
+                
+            }).catch(err => {
+                console.log(err)
+            })
+        },
 
     },
     
 }
 </script>
 <style scoped>
+.allCursor{
+    cursor: pointer
+}
 .materialLib{
-    height: 95vh;
+    height: 92vh;
 }
 .tag{
     width: 400px;
@@ -258,15 +357,23 @@ export default {
     flex-wrap: wrap;
 }
 .reuseLi{
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     background: white;
     list-style: none;
     margin:10px 0 0 10px
 
 }
 .reuseLi>img{
-    width: 100px;
+    width: 70px;
+    height: 70px;  
+}
+.demo-spin-icon-load{
+    animation: ani-demo-spin 1s linear infinite;
+}
+.demo-spin-col{
     height: 100px;
+    position: relative;
+    border: 1px solid #eee;
 }
 </style>
