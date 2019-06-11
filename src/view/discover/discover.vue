@@ -252,7 +252,7 @@ export default {
                 // 只有当点击到图片时才进行操作
             if (event.target.tagName.toLowerCase() == 'img') {
                 this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({name:'proDetail'})
+                this.$router.push({name:'proDetail',query: {data:value}})
                 console.log('img clicked', value)
                 console.log(' vuex', this.proDetailVal)
                 }

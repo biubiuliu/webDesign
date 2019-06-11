@@ -123,9 +123,7 @@ export default {
         },
         //变形
         skewControl (){
-            console.log("小姐姐+++++++++++",this.selectedObj)
             if(this.selectedObj == null){
-                console.log("小姐姐-----------")
                 this.skewModel = false;
                 return
             }
@@ -217,7 +215,10 @@ export default {
         paste(_clipboard){
             // clone again, so you can do multiple copies.
             let card = this.card;
-            _clipboard.clone(function(clonedObj) {
+            
+            _clipboard.clone((clonedObj) => {
+                console.log("clonedObj",clonedObj)
+                console.log("this.selectedObj",this.selectedObj)
                 card.discardActiveObject();
                 clonedObj.set({
                     borderColor: '#f90',
@@ -230,7 +231,13 @@ export default {
                     left: clonedObj.left + 20,
                     top: clonedObj.top + 20,
                     evented: true,
+                    imgType: clonedObj.imgType, // imgType:0背景,1素材 2自定义商品
+                    goods_id: clonedObj.goods_id,
+                    goodsImg_id: clonedObj.goodsImg_id,
+                    material_id: clonedObj.material_id,
+                    
                 });
+                
                 if (clonedObj.type === 'activeSelection') {
                     // active selection needs a reference to the canvas.
                     clonedObj.card = card;
@@ -251,8 +258,10 @@ export default {
         copy(){
         let card = this.card;
         var _self = this;
-            card.getActiveObject().clone(function(cloned){
+        console.log("card",card._objects)
+            card.getActiveObject().clone((cloned) => {
                 // let _clipboard = cloned;
+                console.log("cloned",cloned)
                 _self.paste(cloned);
                 
             })

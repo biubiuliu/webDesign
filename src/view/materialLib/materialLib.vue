@@ -51,6 +51,7 @@
 import { fabric } from 'fabric'
 import {mapGetters, mapActions} from 'vuex'
 import { getmaterial } from '@/api/material.js'
+
 export default {
     name: 'materialLib',
     data() {
@@ -59,7 +60,8 @@ export default {
             bgUrl: [],
             isRoow: true,
             goodsBgImgArr:[],
-            materialBgImgArr:[]
+            materialBgImgArr:[],
+            
         }
     },
     computed: {
@@ -209,6 +211,7 @@ export default {
                 console.log(err)
             })
         },
+
     },
     
 }

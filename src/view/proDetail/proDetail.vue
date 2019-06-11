@@ -19,7 +19,7 @@
                             <div><h3>设计师</h3></div>
                         </div>
                         <div class="right_btn">
-                            <Button type="warning"  long>在创作</Button>
+                            <Button type="warning" @click="linkMaterialLib"  long>在创作</Button>
                             <Button type="warning" ghost long>收藏</Button>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getGoodsType } from '@/api/data.js'
+import { getSchemeInfo } from '@/api/data.js'
 import { mapState } from 'vuex'
 export default {
     name: 'proDetail',
@@ -84,10 +84,13 @@ export default {
             dataArr:[],
             setDataArr:[],
             iconshoucang1:false,
+            proId: null // 方案id
         }
     },
     created() {
-        this.handleGetGoodsType()
+        this.proId = this.proDetailVal.id
+        console.log("proId",this.proId)
+        this.handleGetSchemeInfo(this.proId)
     },
     methods: {
         selectTrol() {
@@ -113,8 +116,9 @@ export default {
                 this.leftIcon = 'iconfont iconxiala-'
         },
         //数据重组
-        handleGetGoodsType () {
-            getGoodsType().then(res => {
+        handleGetSchemeInfo (proId) {
+            getSchemeInfo(proId).then(res => {
+                console.log("详情",res)
                 this.indoor_list = res.data.message
                 this.dataArr = this.indoor_list.category[1].goods;
                 var _this = this;
@@ -127,7 +131,7 @@ export default {
                     _this.setDataArr.push(setDataObj)
                 }
                 this.imgsArr = this.setDataArr
-                console.log("详情",this.imgsArr)
+                
                 console.log(' vuex', this.proDetailVal.src)
             }).catch(err => {
                 console.log(err)
@@ -140,9 +144,12 @@ export default {
                 this.$store.dispatch('updataProDetailVal', value)
                 this.$router.push({name:'proDetail'})
                 console.log('img clicked', value)
-                console.log(' vuex', this.proDetailVal)
                 }
         },
+        linkMaterialLib(){
+            this.$router.push({name:'materialLib', query: {id: this.proId} })
+            console.log('需要跳转MaterialLib')
+        }
         
 
     },

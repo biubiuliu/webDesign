@@ -29,6 +29,9 @@ const app = {
         SET_LOCK: (state, isLocking) => {
             state.isLocking = isLocking
         },
+        SET_PRODETAIL: (state, proDetailVal) => {
+            state.proDetailVal = proDetailVal
+        },
         // drag -s
         SET_SELECTEDOBJ: (state, object) => {
             state.selectedObj = object
@@ -55,8 +58,8 @@ const app = {
 
     },
     actions: {
-        updataProDetailVal(ctx, obj) {
-            ctx.commit('SET_PRODETAIL', obj)
+        updataProDetailVal({ commit }, obj) {
+            commit('SET_PRODETAIL', obj)
         },
         setCanvasW({ commit }, cvsW) {
             commit('SET_CVS_W', cvsW)
