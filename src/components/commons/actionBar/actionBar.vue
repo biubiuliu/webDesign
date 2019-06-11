@@ -47,6 +47,7 @@ export default {
             skewXModelValue: 0,
             skewYModelValue: 0,
             skewModel:false,
+            test:null,
         }
     },
     created() {
@@ -64,6 +65,9 @@ export default {
         ...mapState({
             isLocking: state =>{
             return state.app.isLocking
+            },
+            objJSON: state =>{
+                return state.app.objJSON
             },
         }),
         ...mapGetters([
@@ -219,6 +223,10 @@ export default {
             _clipboard.clone((clonedObj) => {
                 console.log("clonedObj",clonedObj)
                 console.log("this.selectedObj",this.selectedObj)
+                var  imgType_s = this.selectedObj.imgType
+                var  goods_id_s = this.selectedObj.goods_id
+                var  goodsImg_id_s = this.selectedObj.goodsImg_id
+                var  material_id_s = this.selectedObj.material_id
                 card.discardActiveObject();
                 clonedObj.set({
                     borderColor: '#f90',
@@ -231,10 +239,10 @@ export default {
                     left: clonedObj.left + 20,
                     top: clonedObj.top + 20,
                     evented: true,
-                    imgType: clonedObj.imgType, // imgType:0背景,1素材 2自定义商品
-                    goods_id: clonedObj.goods_id,
-                    goodsImg_id: clonedObj.goodsImg_id,
-                    material_id: clonedObj.material_id,
+                    imgType: imgType_s, // imgType:0背景,1素材 2自定义商品
+                    goods_id: goods_id_s,
+                    goodsImg_id: goodsImg_id_s,
+                    material_id: material_id_s,
                     
                 });
                 
@@ -249,8 +257,13 @@ export default {
                 } else {
                     card.add(clonedObj);
                 }
+                console.log("_clipboard",_clipboard)
                 _clipboard.top += 20;
                 _clipboard.left += 20;
+                _clipboard.imgType = clonedObj.imgType, // imgType:0背景,1素材 2自定义商品
+                _clipboard.goods_id = clonedObj.goods_id,
+                _clipboard.goodsImg_id = clonedObj.goodsImg_id,
+                _clipboard.material_id = clonedObj.material_id,
                 card.setActiveObject(clonedObj);
                 // canvas.requestRenderAll();
             });
@@ -258,13 +271,18 @@ export default {
         copy(){
         let card = this.card;
         var _self = this;
-        console.log("card",card._objects)
+        // this.$store.state.app.objJSON = card._objects
+        console.log("objJSON",this.objJSON)
             card.getActiveObject().clone((cloned) => {
+                
                 // let _clipboard = cloned;
                 console.log("cloned",cloned)
                 _self.paste(cloned);
                 
             })
+            this.card.renderAll()
+            this.saveState()
+
         },
     },
     

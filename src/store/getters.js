@@ -6,6 +6,9 @@ const getters = {
     card: state => state.app.cardType === 1 ? state.app.frontCard : state.app.behindCard,
     selectedObj: state => state.app.selectedObj,
     previewImg: state => state.app.previewImg,
+    canvasState: state => state.app.canvasState,
+    undoList: state => state.app.undoList,
+    redoList: state => state.app.redoList,
 
 }
 export default getters;

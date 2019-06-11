@@ -13,7 +13,11 @@
                 <MenuItem name="我的收藏" @click.native="saveScheme">
                     保存方案
                 </MenuItem>
-                <MenuItem name="撤销" class="layout-user">
+                <MenuItem name="撤销" class="layout-user" @click.native="_redo" >
+                    <i  class="iconfont iconchexiao1"></i>
+                    恢复 
+                </MenuItem>
+                <MenuItem name="撤销"  @click.native="_undo">
                     <i  class="iconfont icondaohangchexiao"></i>
                     撤销 
                 </MenuItem>
@@ -163,6 +167,8 @@ export default {
         ...mapGetters([
             'card',
             'selectedObj',
+            'undoList',
+            'redoList',
         ])
     },
     beforeCreate() {
@@ -181,6 +187,8 @@ export default {
             'setCanvasState',
             'setPreviewImg',
             'saveState',
+            'undo',
+            'redo',
         ]),
         //判断存在id 调取接口 渲染画布 赋值
         isProIdfun(){
@@ -253,6 +261,12 @@ export default {
                     format: 'jpeg'
             });
             this.imgFile = this.dataURLtoBlob(base64Data, imgName);
+        },
+        _undo() {
+            this.undo()
+        },
+        _redo() {
+            this.redo()
         },
         //清空画布
         clearAll() {
