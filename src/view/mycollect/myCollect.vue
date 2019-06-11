@@ -3,8 +3,7 @@
         <vue-waterfall-easy ref="waterfall"
             style="width:100%; height:90vh; overflow: hidden"
             :imgWidth="290" :imgsArr="imgsArr"
-            :enablePullDownEvent="true"
-            @scrollReachBottom="handleGetGoodsType"
+            :enablePullDownEvent="false"
             @click="linkDetailFun"
             class="vueWaterfallEasy">
             <div slot="waterfall-head">
@@ -43,15 +42,14 @@
                     </div>
                 </div>
             </div>
-            <div class="img-info" slot-scope="props">
-                <p class="some-info">第{{props.index+1}}张图片</p>
-                <p class="some-info">{{props.value.info}}</p>
+            <div class="img-info" slot-scope="props">              
+                <p class="some-info">{{props.value.name}}</p>
             </div>
-            <div slot="waterfall-over">waterfall-over</div>
+            <div slot="waterfall-over">暂无更多数据</div>
         </vue-waterfall-easy>
-        <div v-if="!imgsArr.length" class="no-scheme">
+        <!-- <div v-if="!imgsArr.length" class="no-scheme">
                 抱歉 没有找到匹配的结果
-        </div>
+        </div> -->
     </div>
 </template>
 <script>
@@ -144,22 +142,24 @@ export default {
 
         //数据重组
         handleGetGoodsType () {
-            getCollectList(this.isSelect).then(res => {
-                 if(this.page==1){
-                        this.imgsArr=[];
+            
+            getCollectList(this.isSelect).then(res => {                           
+                    this.imgsArr=[];  
+                    if(res.data.message.length){                             
+                        res.data.message.map((item,i)=>{
+                            var  setDataObj = {
+                                src: item.img_url,
+                                href: item.img_url,  
+                                name: item.name,                                                  
+                                id: item.id,
+                            };
+                            this.imgsArr.push(setDataObj);                      
+                        });
                     }
-                    this.total = res.data.message.total;                 
-                    res.data.message.data.map((item,i)=>{
-                        var  setDataObj = {
-                            src: item.done_img_url,
-                            href: item.done_img_url,  
-                            name: item.scheme_name,
-                            canvas_type:item.canvas_type,
-                            updated_at:item.updated_at,                                                   
-                            id: item.id,
-                        };
-                        this.imgsArr.push(setDataObj);                      
-                    });
+
+                    this.$refs.waterfall.waterfallOver();
+                    
+                    
             }).catch(err => {
                 console.log(err)
             })
@@ -270,5 +270,11 @@ export default {
     line-height: 400px;
     position: absolute;
     top: 120px;
+}
+.img-info{
+    padding:14px 25px;
+    font-size: 16px;
+    color: #666;
+    text-align: left
 }
 </style>

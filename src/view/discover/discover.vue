@@ -76,9 +76,9 @@
                 </div>
                 <div slot="waterfall-over">暂无更多数据</div>
             </vue-waterfall-easy>
-            <div v-if="!imgsArr.length" class="no-scheme">
+            <!-- <div v-if="!imgsArr.length" class="no-scheme">
                 抱歉 没有找到匹配的结果
-            </div>
+            </div> -->
         </div>
     </div>
 </template>

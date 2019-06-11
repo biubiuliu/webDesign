@@ -74,10 +74,11 @@
                         </div>
                     </div>   
                 </div> 
-            </div>
+            </div>            
             <div v-else class="no-scheme">
                 抱歉 没有找到匹配的结果
             </div>
+            <a class="more" href="javascript:;" v-if="page<total_page||page==total_page&&page!=1" @click="handleGetList">更多</a>
         </div>
         <Modal
             v-model="shemeInfoModal"
@@ -115,6 +116,7 @@
 import vueWaterfallEasy from 'vue-waterfall-easy'
 import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList } from '@/api/data.js'
 import { getEnumList } from  '@/api/material.js'
+import { convertTimeStamp } from '@/libs/util.js'
 
 export default {
     name: 'mydesign',
@@ -137,7 +139,7 @@ export default {
             add_dir_name:'',
             imgsArr: [],
             page:1, 
-            total:0,
+            total_page:1,
             shemeInfoModal:false,
             selectRoomArr:[],
             selectStyleArr:[],
@@ -178,7 +180,7 @@ export default {
                this.dirLi = index;            
             }        
             this.page = 1;
-            this.total = 1;
+            this.total_page = 1;
             this.handleGetList();
             var ul = document.getElementsByClassName(type+'-ul');
             ul[0].style.display = 'none';
@@ -196,7 +198,7 @@ export default {
 
         // 数据重组
         handleGetList () {
-            if(this.page!=1&&this.page> Math.ceil(this.total/30)){
+            if(this.page!=1&&this.page> this.total_page){
                 this.$refs.waterfall.waterfallOver()
                 return
             }  
@@ -205,14 +207,15 @@ export default {
                 page:this.page,
                 sorter:this.sortSelectList[this.sortLi].id,
                 dir_id:this.dirSelectList[this.dirLi].id,
-                page_size:30,
+                page_size:10,
             }
             getMeals(params).then(res => {
                 if(res.data.success){
                     if(this.page==1){
                         this.imgsArr=[];
                     }
-                    this.total = res.data.message.total;  
+                    this.page = this.page+1;
+                    this.total_page = Math.ceil(res.data.message.total/10) ;  
                     if(res.data.message.data.length){
                         res.data.message.data.map((item,i)=>{
                         var  setDataObj = {
@@ -220,14 +223,12 @@ export default {
                             href: item.done_img_url,  
                             name: item.scheme_name,
                             is_personal:item.is_personal,
-                            updated_at:item.updated_at,                                                   
+                            updated_at:convertTimeStamp(item.updated_at),                                                   
                             id: item.id,
                         };
                         this.imgsArr.push(setDataObj);                      
                     });
-                    }             
-                   
-                    this.page=this.page +1;                
+                    }                                          
                 }
             }).catch(err => {
                 console.log(err)
@@ -570,6 +571,7 @@ export default {
     margin-top: 20px;
 }
 .child {
+    background: #fff;
     margin-bottom:20px;	 
     -moz-page-break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -579,12 +581,13 @@ export default {
     overflow: hidden;
     box-sizing: border-box;
     border-radius: 10px;
-    transform: scaleX(1) scaleY(1);
     position: relative;
-    box-shadow: 0 1px 4px rgba(6,31,50,.12);
+    border:1px solid #ddd;
+    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); */
 }
 .child img{
     width: 100%;
+    display:block; 
 }
 .mask{
     display:none;
@@ -593,7 +596,7 @@ export default {
     left: 0;
     bottom: 0;
     right: 0;
-    background: rgba(0,0,0,0.1)
+    background: rgba(0,0,0,0.2)
 }
 .child:hover .mask{
    display:block;
@@ -629,6 +632,16 @@ export default {
     position: absolute;
     right: -54px;
     top: -1px;
+}
+.more{
+    display: block;
+    text-align: center;
+    margin: 100px auto;
+    line-height: 40px;
+    width: 150px;
+    border-radius: 20px;
+    border:1px solid #ddd;
+    color: #666;
 }
 
 </style>
