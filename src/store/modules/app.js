@@ -11,6 +11,7 @@ const app = {
         frontCard: null,
         behindCard: null,
         undoList: [],
+        redoList: [],
         selectedObj: null,
         previewImg: null,
         objJSON: null
@@ -51,10 +52,22 @@ const app = {
         ADD_UNDO: (state, canvasState) => {
             state.undoList.push(canvasState)
         },
+        POP_UNDO: (state) => {
+            state.undoList.pop()
+        },
+        ADD_REDO: (state, canvasState) => {
+            state.redoList.push(canvasState)
+        },
+        POP_REDO: (state) => {
+            state.redoList.pop()
+        },
         SET_PREVIEW_IMG: (state, img) => {
-                state.previewImg = img
-            }
-            // drag  -e
+            state.previewImg = img
+        },
+        addRedo({ commit }, canvasState) {
+            commit('ADD_REDO', canvasState)
+        },
+        // drag  -e
 
     },
     actions: {
@@ -124,6 +137,43 @@ const app = {
                 ]))
 
             // console.log(state.canvasState)
+        },
+        addUndo({ commit }, canvasState) {
+            commit('ADD_UNDO', canvasState)
+        },
+        popUndo({ commit }) {
+            commit('POP_UNDO')
+        },
+        addRedo({ commit }, canvasState) {
+            commit('ADD_REDO', canvasState)
+        },
+        popRedo({ commit }) {
+            commit('POP_REDO')
+        },
+        setRedo({ commit }, list) {
+            commit('SET_REDOLIST', list)
+        },
+        // 撤销
+        undo({ commit, state }) {
+            commit('ADD_REDO', state.canvasState)
+            const lastState = {...state.undoList[state.undoList.length - 1] }
+            commit('SET_CANVASSTATE', lastState)
+                // this.popUndo()
+            commit('POP_UNDO')
+            state.frontCard.loadFromJSON(lastState, () => {
+                state.frontCard.renderAll()
+            })
+        },
+        // 恢复
+        redo({ commit, state }) {
+            commit('ADD_UNDO', state.canvasState)
+            const lastState = {...state.redoList[state.redoList.length - 1] }
+            commit('SET_CANVASSTATE', lastState)
+            commit('POP_REDO')
+            console.log('lastState', lastState)
+            state.frontCard.loadFromJSON(lastState, () => {
+                state.frontCard.renderAll()
+            })
         },
         // 预览图片
         setPreviewImg({ commit }, img) {
