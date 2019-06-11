@@ -1,63 +1,70 @@
 <template>
     <div class="mycollect">
-        <vue-waterfall-easy ref="waterfall"
-            style="width:100%; height:90vh; overflow: hidden"
-            :imgWidth="290" :imgsArr="imgsArr"
-            :enablePullDownEvent="false"
-            @click="linkDetailFun"
-            class="vueWaterfallEasy">
-            <div slot="waterfall-head">
-                <div class="collectTitle">
-                    <a class="Item_collection collecttion" :class="{'isSelect':isSelect==2}" href="javascript:;" @click="changeSelect(2)">
-                        商品收藏
-                    </a>
-                    <a class="scheme_collection collecttion" :class="{'isSelect':isSelect==1}" href="javascript:;"  @click="changeSelect(1)">
-                        方案收藏
-                    </a>
-                    <a @click="filtrateFun" v-if='isSelect==2' class="filtrate_collection collecttion">
-                        筛选<i class="iconfont iconxiala-"></i>
-                    </a>
-                    <div>
-                        <Modal
-                            v-model="mycollectModel"
-                            :closable="false"
-                            :styles="{top: '120px',marginRight:'5%',width:'240px'}">
-                            <div class="filtrate_model flexLayout">
-                                <a class="styles" :class="{'isSelectChoose':type=='style'}" @click="changeChoose('style')">风格</a>
-                                <a class="classify" :class="{'isSelectChoose':type=='classify'}" @click="changeChoose('classify')">分类</a>
+        <div class="header">
+            <div class="collectTitle">
+                <a class="Item_collection collecttion" :class="{'isSelect':isSelect==2}" href="javascript:;" @click="changeSelect(2)">
+                    商品收藏
+                </a>
+                <a class="scheme_collection collecttion" :class="{'isSelect':isSelect==1}" href="javascript:;"  @click="changeSelect(1)">
+                    方案收藏
+                </a>
+                <a @click="filtrateFun" v-if='isSelect==2' class="filtrate_collection collecttion">
+                    筛选<i class="iconfont iconxiala-"></i>
+                </a>
+                <div>
+                    <Modal
+                        v-model="mycollectModel"
+                        @on-ok="sureChoose"
+                        @on-cancel="exitChoose"
+                        :closable="false"
+                        :mask-closable="false"
+                        :styles="{top: '120px',marginRight:'5%',width:'240px'}">
+                        <div class="filtrate_model flexLayout">
+                            <a class="styles" :class="{'isSelectChoose':type==1}" @click="changeChoose(1)">风格</a>
+                            <a class="classify" :class="{'isSelectChoose':type==2}" @click="changeChoose(2)">分类</a>
+                        </div>
+                        <ul class="col_checkbox">
+                            <div  v-if="type==1">
+                                <li v-for="(item,index) in selectStyleArr" :key="index" >
+                                    <Checkbox  size='large' @on-change="changeSelectStyle(index,item.checked)" v-model="item.checked">
+                                        {{item.style_name}}({{item.count}})
+                                    </Checkbox>
+                                </li>
                             </div>
-                            <ul class="col_checkbox">
-                                <CheckboxGroup v-model="selectStyle" v-if="type=='style'" @on-change="changeSelectStyle">
-                                    <Checkbox  size='large' v-for="(item,index) in selectStyleArr" :key="index" :label="item.id">
-                                        {{item.style_name}}
+                            <div v-else>
+                                <li  v-for="(item,index) in selectCatArr" :key="index">
+                                    <Checkbox  size='large' @on-change="changeSelectRoom(index,item.checked)" v-model="item.checked">
+                                        {{item.cat_name}}({{item.count}})
                                     </Checkbox>
-                                </CheckboxGroup>
-                                <CheckboxGroup v-model="selectRoom" v-else  @on-change="changeSelectRoom">
-                                    <Checkbox  size='large' v-for="(item,index) in selectRoomArr" :key="index" :label="item.cat_id">
-                                        {{item.cat_name}}
-                                    </Checkbox>
-                                </CheckboxGroup>                                   
-                            </ul>
-                        </Modal>
-                    </div>
+                                </li>
+                            </div>
+                        </ul>
+                    </Modal>
                 </div>
             </div>
-            <div class="img-info" slot-scope="props">              
-                <p class="some-info">{{props.value.name}}</p>
+        </div>
+        <div class="parent">
+            <div  class="child" v-for="(item, index) in dataArr" :key="index" @click="linkDetailFun(item)">
+                <div :class="{'goods-img':isSelect==2}">               
+                    <img :src="item.src" alt="" @error="imgError(item)">
+                </div>
+                <div class="img-info" :class="{'scheme-img-info':isSelect==1}">
+                    <p class="some-info">{{item.name}}</p>
+                    <p class="some-info">{{isSelect==1?item.time:'￥'+item.price}}</p>
+                </div>
             </div>
-            <div slot="waterfall-over">暂无更多数据</div>
-        </vue-waterfall-easy>
-        <!-- <div v-if="!imgsArr.length" class="no-scheme">
-                抱歉 没有找到匹配的结果
-        </div> -->
+        </div>
+        <div v-if="!dataArr.length" class="no-scheme">
+                暂无更多数据
+        </div>
     </div>
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getCollectList } from '@/api/data.js'
-import { getEnumList,category } from  '@/api/material.js'
-
+import { getCollectList , getCollectScreen } from '@/api/data.js'
+import { convertTimeStamp } from '@/libs/util.js'
 import { mapState } from 'vuex'
+
 export default {
     name: 'mycollect',
     components: {
@@ -74,16 +81,13 @@ export default {
         return {
             msg: '这是收藏',
             isSelect:2,
-            single:false,
-            imgsArr: [],
             dataArr:[],
-            setDataArr:[],
             mycollectModel:false,
-            selectRoomArr:[],
-            selectStyleArr:[],
-            selectStyle:[],
-            selectRoom:[],
-            type:'style'
+            selectCatArr:[],
+            selectStyleArr:[],   
+            beforeSelectCat:[],
+            beforeSelectStyle:[],     
+            type:1
         }
     },
     created() {
@@ -91,14 +95,16 @@ export default {
         this.handleGetEnumList()
     },
     methods: {
-        changeSelectStyle(data){
-            console.log(data)//拿到的就是选中的数组。。默认是label的值，可以自定义
-            this.selectStyle = data;
+        imgError(item) {
+            item.src = require('../../assets/defalut.png');
+        },
+        
+        changeSelectStyle(i,data){          
+            this.selectStyleArr[i].checked = data;
         },
 
-        changeSelectRoom(data){
-            console.log(data)//拿到的就是选中的数组。。默认是label的值，可以自定义
-            this.selectRoom = data;
+        changeSelectRoom(i,data){
+            this.selectCatArr[i].checked = data;;
         },
 
         changeSelect(id){
@@ -113,62 +119,96 @@ export default {
 
         // 获取分类风格
         handleGetEnumList() {
-              category().then(res => {
+              getCollectScreen().then(res => {
                 if(res.data.success){
-                    this.selectRoomArr = res.data.message.category;
-                    this.selectStyleArr = res.data.message.style;
-                    this.brandLabelArr = res.data.message.brand;
+                     res.data.message.cat_group.map((item)=>{
+                         item.checked = false;
+                     })
+                     res.data.message.style_group.map((item)=>{
+                         item.checked = false;
+                     })
+                    this.selectCatArr = res.data.message.cat_group;
+                    this.selectStyleArr = res.data.message.style_group;
+                    this.beforeSelectCat = JSON.parse(JSON.stringify(this.selectCatArr));
+                    this.beforeSelectStyle = JSON.parse(JSON.stringify(this.selectStyleArr));
                 }
             })
         },
 
         // 数据重组
-        handleGetGoodsType () {           
-            getCollectList(this.isSelect).then(res => {                           
-                    this.imgsArr=[];  
-                    if(res.data.message.length){                             
-                        res.data.message.map((item,i)=>{
-                            var  setDataObj = {
-                                src: item.img_url,
-                                href: item.img_url,  
-                                name: item.name,                                                  
-                                id: item.id,
-                            };
-                            this.imgsArr.push(setDataObj);                      
-                        });
-                    }
-
-                    this.$refs.waterfall.waterfallOver();
-                    
-                    
+        handleGetGoodsType (cat_ids,style_type) {
+            var getData = this.isSelect == 1 ? getCollectList(this.isSelect):getCollectList(this.isSelect,style_type,cat_ids);
+            getData.then(res => {  
+                this.dataArr = [];                                             
+                if(res.data.message.length){                                                
+                    res.data.message.map((item,i)=>{                      
+                        var  setDataObj = {
+                            src: item.img_url,
+                            href: item.img_url,  
+                            name: item.name,                                                  
+                            id: item.id,
+                            price:item.shop_price,
+                            time:convertTimeStamp(item.created_at)
+                        };
+                        this.dataArr.push(setDataObj);                                          
+                    });
+                }                                                  
             }).catch(err => {
                 console.log(err)
             })
         },
 
-        linkDetailFun(event, { index, value }) {
+        // 确定筛选
+        sureChoose () {
+            this.beforeSelectCat = JSON.parse(JSON.stringify(this.selectCatArr));
+            this.beforeSelectStyle = JSON.parse(JSON.stringify(this.selectStyleArr));
+            var cat_ids = [];
+            var style_type = [];
+            this.selectCatArr.map((item)=>{
+                if(item.checked){
+                    cat_ids.push(item.cat_id)
+                }
+            })
+            this.selectStyleArr.map((item)=>{
+                if(item.checked){
+                    style_type.push(item.style_id.toString())
+                }
+            })
+
+            this.handleGetGoodsType (cat_ids.length?cat_ids.join(','):'',style_type.length?style_type.join(','):'')
+        },
+
+        // 取消筛选 
+        exitChoose () {
+            this.selectCatArr = JSON.parse(JSON.stringify(this.beforeSelectCat));
+            this.selectStyleArr = JSON.parse(JSON.stringify(this.beforeSelectStyle));
+        },
+
+        linkDetailFun (value) {
             event.preventDefault()
-                // 只有当点击到图片时才进行操作
-            if (event.target.tagName.toLowerCase() == 'img') {
                 this.$store.dispatch('updataProDetailVal', value)
                 this.$router.push({name:'proDetail',query: {data:value}})
                 console.log('img clicked', value)
                 console.log(' vuex', this.proDetailVal)
-                }
         },
 
         // 筛选
         filtrateFun(){
-            this.mycollectModel = !this.mycollectModel;
-            //this.selectStyle = [];
-            //this.selectRoom = [];
+            this.mycollectModel = !this.mycollectModel;         
         }
     }  
 }
 </script>
 <style scoped>
 .mycollect{
-    color: black
+    color: black;
+    /* height: 93vh; */
+}
+.header{
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+    top: 60px;
 }
 .collectTitle{
     display: flex;
@@ -180,6 +220,9 @@ export default {
     padding: 0 60px;
     position: relative;
     background: #fff;
+}
+.vueWaterfallEasy,.parent{
+    padding-top: 60px;
 }
 .collecttion{
     width: 80px;
@@ -258,6 +301,71 @@ export default {
     padding:14px 25px;
     font-size: 16px;
     color: #666;
+    background: #fff;
     text-align: left
 }
+.parent { 
+    width:100%;
+    -moz-column-count: 5;
+    -webkit-column-count: 5;
+    column-count: 5;
+    padding:60px 60px 0 60px;
+    margin-top: 20px;
+}
+.child {
+    background: #f2f2f2;;
+    margin-bottom:20px;	 
+    -moz-page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    break-inside: avoid;
+    color:#f2f2f4;
+    /* width: 340px; */
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 10px;
+    position: relative;
+    border:1px solid #ddd;
+    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); */
+}
+.child img{
+    width: 100%;
+    display:block; 
+}
+.goods-img{
+    /* height: 320px;
+    overflow: hidden; */
+}
+.goods-img img{
+    width: 100%;   
+}
+.scheme-img-info{
+    padding:14px 25px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+}
+.scheme-img-info .some-info:nth-child(1) {
+    flex: 1;
+    text-align: left;
+    color: #666;
+    font-size: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.scheme-img-info .some-info:nth-child(2) {
+    flex: 1;
+    text-align: right;
+    color: #999;
+    font-size: 14px;
+}
+.img-info .some-info{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: left;
+    color: #666;
+    font-size: 16px;
+}
+
 </style>

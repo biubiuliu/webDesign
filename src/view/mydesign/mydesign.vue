@@ -32,11 +32,11 @@
             <div class="parent"  v-if="imgsArr.length">
                 <div  class="child" v-for="(item, index) in imgsArr" :key="index">
                     <!-- <div class="img"> -->
-                        <img :src="item.src" alt="" onerror="this.src='https://run.mockplus.cn/assets/logo.png'">
+                        <img :src="item.src" alt="" @error="imgError(item)">
                     <!-- </div>                         -->
                     <div  class="scheme-img-info">
                         <p class="some-info">{{item.name}}</p>
-                        <p class="some-info">{{item.updated_at}}</p>
+                        <p class="some-info">{{item.time}}</p>
                     </div>
                     <div class="mask">
                         <div style="position:relative">
@@ -159,7 +159,20 @@ export default {
         this.handleGetList();
         this.handleGetEnumList();
     },
+    mounted () {
+        // 添加滚动事件，检测滚动到页面底部
+       window.addEventListener('scroll', this.handleScroll)
+    },
     methods: {
+        handleScroll() {
+            // 滚动到页面底部时
+
+        },
+
+        imgError(item) {
+            item.src = require('../../assets/defalut.png');
+        },
+
         // 排序顺序
         selectEnter (type) {
             var ul = document.getElementsByClassName(type+'-ul');
@@ -207,7 +220,7 @@ export default {
                 page:this.page,
                 sorter:this.sortSelectList[this.sortLi].id,
                 dir_id:this.dirSelectList[this.dirLi].id,
-                page_size:10,
+                page_size:15,
             }
             getMeals(params).then(res => {
                 if(res.data.success){
@@ -215,7 +228,7 @@ export default {
                         this.imgsArr=[];
                     }
                     this.page = this.page+1;
-                    this.total_page = Math.ceil(res.data.message.total/10) ;  
+                    this.total_page = Math.ceil(res.data.message.total/15) ;  
                     if(res.data.message.data.length){
                         res.data.message.data.map((item,i)=>{
                         var  setDataObj = {
@@ -223,7 +236,7 @@ export default {
                             href: item.done_img_url,  
                             name: item.scheme_name,
                             is_personal:item.is_personal,
-                            updated_at:convertTimeStamp(item.updated_at),                                                   
+                            time:convertTimeStamp(item.created_at),                                                   
                             id: item.id,
                         };
                         this.imgsArr.push(setDataObj);                      
@@ -444,7 +457,7 @@ export default {
 .mydesignBody{
     background: #f2f2f4;
     color: black;
-    height: 93vh; 
+    /* height: 93vh;  */
     font-size: 14px;
     position: relative;
 }

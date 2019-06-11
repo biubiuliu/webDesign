@@ -37,10 +37,10 @@
                 </div>
                 <div slot="waterfall-head">
                     <div class="discoverLable">
-                        <Button  >
+                        <!-- <Button  >
                             Forward
                             <Icon type="md-close" />
-                        </Button>
+                        </Button> -->
                         <div class="vertical">
                             <span>{{changeblue==0?"空间标签":'分类标签'}} :</span>
                             <Button class="roomlabel" @click="changeChooseLableFun(0,0)" :class="{choose:spaceLabelId==0}">全部</Button>
@@ -63,6 +63,11 @@
                             <Button class="roomlabel" @click="changeChooseLableFun(2,item.bid)" :class="{choose:brandLableId==item.bid}" 
                                 v-for="(item,index) in brandLabelArr" :key="index">
                                 {{item.name}}
+                                <div class="brand_lable">
+                                    <li v-for="(m,n) in item.series_list" :key="n" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.id)">
+                                        {{m.series_name}}
+                                    </li>
+                                </div>
                             </Button>
                         </div>
                     </div>
@@ -72,7 +77,7 @@
                 </div>
                 <div :class="{'scheme-img-info':changeblue==0}" class="img-info" slot-scope="props">
                     <p class="some-info">{{props.value.name}}</p>
-                    <p class="some-info">{{props.value.updated_at||'￥'+props.value.price}}</p>
+                    <p class="some-info">{{props.value.time||'￥'+props.value.price}}</p>
                 </div>
                 <div slot="waterfall-over">暂无更多数据</div>
             </vue-waterfall-easy>
@@ -86,8 +91,9 @@
 import vueWaterfallEasy from 'vue-waterfall-easy'
 import { getGoodsType,  getBrandList, getMeals, getGoodsList } from '@/api/data.js'
 import { category,getEnumList } from '@/api/material.js'
-
+import { convertTimeStamp } from '@/libs/util.js'
 import { mapState } from 'vuex'
+
 export default {
     name: 'discover',
     components: {
@@ -117,6 +123,7 @@ export default {
             spaceLabelId:0,// 选择的空间标签id
             styleLableId:0,// 选择的风格标签id
             brandLableId:0,// 选择的品牌标签id
+            seriesId:0,// 品牌下面的系列id
             keywords:'',
             page:1,
             total:0
@@ -153,6 +160,7 @@ export default {
             this.spaceLabelId=0;
             this.styleLableId=0;
             this.brandLableId=0;
+            this.seriesId=0;
             this.page = 1;
             this.total = 1;
             if(index==1){
@@ -182,6 +190,7 @@ export default {
                 is_personal:0,
                 keywords:this.keywords,
                 bid:this.brandLableId,
+                series_id:this.seriesId,
                 page:this.page,
                 page_size:30
             }
@@ -201,7 +210,7 @@ export default {
                             href: item.done_img_url,  
                             name: item.scheme_name,
                             canvas_type:item.canvas_type,
-                            updated_at:item.updated_at,                                                   
+                            time:convertTimeStamp(item.created_at),                                                   
                             id: item.id,
                         };
                         this.imgsArr.push(setDataObj);                      
@@ -291,18 +300,26 @@ export default {
                    this.handleGetGoodsType();
                    break;          
                case 1:
-                    this.styleLableId=id;
+                    this.styleLableId=id;                   
                     this.page = 1;
                     this.handleGetGoodsType();
                     break;                 
                case 2:
                     this.brandLableId=id;
+                    this.seriesId = 0;
                     this.page = 1;
                     this.handleGetGoodsType();
                     break;
                default:
                    break;
            }
+       },
+
+       changeChooseSeriesFun (type,id,series_id) {
+           this.brandLableId = id;
+           this.seriesId = series_id
+           this.page = 1;
+           this.handleGetGoodsType();
        },
 
        // input输入
@@ -381,6 +398,7 @@ export default {
     width: 100%;
     border-bottom: 1px solid #c4bebe;
     cursor: pointer;
+    position: relative;
 }
 .searchBtn{
     width: 15%;
@@ -403,6 +421,9 @@ export default {
 .vueWaterfallEasy{
     left: 0px;
     z-index: 0;
+    background: #f2f2f2;
+    border-radius: 8px;
+    overflow: hidden;
 }
 .waterfall{
     /* height: 100vh; */
@@ -423,7 +444,32 @@ export default {
 }
 .roomlabel{
     margin-left: 10px;
-    font-size: 14px
+    font-size: 14px;
+    position: relative;
+}
+.roomlabel:hover .brand_lable{
+    display: block
+}
+.roomlabel:hover .brand_lable li{
+    color: #666
+}
+.brand_lable li:hover{
+    background: #f2f2f2;
+}
+.brand_lable{
+    position: absolute;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    left: 0;
+    top: 32px;
+    width: 100%;
+    z-index: 1;
+    display: none;
+}
+.brand_lable li{
+    word-wrap:break-word;
+    line-height: 30px;
+    width: 100%;
 }
 .vertical{
     margin: 20px 0;
@@ -437,13 +483,21 @@ export default {
     color: #fff;
     margin-left: 10px;
 }
+.series_choose{
+    background-color: #ff9a00!important;
+    color: #fff!important;
+}
 .img-info{
     padding:10px;
+    background: #fff;
+    border-radius: 8px;
 }
 .scheme-img-info{
     padding:10px;
     display: flex;
     align-items: center;
+    background: #fff;
+    border-radius: 8px;
 }
 .scheme-img-info .some-info:nth-child(1) {
     flex: 1;
@@ -467,6 +521,7 @@ export default {
     text-align: left;
     color: #666;
     font-size: 16px;
+    background: #fff;
 }
 .no-scheme{
     width: 100%;

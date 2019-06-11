@@ -80,9 +80,22 @@ export const getSchemeGoodsList = (id) => {
 }
 
 // 获取收藏列表
-export const getCollectList = (type) => {
+export const getCollectList = (type,style_type,cat_ids) => {
     return axios.request({
-        url: '/api/v1/get/collectList?type=' + type,
+        url: '/api/v1/get/collectList',
+        method: 'get',
+        params: {
+            type,
+            style_type,
+            cat_ids,
+        },
+    })
+}
+
+// 获取收藏的筛选列表
+export const getCollectScreen  = () => {
+    return axios.request({
+        url: '/api/v1/get/collectScreen',
         method: 'get',
     })
 }
