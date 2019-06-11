@@ -32,7 +32,7 @@
                                         {{item.style_name}}
                                     </Checkbox>
                                 </CheckboxGroup>
-                                    <CheckboxGroup v-model="selectRoom" v-else  @on-change="changeSelectRoom">
+                                <CheckboxGroup v-model="selectRoom" v-else  @on-change="changeSelectRoom">
                                     <Checkbox  size='large' v-for="(item,index) in selectRoomArr" :key="index" :label="item.cat_id">
                                         {{item.cat_name}}
                                     </Checkbox>
@@ -93,30 +93,12 @@ export default {
     methods: {
         changeSelectStyle(data){
             console.log(data)//拿到的就是选中的数组。。默认是label的值，可以自定义
+            this.selectStyle = data;
         },
+
         changeSelectRoom(data){
             console.log(data)//拿到的就是选中的数组。。默认是label的值，可以自定义
-        },
-        selectTrol() {
-            var project = document.getElementById('project')
-                project.style.display = 'block';
-                this.leftIcon = 'iconfont iconxiala'
-        },
-        selectTrolLeave() {
-            var project = document.getElementById('project')
-                project.style.display = 'none';
-                this.leftIcon = 'iconfont iconxiala-'
-        },
-        mouseenter(index, item) {
-            this.changeblue = index;
-            
-        },
-        changeSelectFun(index, item){
-            console.log('index',index)
-            this.selectDefault = item.title
-            var project = document.getElementById('project')
-                project.style.display = 'none';
-                this.leftIcon = 'iconfont iconxiala-'
+            this.selectRoom = data;
         },
 
         changeSelect(id){
@@ -140,9 +122,8 @@ export default {
             })
         },
 
-        //数据重组
-        handleGetGoodsType () {
-            
+        // 数据重组
+        handleGetGoodsType () {           
             getCollectList(this.isSelect).then(res => {                           
                     this.imgsArr=[];  
                     if(res.data.message.length){                             
@@ -164,17 +145,19 @@ export default {
                 console.log(err)
             })
         },
+
         linkDetailFun(event, { index, value }) {
             event.preventDefault()
                 // 只有当点击到图片时才进行操作
             if (event.target.tagName.toLowerCase() == 'img') {
                 this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({name:'proDetail'})
+                this.$router.push({name:'proDetail',query: {data:value}})
                 console.log('img clicked', value)
                 console.log(' vuex', this.proDetailVal)
                 }
         },
-        //筛选
+
+        // 筛选
         filtrateFun(){
             this.mycollectModel = !this.mycollectModel;
             //this.selectStyle = [];

@@ -40,7 +40,7 @@
                     </div>
                     <div class="mask">
                         <div style="position:relative">
-                            <a class="midify" href="javascript:;" @click="toDetail(item.id)">
+                            <a class="midify" href="javascript:;" @click="toDetail(item)">
                                 <i class="iconfont iconiconset0137"></i>
                             </a>
                             <a href="javascript:;"  @click="del(item.id)">
@@ -261,9 +261,9 @@ export default {
         },
 
         // 修改方案
-        toDetail (id){
-            this.$Message.info('修改'+id);
-            this.$router.push({name:'proDetail'})
+        toDetail (value){
+            this.$store.dispatch('updataProDetailVal', value)
+            this.$router.push({name:'proDetail',query: {data:value}})
         },
 
         // 修改方案信息确定
