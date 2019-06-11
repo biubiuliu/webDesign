@@ -13,7 +13,7 @@
                 <MenuItem name="我的收藏" @click.native="saveScheme">
                     保存方案
                 </MenuItem>
-                <MenuItem name="撤销" class="layout-user" @click.native="_redo" >
+                <MenuItem name="恢复" class="layout-user" @click.native="_redo" >
                     <i  class="iconfont iconchexiao1"></i>
                     恢复 
                 </MenuItem>
