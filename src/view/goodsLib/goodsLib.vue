@@ -29,13 +29,17 @@
         <div>
             <ul class="goodsUl flexLayout">
                 <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun"  @mouseenter="mouseenter(item,index)"  @mouseleave="mouseleave(item,index)">
-                    <img class="goodsImg" :src="item.goods_thumb" alt="">
-                    <div class="iconBox flexLayout" v-if="true">
+                    <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失" crossorigin="anonymous">
+                    <div class="iconBox flexLayout">
                         <div @click="iconshoucang1Fun(index)" ><i  class="iconfont iconshoucang1"></i></div>
                         <div @click="iconxiazaiFun(index)"><i  class="iconfont iconxiazai"></i></div>
                     </div>
                 </li>
             </ul>
+            <Spin fix v-if="isShowSpin">
+                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div>
+            </Spin>
         </div>
         <div class="goodsModalBox">
             <Modal
@@ -56,6 +60,7 @@
 </template>
 <script>
 import { goodsList, category } from '@/api/material.js'
+import {mapState, mapGetters, mapActions} from 'vuex'
 export default {
     name: 'goodsLib',
     data() {
@@ -74,19 +79,33 @@ export default {
             getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null}
         }
     },
+    computed: {
+        ...mapState({
+                isShowSpin: state =>{
+                    return state.app.isShowSpin
+                },
+            }),
+        ...mapGetters([
+                'card',
+                'selectedObj',
+            ]),
+    },
     mounted() {
         this.handlegoodsList(this.getGoods)
         this.handlecategory()
     },
     methods: {
+        ...mapActions([
+            'saveState',
+        ]),
         /**
          * start function
          */
         mouseenter(item,index) {
-            item.isShowIcon = true; 
+
         },
         mouseleave(item,index) {
-            item.isShowIcon = false;
+
         },
         goodsImgDownFun() {
             this.modal9 = true;
@@ -115,6 +134,36 @@ export default {
             this.handlegoodsList(this.getGoods)
             console.log("你改变了分类",value)
         },
+                // 将自定义商品图片渲染到canvas
+        selectDecorateGoods(e) {
+            const card = this.card
+            console.log("card", e.target.src)
+            if (!card) return
+            fabric.Image.fromURL(e.target.src, (img) => {
+            img.set({
+                borderColor: '#f90',
+                cornerColor: '#f90',
+                cornerSize: 10,
+                transparentCorners: false,
+                cornerStyle: 'circle',
+                borderDashArray: [3,3],
+                angle: 0,
+                left: 100,
+                top: 100,
+                scaleX: 200/img.width, 
+                scaleY: 200/img.height ,
+                src:e.target.src,
+                imgType:2,
+                goods_id: e.target.name,
+                goodsImg_id:e.target.id,
+                material_id: null,
+                // backgroundImgId:e.target.id
+            }); 
+            card.add(img).setActiveObject(img)
+            // img.crossOrigin = 'Anonymous';   
+            this.saveState()
+            },{crossOrigin: 'anonymous'})
+        },
         /**
          * end function
          * start api
@@ -123,7 +172,7 @@ export default {
             let getGoods2 = this.getGoods
             goodsList(getGoods2.page, getGoods2.style_id, getGoods2.keywords, getGoods2.brand_id, getGoods2.category_id).then(res=>{
                 this.goodsImgArr = res.data.message.data
-                // console.log('------------------', res)
+                console.log('------------------', res)
                 
             }).catch(err=>{
                 console.log( err)
