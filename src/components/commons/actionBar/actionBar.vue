@@ -9,14 +9,14 @@
             <Tooltip class="aliIcon" content="水平翻转"><i @click="flipXObject" class="iconfont iconjingxiang1"></i></Tooltip>
             <Tooltip class="aliIcon" content="垂直翻转"><i @click="flipYObject" class="iconfont iconjingxiang2"></i></Tooltip>
             <Tooltip class="aliIcon" content="等比例缩放"><i @click="zoomObject" class="iconfont iconsuofang1"></i></Tooltip>
-            <Tooltip class="aliIcon" content="裁剪"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
+            <Tooltip class="aliIcon" content="裁剪" v-if="cutModel"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
+            <Tooltip class="aliIcon" content="确定" v-else><i  @click="cutModelOk" class="iconfont iconai50"></i></Tooltip>
             <Tooltip class="aliIcon" content="变形"><i @click="skewControl" class="iconfont iconbianxing"></i></Tooltip>
             <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
             <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
             <Tooltip class="aliIcon" content="锁定" v-if="isLocking"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
             <Tooltip class="aliIcon" content="取消锁定" v-else><i @click="cancellockObject" class="iconfont iconjiesuo1"></i></Tooltip>
             <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
-            <!-- <canvas style="visibility: hidden;" id="canvas_crop"></canvas> -->
         </div>
         
     </div>
@@ -32,7 +32,22 @@
         <div slot="footer">
             <Button type="primary" @click="skewModelOk">确定</Button>
         </div>
+        <canvas class="canvasCut" style="visibility: hidden;" id="canvas_crop"></canvas>
     </Modal>
+    
+    <!-- <Modal
+        v-model="cutModel"
+        title="裁剪"
+        draggable
+        width="300"
+        :closable="false"
+        slot="footer">
+        <canvas class="canvasCut" style="visibility: hidden;" id="canvas_crop"></canvas>
+        <div slot="footer">
+            
+            <Button type="primary" @click="cutModelOk">确定</Button>
+        </div>
+    </Modal> -->
 </div>
     
 </template>
@@ -47,13 +62,24 @@ export default {
             skewXModelValue: 0,
             skewYModelValue: 0,
             skewModel:false,
+            cutModel:true,
             test:null,
+            //裁剪
+            controlsVisibility:null,  //图片裁剪后显示的位置
+            el: null,
+            object: null,
+            lastActive: null,
+            selection_object_left : 0,
+            selection_object_top : 0,
+            isCropping : false,
         }
     },
     created() {
-        console.log("0.0",this.selectedObj)
+        // console.log("0.0",this.selectedObj)
     },
     updated() {
+        this.object = this.selectedObj
+        // console.log("0.0",this.selectedObj)
         if(this.selectedObj == null){
             this.skewModel = false;
             return
@@ -119,11 +145,135 @@ export default {
             this.card.renderAll()
             this.saveState()
         },
+
         //裁剪
         cutObject(){
-            // this.selectedObj
-             //生成一个和待裁剪元素相同大小的矩形用于框选裁剪区域
-            console.log("nidaye")
+            this.cutModel = false
+            var card = this.card
+            //生成一个和待裁剪元素相同大小的矩形用于框选裁剪区域
+            var el = this.el
+            el = new fabric.Rect({
+                fill: 'rgba(0,0,0,0)',
+                originX: 'left',
+                originY: 'top',
+                stroke: '#ccc',
+                //strokeDashArray: [2, 2],
+                strokWidth: 5,
+                //opacity: 1,
+                width: 1,
+                height: 1,
+                borderColor: '#36fd00',
+                cornerColor: 'green',
+                hasRotatingPoint: false,
+                selectable: true
+            });
+            
+            el.left = card.getActiveObject().left;
+            this.selection_object_left = card.getActiveObject().left;
+            this.selection_object_top = card.getActiveObject().top;
+            el.top = card.getActiveObject().top;
+            el.width = card.getActiveObject().width * card.getActiveObject().scaleX;
+            el.height = card.getActiveObject().height * card.getActiveObject().scaleY;
+            card.add(el);
+            card.setActiveObject(el);
+                this.isCropping = true;
+        },
+        cropImage(png, left, top, height, width) {
+            var card = this.card
+        //将图片放进一个新的canvas中，经裁剪后导出一个新的图片。
+        //如果用户选框大于原图片，则将选框缩至原图片大小
+            if (top < png.top) {
+                height = height - (png.top - top);
+                top = png.top;
+            }
+            if (left < png.left) {
+                width = width - (png.left - left);
+                left = png.left;
+            }
+            if (top + height > png.top + png.height * png.scaleY)
+                height = png.top + png.height * png.scaleY - top;
+            if (left + width > png.left + png.width * png.scaleX)
+                width = png.left + png.width * png.scaleX - left;
+
+            var canvas_crop = new fabric.Canvas("canvas_crop");
+            
+            fabric.Image.fromURL(card.toDataURL('png'), (img) => {
+                var _this =  this
+                img.set('left', -left);
+                img.set('top', -top);
+                // console.log("img",img)
+                canvas_crop.add(img)
+                canvas_crop.setHeight(height);
+                canvas_crop.setWidth(width);
+                canvas_crop.renderAll();
+                fabric.Image.fromURL(canvas_crop.toDataURL('png'), (croppedImg)=> {
+                    
+                    croppedImg.set({
+                        borderColor: '#f90',
+                        cornerColor: '#f90',
+                        cornerSize: 10,
+                        transparentCorners: false,
+                        cornerStyle: 'circle',
+                        borderDashArray: [3,3],
+                        angle: 0,
+                        // scaleX: card.width / img.width /2, 
+                        // scaleY: card.width / img.height /2,
+                        left: left,
+                        top: top,
+                        // src:e.target.src,
+                        imgType:0, // imgType:0背景,1素材 2自定义商品
+                        goods_id: null,
+                        goodsImg_id:null,
+                        material_id: null,
+                        // backgroundImgId:e.target.id
+                    }); 
+                    
+                    _this.controlsVisibility = croppedImg.aCoords
+                    card.add(croppedImg).renderAll();
+                    card.remove(img).renderAll();
+                    
+                    console.log("cropImage",croppedImg.aCoords)
+                    console.log("img",img.aCoords)
+                    console.log("this.controlsVisibility",_this.controlsVisibility)
+                    console.log("cropImage",canvas_crop.toDataURL('png'))
+                });
+            });
+        
+        },
+        cutModelOk(){
+            
+            if (!this.isCropping) {
+                alert("请先框选裁剪区域。");
+                return;
+            }
+            
+            console.log("selectedObj",this.selectedObj)
+            console.log("object",this.object)
+            let el = this.selectedObj
+            let object = this.object
+            let canvas = this.card
+            let lastActive = this.lastActive
+
+            var left = el.left - object.left;
+            var top = el.top - object.top;
+
+            left *= 1;
+            top *= 1;
+
+            var width = el.width * 1;
+            var height = el.height * 1;
+
+            //将当前帧导出到一个新的canvas中并执行裁剪，在此期间暂停记录历史记录。
+            this.cropImage(object, el.left, el.top, parseInt(el.scaleY * height), parseInt(width * el.scaleX));
+            canvas.remove(object);
+            canvas.remove(canvas.getActiveObject());
+            lastActive = object;
+            canvas.renderAll();
+
+            this.isCropping = false;
+            this.cutModel = true
+            console.log("裁剪ok",object)
+
         },
         //变形
         skewControl (){
@@ -133,7 +283,7 @@ export default {
             }
             this.skewModel = true
             // this.card.requestRenderAll();
-            console.log("selectedObj",this.selectedObj)
+            // console.log("selectedObj",this.selectedObj)
         },
         //变形modal
         skewModelOk(){
@@ -293,6 +443,11 @@ export default {
     -webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+.canvasCut{
+    position: fixed;
+    width: 0px;
+    height: 0px;
 }
 .aliIcon{
     text-align: center;

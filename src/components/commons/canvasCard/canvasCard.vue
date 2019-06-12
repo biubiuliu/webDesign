@@ -1,10 +1,13 @@
 <template>
-    <canvas id="canvas" :width="cvsW" :height="cvsH"></canvas>
+    <div>
+        <canvas id="canvas" :width="cvsW" :height="cvsH"></canvas>
+    </div>
+    
 </template>
 
 <script>
 import {mapState, mapGetters,mapActions } from 'vuex'
-import { fabric } from 'fabric'
+// import { fabric } from 'fabric'
 export default {
 name: "CanvasCard",
     computed: {
@@ -72,6 +75,7 @@ name: "CanvasCard",
             })
             card.on('object:modified', (e) => {
             // console.log('object:modified',e)
+            sessionStorage.clear()
             this.saveState()
             })
             card.on('object:removed', (e) => {
@@ -88,6 +92,7 @@ name: "CanvasCard",
             })
             card.on('selection:updated', (e) => {
             // console.log('selection:updated', e.target.hasControls)
+            sessionStorage.clear()
             this.setIsLocking(e.target.hasControls)
             this.setSelectedObj(e.target)
             })
