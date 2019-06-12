@@ -1,13 +1,22 @@
 import axios from '@/libs/api.request'
 
+// 获取验证码
+export const getCode = (mobile) => {
+    return axios.request({
+        url: '/api/v1/get/verification/code',
+        method: 'get',
+        params: { mobile },
+    })
+}
 
-// // 方案详情信息
-// export const schemeDetail = (id) => {
-//     return axios.request({
-//         url: '/api/v1/get/schemeDetail',
-//         method: 'get'
-//     })
-// }
+// 登录
+export const userLogin = (params) => {
+    return axios.request({
+        url: '/api/v1/login/user',
+        method: 'post',
+        data: params
+    })
+}
 
 // 获取方案列表
 export const getMeals = (params) => {
@@ -80,13 +89,13 @@ export const getSchemeGoodsList = (id) => {
 }
 
 // 获取收藏列表
-export const getCollectList = (type,style_type,cat_ids) => {
+export const getCollectList = (type,style_ids,cat_ids) => {
     return axios.request({
         url: '/api/v1/get/collectList',
         method: 'get',
         params: {
             type,
-            style_type,
+            style_ids,
             cat_ids,
         },
     })
@@ -97,5 +106,36 @@ export const getCollectScreen  = () => {
     return axios.request({
         url: '/api/v1/get/collectScreen',
         method: 'get',
+    })
+}
+
+// 获取商品详情
+export const getGoodsDetail = (goods_id) => {
+    return axios.request({
+        url: '/api/v1/get/goods/info',
+        method: 'get',
+        params:{
+            goods_id
+        }
+    })
+}
+
+// 获取方案关联信息
+export const getSchemeRelated = (id) => {
+    return axios.request({
+        url: '/api/v1/get/schemeRelated',
+        method: 'get',
+        params:{
+            id
+        }
+    })
+}
+
+// 收藏
+export const isCollect = (params) => {
+    return axios.request({
+        url: '/api/v1/add/collect',
+        method: 'post',
+        data:params
     })
 }

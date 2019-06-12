@@ -78,7 +78,7 @@
             <div v-else class="no-scheme">
                 抱歉 没有找到匹配的结果
             </div>
-            <a class="more" href="javascript:;" v-if="page<total_page||page==total_page&&page!=1" @click="handleGetList">更多</a>
+            <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div>
         </div>
         <Modal
             v-model="shemeInfoModal"
@@ -165,8 +165,17 @@ export default {
     },
     methods: {
         handleScroll() {
-            // 滚动到页面底部时
-
+            // 变量scrollTop是滚动条滚动时，距离顶部的距离
+       		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
+       		// 变量windowHeight是可视区的高度
+       		var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+       		// 变量scrollHeight是滚动条的总高度
+       		var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
+            // 滚动条到底部的条件
+            if(scrollTop+windowHeight==scrollHeight){
+                // 写后台加载数据的函数
+         	   this.handleGetList()
+            }   
         },
 
         imgError(item) {
@@ -212,11 +221,11 @@ export default {
         // 数据重组
         handleGetList () {
             if(this.page!=1&&this.page> this.total_page){
-                this.$refs.waterfall.waterfallOver()
+               
                 return
             }  
             let params = {
-                user_id:'111',                            
+                type:1,                            
                 page:this.page,
                 sorter:this.sortSelectList[this.sortLi].id,
                 dir_id:this.dirSelectList[this.dirLi].id,
@@ -238,6 +247,7 @@ export default {
                             is_personal:item.is_personal,
                             time:convertTimeStamp(item.created_at),                                                   
                             id: item.id,
+                            type:1// 传详情用
                         };
                         this.imgsArr.push(setDataObj);                      
                     });
@@ -462,10 +472,11 @@ export default {
     position: relative;
 }
 .header_select{
-    /* position: fixed;
+    position: fixed;
+    top:60px;
     left: 0;
     right: 0;
-    z-index: 1; */
+    z-index: 1; 
     background: #f2f2f4;
 }
 .flex{
@@ -580,7 +591,7 @@ export default {
     -moz-column-count: 5;
     -webkit-column-count: 5;
     column-count: 5;
-    padding:0 60px;
+    padding:104px 60px 40px 60px;
     margin-top: 20px;
 }
 .child {
@@ -649,11 +660,9 @@ export default {
 .more{
     display: block;
     text-align: center;
-    margin: 100px auto;
+    margin: 10px auto;
     line-height: 40px;
     width: 150px;
-    border-radius: 20px;
-    border:1px solid #ddd;
     color: #666;
 }
 

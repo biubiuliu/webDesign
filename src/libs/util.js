@@ -1,3 +1,5 @@
+
+// 时间转化
 export const convertTimeStamp = (timestamp) => {
     if (!timestamp) {
       timestamp = new Date().getTime();
@@ -36,3 +38,59 @@ export const convertTimeStamp = (timestamp) => {
             d_days >= 3 && d_days < 30 ? `${M}-${D} ${H}:${m}` :
               d_days >= 30 ? `${Y}-${M}-${D} ${H}:${m}` : '' + timestamp;
   }
+
+/**
+ * @description:本地存储
+ * @param key:存储的键值 
+ * @param value:存储的内容
+ */
+export function setStorage(key,value){
+    var curTime = new Date().getTime();
+    localStorage.setItem(key,JSON.stringify({data:value,time:curTime}));
+}
+
+/**
+ * @description:获取本地存储 没传时间默认24小时
+ * @param key:存储的键值 
+ * @param exp:过期时间  1秒 1000  1分1000*60  1小时 1000*60*60 以此类推
+ */
+export function getStorage(key,exp){
+    var data = localStorage.getItem(key);
+    var dataObj = JSON.parse(data);
+    var outTime = exp?exp:1000*60*60*24;
+    if(!dataObj){
+      return null
+    }
+    if (new Date().getTime() - dataObj.time>outTime) {
+      return null
+    }
+    
+    var dataObjDatatoJson = dataObj.data;
+    return dataObjDatatoJson;
+}
+
+/**
+ * @description:删除本地存储
+ * @param key:存储的键值 
+ */
+export function delStorage(key){
+    localStorage.removeItem(key);
+}
+
+// 手机号掩码
+export function mobilePhoneMask(tel) {
+  var output = tel;
+  if (tel == null || tel == "")
+      return output;
+  output = tel;
+  if (tel.length > 6) {
+      output = tel.substr(0, 3) + "*****" + tel.substr(tel.length - 3);
+  }
+  else if (tel.length > 3) {
+      output = tel.substr(0, 3) + "*****";
+  }
+  else if (tel.length > 0) {
+      output = tel.substr(0, 1) + "*****";
+  }
+  return output;
+}

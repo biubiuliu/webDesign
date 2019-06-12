@@ -1,64 +1,62 @@
 <template>
     <div class="proDetailBody">
-        <div class="waterfall">
-            <vue-waterfall-easy ref="waterfall"
-                                style="width:100%; height:90vh; overflow: hidden"
-                                :imgWidth="290" :imgsArr="imgsArr"
-                                :enablePullDownEvent="true"
-                                @click="linkDetailFun"
-                                class="vueWaterfallEasy">
-                <div slot="waterfall-head" class="fall_head">
-                    <div class="detailImg">
-                        <img class="image_size" :src="proDetailVal.src" alt="">
+        <div class="waterfall" >
+            <div slot="waterfall-head" class="fall_head">
+                <div class="detailImg">
+                    <img class="image_size" :src="scheme_info.done_img_url" alt=""  @error="imgError(scheme_info,1)">
+                </div>
+                <div class="detail_list">
+                    <div class="right_title">#{{scheme_info.scheme_name}}#</div>
+                    <div class="right_list">
+                        <img class="image_photo" :src="user_info.head_img" alt="" @error="imgError(user_info,0)">
+                        <div class="username">{{user_info.name}}</div>
+                        <div><h3>{{user_info.post_name}}</h3></div>
                     </div>
-                    <div class="detail_list">
-                        <div class="right_title">#北欧家居#</div>
-                        <div class="right_list">
-                            <img class="image_photo" :src="proDetailVal.src" alt="">
-                            <div><h1>MUZI</h1></div>
-                            <div><h3>设计师</h3></div>
+                    <div class="right_btn">
+                        <Button type="warning" @click="linkMaterialLib"  long>再创作</Button>
+                        <Button type="warning" ghost long  @click="judgeCollect(scheme_info.id,1,!scheme_info.is_collect)">{{scheme_info.is_collect?'取消收藏':'收藏'}}</Button>
+                    </div>
+                </div>
+            </div>
+            <div slot="waterfall-head">
+                <div class="discoverTitle" v-if="goods_list.length">
+                    <div>单品列表</div>
+                    <div class="parent">
+                        <div  class="child" v-for="(item, index) in goods_list" :key="index" @click="linkDetailFun(item)">
+                            <div>               
+                                <img :src="item.goods_img" alt="" @error="imgError(item,2)">
+                            </div>
+                            <div class="img-info">
+                                <p class="some-info">{{item.goods_name}}</p>
+                                <p class="some-info">{{'￥'+item.shop_price}}</p>
+                            </div>
                         </div>
-                        <div class="right_btn">
-                            <Button type="warning" @click="linkMaterialLib"  long>在创作</Button>
-                            <Button type="warning" ghost long>收藏</Button>
+                    </div>
+                </div>
+            </div>
+            <div slot="waterfall-head" v-if="recommend_list.length">
+                <div class="discoverTitle">推荐方案</div>
+                <div class="parent">
+                    <div  class="child" v-for="(item, index) in recommend_list" :key="index" @click="linkDetailFun(item)">
+                        <div>               
+                            <img :src="item.done_img_url" alt="" @error="imgError(item,1)">
+                        </div>
+                        <div class="scheme-img-info">
+                            <p class="some-info">{{item.scheme_name}}</p>
+                            <p class="some-info">{{item.time}}</p>
                         </div>
                     </div>
                 </div>
-                <div slot="waterfall-head">
-                    <div class="discoverTitle">
-                        <div>单品列表</div>
-                        <ul class="item_list">
-                            <li class="item_list_li"
-                                
-                                @mouseenter="mouseenter(index,item)"
-                                v-for="(item,index) in imgsArr" :key="index">
-                                <img :src="item.src" alt="">
-                                <p>这是第{{index}}张单品</p>
-                                <p><Icon type="logo-yen" />500</p>
-                                <div class="flexLayout" :class="{iconBox:changeblue==index}">
-                                    <i   class="iconfont iconshoucang1"></i>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div slot="waterfall-head">
-                    <div class="discoverTitle">推荐方案</div>
-                </div>
-                <div class="img-info" slot-scope="props">
-                    <p class="some-info">第{{props.index+1}}张图片</p>
-                    <p class="some-info">{{props.value.info}}</p>
-                </div>
-                <div slot="waterfall-over">waterfall-over</div>
-            </vue-waterfall-easy>
+            </div>
         </div>
     </div>
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getSchemeInfo } from '@/api/data.js'
+import { getSchemeRelated,getGoodsDetail,isCollect } from '@/api/data.js'
 import { mapState } from 'vuex'
+import { convertTimeStamp } from '@/libs/util.js'
+
 export default {
     name: 'proDetail',
     computed: {
@@ -84,76 +82,104 @@ export default {
             dataArr:[],
             setDataArr:[],
             iconshoucang1:false,
+            goods_list: [],
+            recommend_list: [],
+            scheme_info: {},
+            user_info:{},
             proId: null // 方案id
         }
     },
+
     created() {
-        this.proId = this.proDetailVal.id
-        console.log("proId",this.proId)
+        this.proId = this.proDetailVal.id;
+        if(this.proDetailVal.type==2){
+            alert('商品还没做')
+        }
         this.handleGetSchemeInfo(this.proId)
     },
+
     methods: {
-        selectTrol() {
-            var project = document.getElementById('project')
-                project.style.display = 'block';
-                this.leftIcon = 'iconfont iconxiala'
-        },
-        selectTrolLeave() {
-            var project = document.getElementById('project')
-                project.style.display = 'none';
-                this.leftIcon = 'iconfont iconxiala-'
-        },
-        mouseenter(index, item) {
-            this.iconshoucang1 = true
-            this.changeblue = index;
+        imgError(data,type) {
+            switch (type) {
+                case 0:
+                    data.head_img = require('../../assets/defalut.png');
+                    break;
+                case 1:
+                    data.done_img_url = require('../../assets/defalut.png');
+                    break;
+                case 2:
+                    data.goods_img = require('../../assets/defalut.png');
+                    break;
+                default:
+                    break;
+            }
             
         },
-        changeSelectFun(index, item){
-            console.log('index',index)
-            this.selectDefault = item.title
-            var project = document.getElementById('project')
-                project.style.display = 'none';
-                this.leftIcon = 'iconfont iconxiala-'
-        },
+
         //数据重组
         handleGetSchemeInfo (proId) {
-            getSchemeInfo(proId).then(res => {
-                console.log("详情",res)
-                this.indoor_list = res.data.message
-                this.dataArr = this.indoor_list.category[1].goods;
-                var _this = this;
-                for (let i = 0; i < _this.dataArr.length; i++) {
-                var   setDataObj = {src: "",href: "",info: "",id: ""};
-                    setDataObj.src = _this.dataArr[i]["goods_thumb"];
-                    setDataObj.href = _this.dataArr[i]["goods_thumb"];
-                    setDataObj.info = _this.dataArr[i]["goods_name"];
-                    setDataObj.id = _this.dataArr[i]["goods_id"];
-                    _this.setDataArr.push(setDataObj)
+            getSchemeRelated (proId).then(res => {
+                if(res.data.success){
+                    let data =  res.data.message;
+                    this.scheme_info = data.scheme_info;
+                    this.goods_list = data.goods_list;
+                    data.recommend_list.map((item)=>{
+                        item.time = convertTimeStamp(item.created_at)
+                    })
+                    this.recommend_list = data.recommend_list;
+                    this.scheme_info = data.scheme_info;
+                    this.user_info = data.user_info;
                 }
-                this.imgsArr = this.setDataArr
-                
-                console.log(' vuex', this.proDetailVal.src)
             }).catch(err => {
                 console.log(err)
             })
         },
-        linkDetailFun(event, { index, value }) {
+
+        linkDetailFun (value) {
             event.preventDefault()
                 // 只有当点击到图片时才进行操作
             if (event.target.tagName.toLowerCase() == 'img') {
                 this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({name:'proDetail'})
+                this.$router.push({name:'proDetail',query: {data:value}})
                 console.log('img clicked', value)
-                }
+            }
         },
-        linkMaterialLib(){
+
+
+        linkMaterialLib () {
             this.$router.push({name:'materialLib', query: {id: this.proId} })
             console.log('需要跳转MaterialLib')
-        }
-        
+        },
 
+        // 判断收藏
+        judgeCollect (id,type,isCollected) {
+            if(!isCollected){
+                this.$Modal.confirm({
+                    title: '提示',
+                    content: '<p>确定要取消收藏吗</p>',
+                    onOk: () => {
+                        this.toCollect(id,type,isCollected);
+                    },               
+                });
+            }else{
+                 this.toCollect(id,type,isCollected);
+            }   
+        },
+
+        // 收藏
+        toCollect (id,type,isCollected) {
+            let params = {
+                id:id,
+                type:type
+            }
+            isCollect (params).then( res=> {
+                if(res.data.success){
+                    this.scheme_info.is_collect = !this.scheme_info.is_collect;
+                     this.$Message.info(res.data.message);
+                }
+            })
+        }  
     },
-    
 }
 </script>
 <style scoped>
@@ -161,10 +187,10 @@ export default {
     background: #EDF0F2
 }
 .discoverTitle{
-    font-size: 25px;
-    color: #5a5656;
+    font-size: 20px;
+    color: #666;
     text-align: left;
-    margin: 0 9%
+    margin: 0 60px;
 }
 .fall_head{
     display: flex;
@@ -173,8 +199,11 @@ export default {
 }
 .detailImg{
     width: 60%;
+    height: 546px;
     text-align: center;
     background: white;
+    padding:24px 126px;
+    overflow: hidden;
 }
 .detail_list{
     margin-left: 20px;
@@ -184,8 +213,7 @@ export default {
     padding: 20px;
 }
 .image_size{
-    width:780px;
-    height: 546px;
+    height:100%;
 }
 .image_photo{
     width: 100px;
@@ -194,9 +222,10 @@ export default {
     border: 1px solid black;  
 }
 .right_title{
+    color: #000;
     padding-bottom: 10px;
     width: 100%;
-    font-size: 20px;
+    font-size: 16px;
     text-align: left;
     border-bottom: 1px solid #c0c0c0;
 }
@@ -234,5 +263,66 @@ margin-top: 20px;;
 }
 .iconBox{
     color: #f90
+}
+.username{
+    font-size: 22px;
+    font-weight: 400;
+    color: rgb(0, 0, 0);
+}
+.parent { 
+    width:100%;
+    -moz-column-count: 5;
+    -webkit-column-count: 5;
+    column-count: 5;
+    padding:10px 60px 40px 60px;
+    margin-top: 20px;
+}
+.child {
+    background: #f2f2f2;;
+    margin-bottom:20px;	 
+    -moz-page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    break-inside: avoid;
+    color:#f2f2f4;
+    /* width: 340px; */
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 10px;
+    position: relative;
+    border:1px solid #ddd;
+    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); */
+}
+.child img{
+    width: 100%;
+    display:block; 
+}
+.scheme-img-info{
+    padding:14px 25px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+}
+.scheme-img-info .some-info:nth-child(1) {
+    flex: 1;
+    text-align: left;
+    color: #666;
+    font-size: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.scheme-img-info .some-info:nth-child(2) {
+    flex: 1;
+    text-align: right;
+    color: #999;
+    font-size: 14px;
+}
+.img-info .some-info{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: left;
+    color: #666;
+    font-size: 16px;
 }
 </style>

@@ -1,5 +1,8 @@
 import axios from 'axios'
 import store from '@/store'
+import md5 from 'js-md5';
+import {getStorage} from './util'
+
 const addErrorLog = errorInfo => {
     const { statusText, status, request: { responseURL } } = errorInfo
     let info = {
@@ -17,9 +20,21 @@ class HttpRequest {
         this.queue = {}
     }
     getInsideConfig() {
+        // 登录带的参数
+        const login_server = '4NR01nHbPT9FTXrFUM1Y3BE1';
+        const timestamp = new Date().getTime() / 1000;
+        const userInfo = getStorage('userInfo')
+        const sessionKey = userInfo&&userInfo.sessionKey?userInfo.sessionKey:'';
+        
         const config = {
             baseURL: this.baseUrl,
-            headers: {}
+            headers: {}             
+        }
+
+        if (sessionKey) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
+            config.headers.sessionKey = sessionKey;
+            config.headers.sign = md5(login_server+sessionKey+timestamp);
+            config.headers.timestamp = timestamp
         }
         return config
     }

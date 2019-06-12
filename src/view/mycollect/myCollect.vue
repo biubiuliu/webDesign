@@ -148,7 +148,8 @@ export default {
                             name: item.name,                                                  
                             id: item.id,
                             price:item.shop_price,
-                            time:convertTimeStamp(item.created_at)
+                            time:convertTimeStamp(item.created_at),
+                            type:this.isSelect,
                         };
                         this.dataArr.push(setDataObj);                                          
                     });
@@ -202,7 +203,6 @@ export default {
 <style scoped>
 .mycollect{
     color: black;
-    /* height: 93vh; */
 }
 .header{
     position: fixed;
@@ -294,8 +294,6 @@ export default {
     font-size: 24px;
     color: #7e8e98;
     line-height: 400px;
-    position: absolute;
-    top: 120px;
 }
 .img-info{
     padding:14px 25px;
@@ -309,7 +307,7 @@ export default {
     -moz-column-count: 5;
     -webkit-column-count: 5;
     column-count: 5;
-    padding:60px 60px 0 60px;
+    padding:60px 60px 40px 60px;
     margin-top: 20px;
 }
 .child {

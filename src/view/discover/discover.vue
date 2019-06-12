@@ -2,7 +2,7 @@
     <div>
         <div class="waterfall">
             <vue-waterfall-easy ref="waterfall"
-                                style="width:100%; height:90vh; overflow: hidden"
+                                style="width:100%; height:93vh; overflow: hidden"
                                 :imgWidth="290" :imgsArr="imgsArr"
                                 :enablePullDownEvent="true"
                                 @scrollReachBottom="handleGetGoodsType"
@@ -93,6 +93,7 @@ import { getGoodsType,  getBrandList, getMeals, getGoodsList } from '@/api/data.
 import { category,getEnumList } from '@/api/material.js'
 import { convertTimeStamp } from '@/libs/util.js'
 import { mapState } from 'vuex'
+import { getStorage } from '@/libs/util.js'
 
 export default {
     name: 'discover',
@@ -131,7 +132,7 @@ export default {
     },
     created() {
         this.getScreenLabels();
-        this.handleGetGoodsType()
+        this.handleGetGoodsType();
     },
     methods: {
         selectTrol() {
@@ -212,6 +213,7 @@ export default {
                             canvas_type:item.canvas_type,
                             time:convertTimeStamp(item.created_at),                                                   
                             id: item.id,
+                            type:this.changeblue?2:1//1是方案 2是单品
                         };
                         this.imgsArr.push(setDataObj);                      
                     })

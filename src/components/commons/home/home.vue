@@ -35,12 +35,12 @@ name: 'home',
         z-index: 9;
     }
     .layout{
-        border: 1px solid #d7dde4;
-        background: #f5f7f9;
+        /* border: 1px solid #d7dde4; */
+        background: #f2f2f2; 
         position: relative;
         border-radius: 4px;
-        overflow: hidden;
-        
+        /* overflow: hidden; */
+        height: 100vh;
     }
     .discover{
         position: relative;

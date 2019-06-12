@@ -2,6 +2,7 @@
     <div :style="{position: 'fixed', width: '100%', minWidth:'800px'}">
         <Menu mode="horizontal" theme="dark" id="dark" active-name="1">
             <div class="layout-logo">
+                <img src="./logo.png" class="logo-img">
             </div>
             <div class="layout-nav">
                 <MenuItem name="我的设计" to="/home/mydesign">
@@ -23,35 +24,66 @@
                         创建设计
                     </Button>  
                 </MenuItem>
-                <MenuItem name="用户名" >
-                    用户名
+                <MenuItem name="用户名" v-if="username=='请登录'">
+                    {{username}}
                 </MenuItem>
+                <Submenu name="用户名" v-else>
+                    <template slot="title">
+                       {{username}}
+                    </template>
+                    <MenuItem name="logout">
+                        <a href="javascript:;" @click="logout">退出登录</a>
+                    </MenuItem>
+                </Submenu>
             </div>
         </Menu>
     </div>
 </template>
 <script>
+import { getStorage,delStorage,mobilePhoneMask } from '@/libs/util.js'
+
 export default {
     name: 'navBar',
     data(){
         return{
-            aa: 'd'
+            aa: 'd',
+            username:''
         }
     },
+    created() {
+       this.getUserName();
+    },
     methods: {
+        getUserName(){
+            let userInfo = getStorage('userInfo');
+            this.username = userInfo&&userInfo.mobile?mobilePhoneMask(userInfo.mobile):"请登录"
+            if(!userInfo){
+                this.$router.push({name:'login'})
+            }
+        },
+        logout(){
+            this.$Modal.confirm({
+                title: '提示',
+                content: '<p>确定退出登录吗？</p>',
+                onOk: () => {
+                    delStorage('userInfo');
+                    this.$router.push({name:'login'})
+                },
+            });
+        }
     },
 }
 </script>
 <style scope>
     .layout-logo{
         width: 100px;
-        height: 30px;
-        background: #5b6270;
+        /* height: 30px;
+        background: #5b6270; */
         margin-right: 50px;
         border-radius: 3px;
         float: left;
         position: relative;
-        top: 15px;
+        top: 10px;
         left: 20px;
         
     }
@@ -61,6 +93,15 @@ export default {
     }
     .layout-user{
         margin-left: auto;
+    }
+    .ivu-menu-item-selected{
+        color:#f90!important
+    }
+    .ivu-menu-dark{
+        background: #2e2f34
+    }
+    .logo-img{
+        width: 100%
     }
 </style>
 
