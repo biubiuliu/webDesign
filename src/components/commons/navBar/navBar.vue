@@ -58,7 +58,7 @@ export default {
             let userInfo = getStorage('userInfo');
             this.username = userInfo&&userInfo.mobile?mobilePhoneMask(userInfo.mobile):"请登录"
             if(!userInfo){
-                this.$router.push({name:'login'})
+                //this.$router.push({name:'login'})
             }
         },
         logout(){
