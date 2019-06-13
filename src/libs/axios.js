@@ -33,8 +33,9 @@ class HttpRequest {
 
         if (sessionKey) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
             config.headers.sessionKey = sessionKey;
-            config.headers.sign = md5(login_server+sessionKey+timestamp);
-            config.headers.timestamp = timestamp
+            config.headers.randNumber = Math.random();
+            config.headers.timestamp = timestamp;
+            config.headers.sign = md5(login_server+sessionKey+timestamp+config.headers.randNumber);           
         }
         return config
     }

@@ -213,7 +213,7 @@ export default {
                             canvas_type:item.canvas_type,
                             time:convertTimeStamp(item.created_at),                                                   
                             id: item.id,
-                            type:this.changeblue?2:1//1是方案 2是单品
+                            type:1//1是方案 2是单品
                         };
                         this.imgsArr.push(setDataObj);                      
                     })
@@ -249,7 +249,8 @@ export default {
                             href: item.goods_thumb,  
                             name: item.goods_name,                                                 
                             id: item.goods_id,
-                            price:item.shop_price
+                            price:item.shop_price,
+                            type:2,
                         };
                         this.imgsArr.push(setDataObj);                      
                     })
@@ -262,11 +263,14 @@ export default {
             event.preventDefault()
                 // 只有当点击到图片时才进行操作
             if (event.target.tagName.toLowerCase() == 'img') {
+                if(value.type==2){
+                    return  this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
+                }
                 this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({name:'proDetail',query: {data:value}})
+                this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
                 console.log('img clicked', value)
                 console.log(' vuex', this.proDetailVal)
-                }
+            }
         },
 
         // 获取方案风格、空间类型

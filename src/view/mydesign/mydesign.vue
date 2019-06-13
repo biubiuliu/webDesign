@@ -114,7 +114,7 @@
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList } from '@/api/data.js'
+import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList, delScheme } from '@/api/data.js'
 import { getEnumList } from  '@/api/material.js'
 import { convertTimeStamp } from '@/libs/util.js'
 
@@ -286,7 +286,7 @@ export default {
         // 修改方案
         toDetail (value){
             this.$store.dispatch('updataProDetailVal', value)
-            this.$router.push({name:'proDetail',query: {data:value}})
+            this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
         },
 
         // 修改方案信息确定
@@ -305,7 +305,8 @@ export default {
                     this.$Message.success(res.data.message);
                     this.imgsArr.map((item) => {
                         item.name = item.id == this.shemeInfo.id? 
-                        this.shemeInfo.scheme_name:item.name
+                        this.shemeInfo.scheme_name:item.name;
+                        item.type=1;
                     })                 
                 }else{
                     this.$Message.error(res.data.message);
@@ -320,10 +321,15 @@ export default {
                     title: '提示',
                     content: '<p>是否删除该方案'+id+'</p>',
                     onOk: () => {
-                        this.$Message.info('Clicked ok');
+                        delScheme({ids:id.toString()}).then(res=>{
+                            if(res.data.success){                               
+                                this.imgsArr =  this.imgsArr.filter((obj) => (obj.id !== id))
+                                this.$Message.success(res.data.message);
+                            }
+                        })                       
                     },
                     onCancel: () => {
-                        this.$Message.info('Clicked cancel');
+                        //this.$Message.info('Clicked cancel');
                     }
             });
         },

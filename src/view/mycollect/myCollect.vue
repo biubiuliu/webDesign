@@ -139,21 +139,23 @@ export default {
         handleGetGoodsType (cat_ids,style_type) {
             var getData = this.isSelect == 1 ? getCollectList(this.isSelect):getCollectList(this.isSelect,style_type,cat_ids);
             getData.then(res => {  
-                this.dataArr = [];                                             
-                if(res.data.message.length){                                                
-                    res.data.message.map((item,i)=>{                      
-                        var  setDataObj = {
-                            src: item.img_url,
-                            href: item.img_url,  
-                            name: item.name,                                                  
-                            id: item.id,
-                            price:item.shop_price,
-                            time:convertTimeStamp(item.created_at),
-                            type:this.isSelect,
-                        };
-                        this.dataArr.push(setDataObj);                                          
-                    });
-                }                                                  
+                this.dataArr = [];   
+                if(res.data.success){                                          
+                    if(res.data.message.length){                                                
+                        res.data.message.map((item,i)=>{                      
+                            var  setDataObj = {
+                                src: item.img_url,
+                                href: item.img_url,  
+                                name: item.name,                                                  
+                                id: item.id,
+                                price:item.shop_price,
+                                time:convertTimeStamp(item.created_at),
+                                type:this.isSelect,
+                            };
+                            this.dataArr.push(setDataObj);                                          
+                        });
+                    }  
+                }                                                
             }).catch(err => {
                 console.log(err)
             })
@@ -186,11 +188,10 @@ export default {
         },
 
         linkDetailFun (value) {
-            event.preventDefault()
-                this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({name:'proDetail',query: {data:value}})
-                console.log('img clicked', value)
-                console.log(' vuex', this.proDetailVal)
+            console.log(value)
+            this.$store.dispatch('updataProDetailVal', value)
+            //this.$router.push({name:'proDetail',query: {data:value}})
+            this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
         },
 
         // 筛选
