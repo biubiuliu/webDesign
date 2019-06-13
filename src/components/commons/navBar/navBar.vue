@@ -12,9 +12,9 @@
                     发现
                 </MenuItem>
             
-                <MenuItem name="我的收藏" to="/home/mycollect">
-                    我的收藏
-                </MenuItem>
+                <!-- <MenuItem name="我的收藏" to="/home/mycollect">
+                    我的收藏 
+                </MenuItem> -->
                 <MenuItem name="6" class="layout-user">
                     <Button shape="circle" icon="ios-search"></Button>
                 </MenuItem>
@@ -67,7 +67,7 @@ export default {
             let userInfo = getStorage('userInfo');
             this.username = userInfo&&userInfo.mobile?mobilePhoneMask(userInfo.mobile):"请登录"
             if(!userInfo){
-                //this.$router.push({name:'login'})
+                this.$router.push({name:'login'})
             }
         },
         clearSchemeId(){

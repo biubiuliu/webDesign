@@ -35,7 +35,7 @@
                             </div>
                     </Content>
                 </div>
-                <div slot="waterfall-head">
+                <div slot="waterfall-head" >
                     <div class="discoverLable">
                         <!-- <Button  >
                             Forward
@@ -231,7 +231,8 @@ export default {
                 style_id:this.styleLableId,
                 keywords:this.keywords,
                 brand_id:this.brandLableId,
-                category_id:this.spaceLabelId
+                category_id:this.spaceLabelId,
+                series_id:this.seriesId,
             }
             getGoodsList(params).then(res => {
                 if(res.data.success){
@@ -261,10 +262,11 @@ export default {
 
         linkDetailFun(event, { index, value }) {
             event.preventDefault()
-                // 只有当点击到图片时才进行操作
+            // 只有当点击到图片时才进行操作
             if (event.target.tagName.toLowerCase() == 'img') {
                 if(value.type==2){
-                    return  this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
+                     this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
+                     return 
                 }
                 this.$store.dispatch('updataProDetailVal', value)
                 this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
@@ -335,8 +337,8 @@ export default {
 
        // 筛选
        search(){
-           this.page=1;
-           this.handleGetGoodsType();
+        //    this.page=1;
+        //    this.handleGetGoodsType();
        }
     }
     

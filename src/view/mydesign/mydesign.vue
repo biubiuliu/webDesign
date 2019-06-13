@@ -1,6 +1,6 @@
 <template style="overflow: hidden">
     <div class="mydesignBody">
-        <div class="header_select flex" slot="waterfall-head">
+        <!-- <div class="header_select flex" slot="waterfall-head">
             <div class="flex selectCusBox">
                 <a class="sort"  href="javascript:;" @mouseenter="selectEnter('sort')" @mouseleave="selectLeave('sort')">
                     {{sortSelectList[sortLi].title}}
@@ -27,7 +27,7 @@
                 <i  class="iconfont iconjia"></i>
                 新建文件
             </Button>
-        </div>
+        </div> -->
         <div style="z-index:99;padding-top: 0px;">
             <div class="parent"  v-if="imgsArr.length">
                 <div  class="child" v-for="(item, index) in imgsArr" :key="index">
@@ -43,7 +43,7 @@
                             <a class="midify" href="javascript:;" @click="toDetail(item)">
                                 <i class="iconfont iconiconset0137"></i>
                             </a>
-                            <a href="javascript:;"  @click="del(item.id)">
+                            <!-- <a href="javascript:;"  @click="del(item.id)">
                                 <i class="iconfont iconshanchu"></i>
                             </a>
                             <a href="javascript:;" @click="copy(item.id)">
@@ -70,7 +70,7 @@
                                     <DropdownItem :name="'checkList-'+item.id">查看清单</DropdownItem>
                                     <DropdownItem :name="'isOpen-'+item.id+'-'+item.is_personal">{{item.is_personal==1?'公开':'取消公开'}}</DropdownItem>
                                 </DropdownMenu>
-                            </Dropdown>                              
+                            </Dropdown>                               -->
                         </div>
                     </div>   
                 </div> 
@@ -110,7 +110,29 @@
                 </FormItem>
             </Form>
         </Modal>
-     </div>
+        <Modal v-model="merchBillModal">
+             <ul class="merch_bill_title">
+                <li>单品名称</li>
+                <li>数量</li>
+                <li>规格属性</li>
+                <li>价格</li>
+            </ul>
+            <ul>              
+                <li>
+
+                </li>
+            </ul>
+            <div slot="footer" class="modal_footer">
+                <span>总价</span>
+                <span>￥1000</span>
+                <div class="print">打印</div>
+            </div>
+        </Modal>   
+        <Spin fix v-if="isShowSpin">
+                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div>
+        </Spin>
+     </div>   
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
@@ -150,7 +172,9 @@ export default {
                 style_type: null, // 风格类型
                 phone: "", // 手机
                 address: "", //	地址
-            }       
+            },
+            merchBillModal:false, // 商品清单的modal  
+            isShowSpin:true,
         }
     },
     created() {
@@ -253,8 +277,10 @@ export default {
                     });
                     }                                          
                 }
+                this.isShowSpin = false
             }).catch(err => {
                 console.log(err)
+                this.isShowSpin = false
             })
         },
 
@@ -473,7 +499,7 @@ export default {
 .mydesignBody{
     background: #f2f2f4;
     color: black;
-    /* height: 93vh;  */
+    height: 91vh;
     font-size: 14px;
     position: relative;
 }
@@ -597,7 +623,8 @@ export default {
     -moz-column-count: 5;
     -webkit-column-count: 5;
     column-count: 5;
-    padding:104px 60px 40px 60px;
+    /* padding:104px 60px 40px 60px; */
+    padding:0 60px 40px 60px;
     margin-top: 20px;
 }
 .child {
@@ -670,6 +697,46 @@ export default {
     line-height: 40px;
     width: 150px;
     color: #666;
+}
+.modal_footer{
+    border-top: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.modal_footer span:first-child{
+    font-size: 18px;
+    color: #333;
+}
+.modal_footer span:nth-child(2){
+    font-size: 18px;
+    color: #ff9a00;
+    font-weight: 700;
+    margin: 0 20px;
+}
+.print{
+    width: 150px;
+    height: 50px;
+    background: #ff9a00;
+    color: #fff;
+    font-size: 14px;
+    line-height: 50px;
+    text-align: center;
+}
+.merch_bill_title{
+    background: #e4e4e4;
+    line-height: 56px;
+    color:#333;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    text-align: center
+}
+.merch_bill_title li:nth-child(1),.merch_bill_title li:nth-child(3){
+    width: 30%
+}
+.merch_bill_title li:nth-child(1),.merch_bill_title li:nth-child(3){
+    width: 30%
 }
 
 </style>
