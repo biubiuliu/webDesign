@@ -111,7 +111,8 @@ const app = {
             commit('SET_SELECTEDOBJ', object)
         },
         saveState({ commit, state }) {
-            // 清空恢复栈redoList
+            sessionStorage.clear()
+                // 清空恢复栈redoList
             commit('SET_REDOLIST', [])
 
             if (state.canvasState) {

@@ -79,10 +79,6 @@ export default {
             goodsLibModal: false,
             social:[],
             getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null},
-            goodsItemData:null,
-            goodsImgItem:null,
-            goodsID:null,
-            goodsImgID:null,
 
         }
     },
@@ -121,13 +117,6 @@ export default {
         goodsImgDownFun(item,index) {
             this.modal9 = true;
             this.$store.dispatch("setGoodsItem", item)
-            this.goodsItemData = item
-            this.goodsID = item.goods_id
-            this.goodsImgID = item.imgs[0].id
-            console.log("item",item)
-            console.log("index",this.goodsImgID)
-            console.log("goodsID",this.goodsID)
-            console.log("goodsItem",this.goodsItem)
         },
         iconshoucang1Fun(index) {
             console.log("收藏", index)
@@ -241,8 +230,6 @@ i{
 .goodsImg{
     width: 100px;
     height: 100px;
-}
-.goodsModalBox{
 }
 .vertical-center-modal{
     display: flex;

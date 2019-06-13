@@ -79,7 +79,7 @@ name: "CanvasCard",
             this.saveState()
             })
             card.on('object:removed', (e) => {
-            // console.log('object:removed')
+            console.log('object:removed')
             this.saveState()
             })
             // card.on('object:selected', (e) => {
