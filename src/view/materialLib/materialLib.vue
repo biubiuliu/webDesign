@@ -83,6 +83,9 @@ export default {
             isShowSpin: state =>{
             return state.app.isShowSpin
             },
+            schemeId: state =>{
+            return state.app.schemeId
+            },
         }),
         ...mapGetters([
             'card',

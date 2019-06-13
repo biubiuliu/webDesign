@@ -14,7 +14,8 @@ const app = {
         redoList: [],
         selectedObj: null,
         previewImg: null,
-        objJSON: null
+        objJSON: null,
+        schemeId: null
     },
     mutations: {
         //设置画布大小
@@ -32,6 +33,9 @@ const app = {
         },
         SET_PRODETAIL: (state, proDetailVal) => {
             state.proDetailVal = proDetailVal
+        },
+        SET_SCHEMEID: (state, schemeId) => {
+            state.schemeId = schemeId
         },
         // drag -s
         SET_SELECTEDOBJ: (state, object) => {
@@ -85,6 +89,9 @@ const app = {
         },
         setIsLocking({ commit }, isLocking) {
             commit('SET_LOCK', isLocking)
+        },
+        setSchemeId({ commit }, schemeId) {
+            commit('SET_SCHEMEID', schemeId)
         },
         // darg
         initFrontCard({ commit }, fCanvas) {

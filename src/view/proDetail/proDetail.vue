@@ -54,7 +54,7 @@
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
 import { getSchemeRelated,getGoodsDetail,isCollect } from '@/api/data.js'
-import { mapState } from 'vuex'
+import { mapState,mapActions } from 'vuex'
 import { convertTimeStamp } from '@/libs/util.js'
 
 export default {
@@ -63,6 +63,9 @@ export default {
         ...mapState({
             proDetailVal: state =>{
                 return state.app.proDetailVal
+            },
+            schemeId: state =>{
+                return state.app.schemeId
             },
         })
     },
@@ -99,6 +102,10 @@ export default {
     },
 
     methods: {
+        ...mapActions([
+            'setSchemeId'
+            
+        ]),
         imgError(data,type) {
             switch (type) {
                 case 0:
@@ -148,7 +155,9 @@ export default {
 
         linkMaterialLib () {
             this.$router.push({name:'materialLib', query: {id: this.proId} })
-            console.log('需要跳转MaterialLib')
+            // this.schemeId = this.proId
+            this.$store.dispatch("setSchemeId", this.proId)
+            // console.log('需要跳转MaterialLib',this.schemeId)
         },
 
         // 判断收藏

@@ -163,6 +163,9 @@ export default {
             proDetailVal: state =>{
                 return state.app.proDetailVal
             },
+            schemeId: state =>{
+                return state.app.schemeId
+            },
         }),
         ...mapGetters([
             'card',
@@ -192,14 +195,15 @@ export default {
         ]),
         //判断存在id 调取接口 渲染画布 赋值
         isProIdfun(){
-            if( this.$route.query.id){
-                this.handleGetSchemeInfo(this.proId)
+            if( this.schemeId ){
+                this.handleGetSchemeInfo(this.schemeId)
+                console.log("this.schemeId",this.schemeId)
             }
             
         },
         shemeInfoModalok () {
                 this.toJson()
-                this.imgObject.id = this.$route.query.id?this.$route.query.id:null
+                this.imgObject.id = this.schemeId ? this.schemeId : null
                 
                 this.imgObject.canvas_type = parseInt(this.vertical) 
                 // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
