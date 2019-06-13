@@ -6,7 +6,7 @@
             <Button type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
         </div>
         <div class="goodsimg">
-            <img :src="goodsImgArr_img[this.index].pic_image" id="pic" :name="goodsImgArr_img[this.index].id" @click="selectDecorateGoods"  crossorigin="anonymous" alt="图片不存在">
+            <img :src="goodsImgArr_img[this.index].pic_image" class="pic" :id="this.goodsItem.goods_id" :name="goodsImgArr_img[this.index].id" @click="selectDecorateGoods"  crossorigin="anonymous" alt="图片不存在">
         </div>
     </div>
 </template>
@@ -25,9 +25,9 @@ export default {
     },
     watch: {
         goodsItem: function() { 
-            // if(this.goodsItem.imgs)return
+            // if(this.goodsItem.imgs) return
             this.goodsImgArr_img = this.goodsItem.imgs
-            console.log("改变",this.goodsImgArr_img);
+            // console.log("改变",this.goodsImgArr_img);
         },
         $route(to) {
             this.$store.dispatch("setGoodsItem", null)
@@ -59,14 +59,14 @@ export default {
             if( this.index == this.goodsImgArr_img.length){
                 this.index=0;
             }
-            document.getElementById("pic").src = this.goodsImgArr_img[this.index];
+            document.getElementsByClassName('pic').src = this.goodsImgArr_img[this.index];
         },
         preImg(){
             this.index--;
             if(this.index<0){
                 this.index = this.goodsImgArr_img.length-1;
             }
-            document.getElementById("pic").src = this.goodsImgArr_img[this.index];
+            document.getElementsByClassName('pic').src = this.goodsImgArr_img[this.index];
         },
         clearGoodsItem(){
             this.$store.dispatch("setGoodsItem", null)
