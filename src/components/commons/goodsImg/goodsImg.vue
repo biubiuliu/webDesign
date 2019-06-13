@@ -1,0 +1,136 @@
+<template>
+    <div class="goods_body">
+        <div class="goodsImgBtn">
+            <Button type='warning' size="small" ghost @click="preImg"><i  class="iconfont iconzuo"></i></Button>
+            <Button type='warning' size="small" ghost @click="nextImg"><i  class="iconfont iconyou"></i></Button>
+            <Button type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
+        </div>
+        <div class="goodsimg">
+            <img :src="goodsImgArr_img[this.index].pic_image" id="pic" :name="goodsImgArr_img[this.index].id" @click="selectDecorateGoods"  crossorigin="anonymous" alt="图片不存在">
+        </div>
+    </div>
+</template>
+<script>
+import { goodsList, category } from '@/api/material.js'
+import {mapState, mapGetters, mapActions} from 'vuex'
+export default {
+    name: 'goodsImg',
+    data() {
+        return {
+            msg: '这是goodsImg',
+            getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null},
+            goodsImgArr_img:null,
+            index: 0,
+        }
+    },
+    watch: {
+        goodsItem: function() { 
+            // if(this.goodsItem.imgs)return
+            this.goodsImgArr_img = this.goodsItem.imgs
+            console.log("改变",this.goodsImgArr_img);
+        },
+        $route(to) {
+            this.$store.dispatch("setGoodsItem", null)
+        },
+    },
+    computed: {
+        ...mapState({
+            goodsItem: state =>{
+                    return state.app.goodsItem
+                },
+            }),
+            ...mapGetters([
+                'card',
+                'selectedObj',
+            ]),
+    },
+    mounted() {
+        this.handlegoodsList(this.getGoods) 
+        this.goodsImgArr_img = this.goodsItem.imgs
+        
+    },
+    methods: {
+        ...mapActions([
+            'saveState',
+            'setGoodsItem',
+        ]),
+        nextImg(){
+            this.index++;
+            if( this.index == this.goodsImgArr_img.length){
+                this.index=0;
+            }
+            document.getElementById("pic").src = this.goodsImgArr_img[this.index];
+        },
+        preImg(){
+            this.index--;
+            if(this.index<0){
+                this.index = this.goodsImgArr_img.length-1;
+            }
+            document.getElementById("pic").src = this.goodsImgArr_img[this.index];
+        },
+        clearGoodsItem(){
+            this.$store.dispatch("setGoodsItem", null)
+        },
+        // 将自定义商品图片渲染到canvas
+        selectDecorateGoods(e) {
+            console.log("e.target",e.target)
+            const card = this.card
+            if (!card) return
+            fabric.Image.fromURL(e.target.src, (img) => {
+            img.set({
+                borderColor: '#f90',
+                cornerColor: '#f90',
+                cornerSize: 10,
+                transparentCorners: false,
+                cornerStyle: 'circle',
+                borderDashArray: [3,3],
+                angle: 0,
+                left: 100,
+                top: 100,
+                scaleX: 200/img.width, 
+                scaleY: 200/img.height ,
+                src:e.target.src,
+                imgType:2,
+                goods_id: e.target.id,
+                goodsImg_id: e.target.name,
+                material_id: null,
+                // backgroundImgId:e.target.id
+            }); 
+            card.add(img).setActiveObject(img)
+            // img.crossOrigin = 'Anonymous';   
+            this.clearGoodsItem()
+            this.saveState()
+            },{crossOrigin: 'anonymous'})
+        },
+        handlegoodsList(getGoods){
+            let getGoods2 = this.getGoods
+            goodsList(getGoods2.page, getGoods2.style_id, getGoods2.keywords, getGoods2.brand_id, getGoods2.category_id).then(res=>{
+                console.log('------------------', res)
+                
+            }).catch(err=>{
+                console.log( err)
+            })
+        },
+    },
+}
+</script>
+<style scoped>
+.goodsimg{
+    width: 530px;
+    height: 530px;
+    margin: 0 auto;
+    background: white;
+}
+.goodsImgBtn{
+    display: flex;
+    justify-content: flex-end
+}
+.goodsImgBtn button{
+    margin-right: 10px;
+}
+img{
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+</style>

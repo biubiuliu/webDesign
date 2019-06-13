@@ -15,7 +15,8 @@ const app = {
         selectedObj: null,
         previewImg: null,
         objJSON: null,
-        schemeId: null
+        schemeId: null,
+        goodsItem: null,
     },
     mutations: {
         //设置画布大小
@@ -36,6 +37,9 @@ const app = {
         },
         SET_SCHEMEID: (state, schemeId) => {
             state.schemeId = schemeId
+        },
+        SET_GOODSITEM: (state, goodsItem) => {
+            state.goodsItem = goodsItem
         },
         // drag -s
         SET_SELECTEDOBJ: (state, object) => {
@@ -92,6 +96,9 @@ const app = {
         },
         setSchemeId({ commit }, schemeId) {
             commit('SET_SCHEMEID', schemeId)
+        },
+        setGoodsItem({ commit }, goodsItem) {
+            commit('SET_GOODSITEM', goodsItem)
         },
         // darg
         initFrontCard({ commit }, fCanvas) {

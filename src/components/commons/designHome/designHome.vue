@@ -14,7 +14,8 @@
             <div class="canvas_body">
                 <action-bar></action-bar>
                 <div class="canvas_div">
-                    <canvas-card></canvas-card>
+                    <canvas-card v-show="!this.goodsItem"></canvas-card>
+                    <goods-img v-show="this.goodsItem"></goods-img>
                 </div>
             </div>
             <!-- <div class="block" id="routerVR" v-if="isShowRNav">
@@ -33,6 +34,7 @@ import designBar from '@/components/commons/designBar/designBar'
 import leftBar from '@/components/commons/leftBar/leftBar'
 import actionBar from '@/components/commons/actionBar/actionBar'
 import canvasCard from '@/components/commons/canvasCard/canvasCard'
+import goodsImg from '@/components/commons/goodsImg/goodsImg'
 
 import materialLib from '@/view/materialLib/materialLib'
 import goodsLib from '@/view/goodsLib/goodsLib'
@@ -40,7 +42,7 @@ import favorite from '@/view/favorite/favorite'
 import uploading from '@/view/uploading/uploading'
 
 
-
+import {mapState} from 'vuex'
 export default {
 name: 'designHome',
 
@@ -49,6 +51,7 @@ components: {
     leftBar,
     actionBar,
     canvasCard,
+    goodsImg,
     materialLib,
     goodsLib,
     favorite,
@@ -75,7 +78,15 @@ components: {
             isShowRNav:false,
         }
     },
+    computed: {
+        ...mapState({
+            goodsItem: state =>{
+                    return state.app.goodsItem
+                },
+            }),
+    },
     created() {
+        console.log("goodsItem0.0",this.goodsItem)
         if(this.$route.name =='goodsLib' || this.$route.name =='favorite'){
             this.isShowRNav = true;
         }
@@ -184,7 +195,6 @@ components: {
 }
 .canvas_div{
     margin-top: 60px;
-    background: white   ;
     color: black
 }
 

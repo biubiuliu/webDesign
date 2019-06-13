@@ -28,12 +28,14 @@
         </div>
         <div>
             <ul class="goodsUl flexLayout">
-                <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun"  @mouseenter="mouseenter(item,index)"  @mouseleave="mouseleave(item,index)">
-                    <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失" crossorigin="anonymous">
+                <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,index)"  @mouseleave="mouseleave(item,index)">
+                    <span  v-for="(items,index) in item.imgs" :key="index" :id ="items.id" ></span>
+                    <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失" crossorigin="anonymous">
                     <div class="iconBox flexLayout">
                         <div @click="iconshoucang1Fun(index)" ><i  class="iconfont iconshoucang1"></i></div>
                         <div @click="iconxiazaiFun(index)"><i  class="iconfont iconxiazai"></i></div>
                     </div>
+                    
                 </li>
             </ul>
             <Spin fix v-if="isShowSpin">
@@ -76,13 +78,21 @@ export default {
             classifySonArr:[],
             goodsLibModal: false,
             social:[],
-            getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null}
+            getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null},
+            goodsItemData:null,
+            goodsImgItem:null,
+            goodsID:null,
+            goodsImgID:null,
+
         }
     },
     computed: {
         ...mapState({
                 isShowSpin: state =>{
                     return state.app.isShowSpin
+                },
+                goodsItem: state =>{
+                    return state.app.goodsItem
                 },
             }),
         ...mapGetters([
@@ -97,6 +107,7 @@ export default {
     methods: {
         ...mapActions([
             'saveState',
+            'setGoodsItem',
         ]),
         /**
          * start function
@@ -107,8 +118,16 @@ export default {
         mouseleave(item,index) {
 
         },
-        goodsImgDownFun() {
+        goodsImgDownFun(item,index) {
             this.modal9 = true;
+            this.$store.dispatch("setGoodsItem", item)
+            this.goodsItemData = item
+            this.goodsID = item.goods_id
+            this.goodsImgID = item.imgs[0].id
+            console.log("item",item)
+            console.log("index",this.goodsImgID)
+            console.log("goodsID",this.goodsID)
+            console.log("goodsItem",this.goodsItem)
         },
         iconshoucang1Fun(index) {
             console.log("收藏", index)
@@ -120,49 +139,16 @@ export default {
         ChangebrandOpt(value){
             this.getGoods.brand_id = value
             this.handlegoodsList(this.getGoods)
-            console.log("你改变了品牌",value)
         },
          //风格列表改变
         ChangeStyleOpt(value){
             this.getGoods.style_id = value
             this.handlegoodsList(this.getGoods)
-            console.log("你改变了风格",value)
         },
          //分类列表改变
         ChangeClassifyOpt(value){
             this.getGoods.category_id = value
             this.handlegoodsList(this.getGoods)
-            console.log("你改变了分类",value)
-        },
-                // 将自定义商品图片渲染到canvas
-        selectDecorateGoods(e) {
-            const card = this.card
-            console.log("card", e.target.src)
-            if (!card) return
-            fabric.Image.fromURL(e.target.src, (img) => {
-            img.set({
-                borderColor: '#f90',
-                cornerColor: '#f90',
-                cornerSize: 10,
-                transparentCorners: false,
-                cornerStyle: 'circle',
-                borderDashArray: [3,3],
-                angle: 0,
-                left: 100,
-                top: 100,
-                scaleX: 200/img.width, 
-                scaleY: 200/img.height ,
-                src:e.target.src,
-                imgType:2,
-                goods_id: e.target.name,
-                goodsImg_id:e.target.id,
-                material_id: null,
-                // backgroundImgId:e.target.id
-            }); 
-            card.add(img).setActiveObject(img)
-            // img.crossOrigin = 'Anonymous';   
-            this.saveState()
-            },{crossOrigin: 'anonymous'})
         },
         /**
          * end function
@@ -172,7 +158,7 @@ export default {
             let getGoods2 = this.getGoods
             goodsList(getGoods2.page, getGoods2.style_id, getGoods2.keywords, getGoods2.brand_id, getGoods2.category_id).then(res=>{
                 this.goodsImgArr = res.data.message.data
-                console.log('------------------', res)
+                // console.log('------------------', res)
                 
             }).catch(err=>{
                 console.log( err)

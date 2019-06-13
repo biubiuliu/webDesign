@@ -18,7 +18,7 @@
                 <MenuItem name="6" class="layout-user">
                     <Button shape="circle" icon="ios-search"></Button>
                 </MenuItem>
-                <MenuItem name="创建设计"  to="/designHome/materialLib">
+                <MenuItem name="创建设计"  @click.native="clearSchemeId" >
                     <Button type="warning" shape="circle">
                         <i  class="iconfont iconiconset0137"></i>
                         创建设计
@@ -41,25 +41,38 @@
 </template>
 <script>
 import { getStorage,delStorage,mobilePhoneMask } from '@/libs/util.js'
-
+import { mapState,mapActions } from 'vuex'
 export default {
     name: 'navBar',
     data(){
         return{
-            aa: 'd',
             username:''
         }
+    },
+    computed: {
+        ...mapState({
+            schemeId: state =>{
+                return state.app.schemeId
+            },
+        })
     },
     created() {
        this.getUserName();
     },
     methods: {
+        ...mapActions([
+            'setSchemeId',
+        ]),
         getUserName(){
             let userInfo = getStorage('userInfo');
             this.username = userInfo&&userInfo.mobile?mobilePhoneMask(userInfo.mobile):"请登录"
             if(!userInfo){
                 //this.$router.push({name:'login'})
             }
+        },
+        clearSchemeId(){
+            this.$store.dispatch("setSchemeId", null)
+            this.$router.push('/designHome/materialLib')
         },
         logout(){
             this.$Modal.confirm({

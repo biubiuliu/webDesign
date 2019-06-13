@@ -101,6 +101,7 @@ export default {
     },
     created() {
         this.handleGetgetmaterial(0)
+        console.log('新建设计2',this.schemeId)
     },
     methods: {
         ...mapActions([
