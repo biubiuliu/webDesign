@@ -25,7 +25,7 @@
                     </Button>  
                 </MenuItem>
                 <MenuItem name="用户名" v-if="username=='请登录'">
-                    {{username}}
+                     <a href="javascript:;" @click="toLogin" style="color:#fff">{{username}}</a>
                 </MenuItem>
                 <Submenu name="用户名" v-else>
                     <template slot="title">
@@ -74,6 +74,11 @@ export default {
             this.$store.dispatch("setSchemeId", null)
             this.$router.push('/designHome/materialLib')
         },
+
+        toLogin() {
+            this.$router.push({name:'login'})
+        },
+
         logout(){
             this.$Modal.confirm({
                 title: '提示',

@@ -139,3 +139,12 @@ export const isCollect = (params) => {
         data:params
     })
 }
+
+// 删除方案
+export const delScheme = (params) => {
+    return axios.request({
+        url: '/api/v1/delete/delScheme',
+        method: 'post',
+        data:params
+    })
+}

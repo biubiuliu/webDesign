@@ -1,6 +1,6 @@
 <template>
     <div class="proDetailBody">
-        <div class="waterfall" >
+        <div class="waterfall"  v-if="type==1">
             <div slot="waterfall-head" class="fall_head">
                 <div class="detailImg">
                     <img class="image_size" :src="scheme_info.done_img_url" alt=""  @error="imgError(scheme_info,1)">
@@ -14,7 +14,7 @@
                     </div>
                     <div class="right_btn">
                         <Button type="warning" @click="linkMaterialLib"  long>再创作</Button>
-                        <Button type="warning" ghost long  @click="judgeCollect(scheme_info.id,1,!scheme_info.is_collect)">{{scheme_info.is_collect?'取消收藏':'收藏'}}</Button>
+                        <Button type="warning" ghost long  @click="judgeCollect(scheme_info.id,1,scheme_info.is_collect)">{{scheme_info.is_collect?'取消收藏':'收藏'}}</Button>
                     </div>
                 </div>
             </div>
@@ -30,6 +30,9 @@
                                 <p class="some-info">{{item.goods_name}}</p>
                                 <p class="some-info">{{'￥'+item.shop_price}}</p>
                             </div>
+                            <div class="collect_box" @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
+                                <i class="iconfont iconshoucang" :class="{collected:item.is_collect}"></i>
+                            </div>                           
                         </div>
                     </div>
                 </div>
@@ -49,6 +52,39 @@
                 </div>
             </div>
         </div>
+        
+        <div class="waterfall" v-else>
+            <div slot="waterfall-head" class="fall_head">
+                <div class="detail_swiper">
+                   <div class="swiper-container" id='gallery'>                      
+                        <div class="swiper-wrapper" >
+                            <div class="swiper-slide" v-for="(item,index) in goods_info.item_imgs" :key="index">
+                                <img  :src="item" alt="">
+                            </div>  
+                            <!-- <div class="swiper-slide" v-if='!goods_info.item_imgs.length'>
+                                <img  src="../../assets/defalut.png" alt="">
+                            </div>                        -->
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-prev"></div><!--左箭头。如果放置在swiper-container外面，需要自定义样式。-->
+                        <div class="swiper-button-next"></div><!--右箭头。如果放置在swiper-container外面，需要自定义样式。-->                       
+                   </div>                   
+                </div>
+                <div class="detail_list">
+                   <P class="right_title">{{goods_info.goods_name}}</P>
+                   <div class="info">
+                        <div><span>价格</span> <span style="color:#f90;font-weight:600">￥{{goods_info.shop_price}}</span></div>                               
+                        <div><span>风格</span> <span>{{goods_info.style_name}}</span></div> 
+                        <div><span>品牌</span> <span>{{goods_info.brand_name}}</span></div> 
+                        <div><span>描述</span> <span>{{goods_info.goods_brief||'暂无描述'}}</span></div>
+                   </div>
+                </div>
+            </div>
+            <div class="desc" v-if="goods_info.goods_desc">
+                <p class="desc_title">商品详情</p>
+                <div v-html="goods_info.goods_desc"></div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -56,6 +92,8 @@ import vueWaterfallEasy from 'vue-waterfall-easy'
 import { getSchemeRelated,getGoodsDetail,isCollect } from '@/api/data.js'
 import { mapState,mapActions } from 'vuex'
 import { convertTimeStamp } from '@/libs/util.js'
+import Swiper from 'swiper'; 
+import 'swiper/dist/css/swiper.min.css';
 
 export default {
     name: 'proDetail',
@@ -89,16 +127,26 @@ export default {
             recommend_list: [],
             scheme_info: {},
             user_info:{},
-            proId: null // 方案id
+            proId: null, // 方案id
+            type:1,
+            goods_info:{}
         }
     },
 
     created() {
-        this.proId = this.proDetailVal.id;
-        if(this.proDetailVal.type==2){
-            alert('商品还没做')
+        this.proId = this.$route.params.id;
+        this.type = this.$route.params.type;
+        if( this.$route.params.type==2){
+            this.handleGetGoodsInfo(this.proId)
+        }else{
+            this.handleGetSchemeInfo(this.proId)
         }
-        this.handleGetSchemeInfo(this.proId)
+    },
+
+    watch: {
+        '$route' (to, from) {
+            this.$router.go(0);
+        }
     },
 
     methods: {
@@ -129,9 +177,13 @@ export default {
                 if(res.data.success){
                     let data =  res.data.message;
                     this.scheme_info = data.scheme_info;
+                    data.goods_list.map((item)=>{
+                         item.type = 2
+                    })
                     this.goods_list = data.goods_list;
                     data.recommend_list.map((item)=>{
                         item.time = convertTimeStamp(item.created_at)
+                        item.type = 1
                     })
                     this.recommend_list = data.recommend_list;
                     this.scheme_info = data.scheme_info;
@@ -142,14 +194,34 @@ export default {
             })
         },
 
+        handleGetGoodsInfo (proId) {
+            getGoodsDetail (proId).then(res=>{
+                if(res.data.success){
+                    this.goods_info = res.data.message;
+                    this.$nextTick(() => {
+                       new Swiper('.swiper-container', {
+                            navigation: {
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            },
+                            pagination: {
+                                el: '.swiper-pagination',
+                            },
+                        });
+                    })
+                }else{
+                    this.$Message.error(res.data.message)
+                }
+            })
+        },
+
         linkDetailFun (value) {
-            event.preventDefault()
-                // 只有当点击到图片时才进行操作
-            if (event.target.tagName.toLowerCase() == 'img') {
-                this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({name:'proDetail',query: {data:value}})
-                console.log('img clicked', value)
+            if(value.type==2){
+                this.$router.push({name:'proDetail',params: {id:value.goods_id,type:value.type}})
+                return
             }
+            this.$store.dispatch('updataProDetailVal', value)
+            this.$router.push({name:'proDetail',params: {id:value.id,type:value.type}})   
         },
 
 
@@ -161,30 +233,35 @@ export default {
         },
 
         // 判断收藏
-        judgeCollect (id,type,isCollected) {
-            if(!isCollected){
+        judgeCollect (id,type,isCollected,i) {
+            if(isCollected){
                 this.$Modal.confirm({
                     title: '提示',
                     content: '<p>确定要取消收藏吗</p>',
                     onOk: () => {
-                        this.toCollect(id,type,isCollected);
+                        this.toCollect(id,type,isCollected,i);
                     },               
                 });
             }else{
-                 this.toCollect(id,type,isCollected);
+                 this.toCollect(id,type,isCollected,i);
             }   
         },
 
         // 收藏
-        toCollect (id,type,isCollected) {
+        toCollect (id,type,isCollected,i) {
             let params = {
                 id:id,
-                type:type
+                type:type,
+                is_cancel:isCollected
             }
             isCollect (params).then( res=> {
                 if(res.data.success){
-                    this.scheme_info.is_collect = !this.scheme_info.is_collect;
-                     this.$Message.info(res.data.message);
+                    if(type==1){
+                        this.scheme_info.is_collect = isCollected==0?1:0;
+                    }else{
+                        this.goods_list[i].is_collect = isCollected==0?1:0;
+                    }
+                    this.$Message.info(res.data.message);
                 }
             })
         }  
@@ -213,6 +290,16 @@ export default {
     background: white;
     padding:24px 126px;
     overflow: hidden;
+    border-radius: 6px;
+}
+.detail_swiper{
+    height: 546px;
+    width: 60%;
+    text-align: center;
+    background: white;
+    padding:24px 126px;
+    overflow: hidden;
+    border-radius: 6px;
 }
 .detail_list{
     margin-left: 20px;
@@ -220,6 +307,7 @@ export default {
     background: white;
     color:rgb(158, 155, 155);
     padding: 20px;
+    border-radius: 6px;
 }
 .image_size{
     height:100%;
@@ -333,5 +421,73 @@ margin-top: 20px;;
     text-align: left;
     color: #666;
     font-size: 16px;
+}
+.img-info {
+    padding:14px 25px;
+    background: #fff;
+}
+.collect_box{
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+}
+.iconshoucang{
+    font-size: 20px;
+    color: #999;
+}
+.collected{
+    color: #f90;
+}
+.child:hover .collect_box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.info{
+    padding-top: 20px;
+    text-align: left;
+    font-size: 16px;
+}
+.info div {
+    line-height: 30px;
+}
+.info div span:first-child{
+    font-size: 14px;
+    color: rgb(134, 142, 150);
+    margin-right: 10px;
+}
+.info div span:last-child{
+    font-size: 14px;
+    color: #333;
+}
+.desc{
+    background: #fff;
+    margin:0 12%;
+    border-radius: 6px;
+    padding: 0 30px 30px 30px;
+    color: #333
+}
+.desc_title{
+    text-align: center;
+    font-size: 30px;
+    line-height: 90px;
+    color: #333;
+}
+.swiper-container{
+    height: 100%;
+}
+.swiper-slide img{
+    height: 100%
+}
+.swiper-slide{
+    background: #f2f2f2;
+}
+#thumbs{
+    margin-top: 20px;
 }
 </style>

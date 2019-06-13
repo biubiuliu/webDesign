@@ -42,7 +42,7 @@ export default new Router({
                         import ('@/view/mycollect/mycollect.vue')
                 },
                 {
-                    path: 'proDetail',
+                    path: 'proDetail/:id/:type',
                     name: 'proDetail',
                     component: () =>
                         import ('@/view/proDetail/proDetail.vue')
