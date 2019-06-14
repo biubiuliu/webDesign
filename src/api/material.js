@@ -49,11 +49,6 @@ export const backgroundImg = (params) => {
         return axios.request({
             url: '/api/v1/add/backgroundImg',
             data: params,
-            headers: {
-                // 'sessionKey': 'sessionKey ',
-                // "sign": 'sign',
-                // "timestamp": 'timestamp',
-            },
             method: 'post',
         })
     }

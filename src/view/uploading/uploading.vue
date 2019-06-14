@@ -11,7 +11,8 @@
                     :before-upload="handleUpload"
                     :on-success="handleSuccess"
                     :max-size="20480"
-                    action="https://yy.mingdiao.com.cn/collocationServers/public/index.php/api/v1/upload/img">
+                    action="https://yy.mingdiao.com.cn/collocationServers/public/index.php/api/v1/upload/img"
+                    :headers="headers">
                     <Button  class="uploadingBtn" icon="ios-cloud-upload-outline">上传本地图片</Button>
                 </Upload>
                 <br/>
@@ -62,6 +63,9 @@
 </template>
 <script>
 import { customGoods,backgroundImg,addMaterial } from '@/api/material.js'
+import { getStorage } from '@/libs/util.js'
+import md5 from 'js-md5';
+
 export default {
     name: 'uploading',
     data() {
@@ -70,9 +74,28 @@ export default {
             file: null,
             changehide:0,
             uploadSrcArr:[],
+            headers:{
+
+            }
         }
     },
     created() {
+        const login_server = '4NR01nHbPT9FTXrFUM1Y3BE1';
+        const timestamp = new Date().getTime() / 1000;
+        const userInfo = getStorage('userInfo')
+        const sessionKey = userInfo&&userInfo.sessionKey?userInfo.sessionKey:'';
+        const randNumber =  Math.random();
+        if(userInfo){
+            this.headers = {
+                sessionKey:sessionKey,
+                randNumber: randNumber,
+                timestamp : timestamp,
+                sign : md5(login_server+sessionKey+timestamp+randNumber)
+            }
+        }else{
+            this.$router.push('/login')
+        }
+        
     },
     methods: {
         // mouseenter:鼠标移入元素范围内触发，该事件不冒泡，即鼠标移到其后代元素上时不会触发。
