@@ -99,7 +99,7 @@ export default {
             getUserName(){
                 let userInfo = getStorage('userInfo');
                 if(userInfo){
-                    this.$router.push({name:'discover'})
+                    //this.$router.push({name:'discover'})
                 }
             },
 

@@ -16,7 +16,7 @@
                     我的收藏 
                 </MenuItem> -->
                 <MenuItem name="6" class="layout-user">
-                    <Button shape="circle" icon="ios-search"></Button>
+                    <!-- <Button shape="circle" icon="ios-search"></Button> -->
                 </MenuItem>
                 <MenuItem name="创建设计"  @click.native="clearSchemeId" >
                     <Button type="warning" shape="circle">
