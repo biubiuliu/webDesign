@@ -13,7 +13,10 @@
                         <div><h3>{{user_info.post_name}}</h3></div>
                     </div>
                     <div class="right_btn">
-                        <Button type="warning" @click="linkMaterialLib"  long>再创作</Button>
+                        <Button type="warning" @click="linkMaterialLib"  long :loading="loading">                           
+                             <span v-if="!loading">再创作</span>
+                             <span v-else>Loading...</span>
+                        </Button>
                         <Button type="warning" ghost long  @click="judgeCollect(scheme_info.id,1,scheme_info.is_collect)">{{scheme_info.is_collect?'取消收藏':'收藏'}}</Button>
                     </div>
                 </div>
@@ -30,9 +33,9 @@
                                 <p class="some-info">{{item.goods_name}}</p>
                                 <p class="some-info">{{'￥'+item.shop_price}}</p>
                             </div>
-                            <div class="collect_box" @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
+                            <a href="javascript:;" class="collect_box" @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
                                 <i class="iconfont iconshoucang" :class="{collected:item.is_collect}"></i>
-                            </div>                           
+                            </a>                           
                         </div>
                     </div>
                 </div>
@@ -89,7 +92,7 @@
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getSchemeRelated,getGoodsDetail,isCollect } from '@/api/data.js'
+import { getSchemeRelated,getGoodsDetail,isCollect,copyScheme } from '@/api/data.js'
 import { mapState,mapActions } from 'vuex'
 import { convertTimeStamp } from '@/libs/util.js'
 import Swiper from 'swiper'; 
@@ -129,7 +132,8 @@ export default {
             user_info:{},
             proId: null, // 方案id
             type:1,
-            goods_info:{}
+            goods_info:{},
+            loading:false
         }
     },
 
@@ -182,7 +186,7 @@ export default {
                     })
                     this.goods_list = data.goods_list;
                     data.recommend_list.map((item)=>{
-                        item.time = convertTimeStamp(item.created_at)
+                        item.time = convertTimeStamp(item.updated_at)
                         item.type = 1
                     })
                     this.recommend_list = data.recommend_list;
@@ -226,10 +230,26 @@ export default {
 
 
         linkMaterialLib () {
-            this.$router.push({name:'materialLib', query: {id: this.proId} })
-            // this.schemeId = this.proId
-            this.$store.dispatch("setSchemeId", this.proId)
-            // console.log('需要跳转MaterialLib',this.schemeId)
+            if(this.scheme_info.is_self){
+                this.$store.dispatch("setSchemeId", this.proId)
+                this.$router.push({name:'materialLib', query: {id: this.proId} })
+            }else{
+                this.loading= true;
+                this.copy();
+            }
+        },
+
+        // 复制方案
+        copy () {
+            copyScheme({id:this.proId}).then(res=>{
+                if(res.data.success){
+                    this.$store.dispatch("setSchemeId", res.data.message.id);
+                    this.$router.push({name:'materialLib', query: {id: res.data.message.id} })
+                }else{
+                    this.$Message.error('不能操作当前方案')
+                }
+                 this.loading= false;
+            })
         },
 
         // 判断收藏

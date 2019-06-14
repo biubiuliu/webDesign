@@ -148,3 +148,12 @@ export const delScheme = (params) => {
         data:params
     })
 }
+
+// 复制方案
+export const copyScheme = (params) => {
+    return axios.request({
+        url:'/api/v1/add/copyScheme',
+        method:'post',
+        data:params
+    })
+}

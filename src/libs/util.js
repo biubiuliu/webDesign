@@ -50,14 +50,14 @@ export function setStorage(key,value){
 }
 
 /**
- * @description:获取本地存储 没传时间默认24小时
+ * @description:获取本地存储 没传时间默认1200分钟
  * @param key:存储的键值 
  * @param exp:过期时间  1秒 1000  1分1000*60  1小时 1000*60*60 以此类推
  */
 export function getStorage(key,exp){
     var data = localStorage.getItem(key);
     var dataObj = JSON.parse(data);
-    var outTime = exp?exp:1000*60*60*24;
+    var outTime = exp?exp:1000*60*1200;
     if(!dataObj){
       return null
     }

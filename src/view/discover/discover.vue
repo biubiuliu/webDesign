@@ -2,7 +2,7 @@
     <div>
         <div class="waterfall">
             <vue-waterfall-easy ref="waterfall"
-                                style="width:100%; height:93vh; overflow: hidden"
+                                style="width:100%; height:100vh"
                                 :imgWidth="290" :imgsArr="imgsArr"
                                 :enablePullDownEvent="true"
                                 @scrollReachBottom="handleGetGoodsType"
@@ -27,7 +27,7 @@
                                             </li>
                                         </ul>
                                     </div>  
-                                    <input class="search_input" placeholder="搜索你喜欢的" type="text" v-on:input="inputFun">
+                                    <input class="search_input" placeholder="搜索你喜欢的" type="text" v-on:input="inputFun" :value="keywords">
                                     <div class="searchBtn" @click="search">
                                         <i class=" iconfont iconsousuo" style="font-size:30px;color:white;"></i>
                                     </div>                                    
@@ -79,8 +79,8 @@
                     <p class="some-info">{{props.value.name}}</p>
                     <p class="some-info">{{props.value.time||'￥'+props.value.price}}</p>
                 </div>
-                <div slot="waterfall-over">暂无更多数据</div>
-            </vue-waterfall-easy>
+                <div slot="waterfall-over">暂无更多数据</div> -->
+             </vue-waterfall-easy>
             <!-- <div v-if="!imgsArr.length" class="no-scheme">
                 抱歉 没有找到匹配的结果
             </div> -->
@@ -164,6 +164,7 @@ export default {
             this.seriesId=0;
             this.page = 1;
             this.total = 1;
+            this.keywords = '';
             if(index==1){
                 this.getGoodsLabels();
                 this.handleGetGoodsType();
@@ -211,8 +212,9 @@ export default {
                             href: item.done_img_url,  
                             name: item.scheme_name,
                             canvas_type:item.canvas_type,
-                            time:convertTimeStamp(item.created_at),                                                   
+                            time:convertTimeStamp(item.updated_at),                                                   
                             id: item.id,
+                            is_personal:item.is_personal,
                             type:1//1是方案 2是单品
                         };
                         this.imgsArr.push(setDataObj);                      
@@ -337,8 +339,8 @@ export default {
 
        // 筛选
        search(){
-        //    this.page=1;
-        //    this.handleGetGoodsType();
+           this.page=1;
+           this.handleGetGoodsType();
        }
     }
     
@@ -434,7 +436,7 @@ export default {
     overflow: hidden;
 }
 .waterfall{
-    /* height: 100vh; */
+     /* height:100vh;  */
     /* overflow: hidden; */
     background: #fff;
 }
@@ -539,5 +541,32 @@ export default {
     line-height: 400px;
     position: absolute;
     bottom: 0px;
+}
+.parent { 
+    width:80%;
+    -moz-column-count: 5;
+    -webkit-column-count: 5;
+    column-count: 5;
+    /* padding:60px 60px 40px 60px; */
+    margin-top: 20px;
+    margin-left: 10%
+}
+.child {
+    background: #f2f2f2;;
+    margin-bottom:20px;	 
+    -moz-page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    break-inside: avoid;
+    color:#f2f2f4;
+    /* width: 340px; */
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 10px;
+    position: relative;
+    border:1px solid #ddd;
+    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); */
+}
+.waterfall::-webkit-scrollbar{
+    display: none;
 }
 </style>
