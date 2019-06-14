@@ -9,7 +9,7 @@
             <Button v-if="closeGoodsBool" type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
         </div>
         <div class="goodsimg" v-if="this.goodsItem.imgs.length !== 0">
-            <img :src="goodsImgArr_img[this.index].pic_image" class="pic" :id="this.goodsItem.goods_id" :name="goodsImgArr_img[this.index].id" @click="selectDecorateGoods"  crossorigin="anonymous"  alt="图片不存在">
+            <img :src="goodsImgArr_img[this.imgIndex].pic_image" class="pic" :id="this.goodsItem.goods_id" :name="goodsImgArr_img[this.imgIndex].id" @click="selectDecorateGoods"  crossorigin="anonymous"  alt="图片不存在">
         </div>
         <div class="goodsimg" v-else>
             <h1>抱歉,暂无相关商品图片</h1>
@@ -45,8 +45,11 @@ export default {
     },
     computed: {
         ...mapState({
-            goodsItem: state =>{
-                    return state.app.goodsItem
+                goodsItem: state =>{
+                        return state.app.goodsItem
+                },
+                imgIndex: state =>{
+                        return state.app.imgIndex
                 },
             }),
             ...mapGetters([
@@ -69,19 +72,24 @@ export default {
         ...mapActions([
             'saveState',
             'setGoodsItem',
+            'setImgIndex',
         ]),
         nextImg(){
             this.index++;
+            this.$store.dispatch("setImgIndex", this.index)
             if( this.index == this.goodsImgArr_img.length){
-                this.index=0;
+                this.index = 0;
             }
+            // console.log("nextImg--------------",this.imgIndex)
             document.getElementsByClassName('pic').src = this.goodsImgArr_img[this.index];
         },
         preImg(){
             this.index--;
-            if(this.index<0){
+            this.$store.dispatch("setImgIndex", this.index)
+            if(this.index < 0){
                 this.index = this.goodsImgArr_img.length-1;
             }
+            // console.log("preImg--------------",this.imgIndex)
             document.getElementsByClassName('pic').src = this.goodsImgArr_img[this.index];
         },
         clearGoodsItem(){
@@ -89,6 +97,7 @@ export default {
         },
         // 将自定义商品图片渲染到canvas
         selectDecorateGoods(e) {
+            this.index = 0
             // console.log("e.target",e.target)
             const card = this.card
             if (!card) return

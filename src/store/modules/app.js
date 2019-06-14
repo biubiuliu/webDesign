@@ -6,6 +6,7 @@ const app = {
         proDetailVal: {},
         isShowSpin: false,
         isLocking: true,
+        imgIndex: 0,
         // drag
         cardType: 1,
         frontCard: null,
@@ -40,6 +41,9 @@ const app = {
         },
         SET_GOODSITEM: (state, goodsItem) => {
             state.goodsItem = goodsItem
+        },
+        SET_IMGINDEX: (state, imgIndex) => {
+            state.imgIndex = imgIndex
         },
         // drag -s
         SET_SELECTEDOBJ: (state, object) => {
@@ -99,6 +103,9 @@ const app = {
         },
         setGoodsItem({ commit }, goodsItem) {
             commit('SET_GOODSITEM', goodsItem)
+        },
+        setImgIndex({ commit }, imgIndex) {
+            commit('SET_IMGINDEX', imgIndex)
         },
         // darg
         initFrontCard({ commit }, fCanvas) {

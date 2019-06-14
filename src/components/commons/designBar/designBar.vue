@@ -204,7 +204,6 @@ export default {
         shemeInfoModalok () {
                 this.toJson()
                 this.imgObject.id = this.schemeId ? this.schemeId : null
-                
                 this.imgObject.canvas_type = parseInt(this.vertical) 
                 // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
                 // this.imgObject = qs.stringify(this.imgObject)
@@ -355,9 +354,14 @@ export default {
         //添加,保存方案
         handleGetSaveScheme(data) {
             getSaveScheme(data).then(res => {
-                console.log('添加,保存方案', res.data)
-                this.$router.push({name:'mydesign'})
-                this.$Message.info(res.data.message);
+                console.log('添加,保存方案', res.data.success)
+                if(!res.data.success) {
+                    this.shemeInfoModal = true
+                    this.$Message.error(res.data.message);
+                }else{
+                    this.$router.push({name:'mydesign'})
+                    this.$Message.info(res.data.message);
+                } 
             }).catch(err =>{
                 console.log(err)
             })

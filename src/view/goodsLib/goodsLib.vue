@@ -117,6 +117,7 @@ export default {
         goodsImgDownFun(item,index) {
             this.modal9 = true;
             this.$store.dispatch("setGoodsItem", item)
+            this.$store.dispatch("setImgIndex", 0)
         },
         iconshoucang1Fun(index) {
             console.log("收藏", index)
