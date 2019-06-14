@@ -123,6 +123,12 @@ export default {
                         setStorage('userInfo',value);
                         let _this=this;
                         setTimeout(function()  {
+                            // let hostName = _this.$route.query.redirect;  // 获取域名
+                            // if (hostName === _this.$url()) {   // 判断如果域名是你项目域名，说明是从本网站内部跳转过来的，
+                            //     _this.$router.go(-1);   // 登录成功后，返回上次进入的页面；
+                            // } else {
+                            //    _this.$router.push({name:'discover'});  // 若不是网站内部跳转过来的，登陆成功后进入网站首页
+                            // }
                              _this.$router.push({name:'discover'})
                         }, 2000)
                    }else{
