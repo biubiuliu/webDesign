@@ -101,7 +101,7 @@ export default {
     },
     created() {
         this.handleGetgetmaterial(0)
-        console.log('新建设计2',this.schemeId)
+        // console.log('新建设计2',this.schemeId)
     },
     methods: {
         ...mapActions([
@@ -123,8 +123,8 @@ export default {
                 angle: 0,
                 scaleX: card.width / img.width /2, 
                 scaleY: card.width / img.height /2,
-                left: 100,
-                top: 100,
+                left: Math.random().toFixed(2)*200 + 100,
+                top: Math.random().toFixed(2)*200 + 100,
                 src:e.target.src,
                 imgType:0, // imgType:0背景,1素材 2自定义商品
                 goods_id: null,
@@ -149,8 +149,8 @@ export default {
                 cornerStyle: 'circle',
                 borderDashArray: [3,3],
                 angle: 0,
-                left: 100,
-                top: 100,
+                left: Math.random().toFixed(2)*200 + 100,
+                top: Math.random().toFixed(2)*200 + 100,
                 scaleX: 200/img.width, 
                 scaleY: 200/img.height ,
                 src:e.target.src,
@@ -178,8 +178,8 @@ export default {
                 cornerStyle: 'circle',
                 borderDashArray: [3,3],
                 angle: 0,
-                left: 100,
-                top: 100,
+                left: Math.random().toFixed(2)*200 + 100,
+                top: Math.random().toFixed(2)*200 + 100,
                 scaleX: 200/img.width, 
                 scaleY: 200/img.height ,
                 src:e.target.src,

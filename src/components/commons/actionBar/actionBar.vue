@@ -232,10 +232,10 @@ export default {
                     card.add(croppedImg).renderAll();
                     card.remove(img).renderAll();
                     
-                    console.log("cropImage",croppedImg.aCoords)
-                    console.log("img",img.aCoords)
-                    console.log("this.controlsVisibility",_this.controlsVisibility)
-                    console.log("cropImage",canvas_crop.toDataURL('png'))
+                    // console.log("cropImage",croppedImg.aCoords)
+                    // console.log("img",img.aCoords)
+                    // console.log("this.controlsVisibility",_this.controlsVisibility)
+                    // console.log("cropImage",canvas_crop.toDataURL('png'))
                 });
             });
         
@@ -246,9 +246,9 @@ export default {
                 alert("请先框选裁剪区域。");
                 return;
             }
-            
-            console.log("selectedObj",this.selectedObj)
-            console.log("object",this.object)
+            // 
+            // console.log("selectedObj",this.selectedObj)
+            // console.log("object",this.object)
             let el = this.selectedObj
             let object = this.object
             let canvas = this.card
@@ -272,7 +272,7 @@ export default {
 
             this.isCropping = false;
             this.cutModel = true
-            console.log("裁剪ok",object)
+            // console.log("裁剪ok",object)
 
         },
         //变形
@@ -319,7 +319,7 @@ export default {
         // 移除Object
         removeObject() {
             if (!this.selectedObj) return
-            console.log(this.selectedObj);
+            // console.log(this.selectedObj);
             this.card.remove(this.selectedObj)
             this.card.renderAll()
             this.$store.dispatch('setSelectedObj', null)
@@ -350,7 +350,7 @@ export default {
             this.card.renderAll()
             this.saveState()
             this.$store.state.app.isLocking = this.selectedObj.hasControls
-            console.log("锁定",this.selectedObj);
+            // console.log("锁定",this.selectedObj);
         },
         //取消锁定
         cancellockObject() {
@@ -363,7 +363,7 @@ export default {
             this.card.renderAll()
             this.saveState()
             // this.$store.dispatch('setSelectedObj', null)
-            console.log("取消锁定",this.selectedObj);
+            // console.log("取消锁定",this.selectedObj);
         },
         //复制粘贴
         paste(_clipboard){
@@ -371,8 +371,8 @@ export default {
             let card = this.card;
             
             _clipboard.clone((clonedObj) => {
-                console.log("clonedObj",clonedObj)
-                console.log("this.selectedObj",this.selectedObj)
+                // console.log("clonedObj",clonedObj)
+                // console.log("this.selectedObj",this.selectedObj)
                 var  imgType_s = this.selectedObj.imgType
                 var  goods_id_s = this.selectedObj.goods_id
                 var  goodsImg_id_s = this.selectedObj.goodsImg_id
@@ -407,7 +407,7 @@ export default {
                 } else {
                     card.add(clonedObj);
                 }
-                console.log("_clipboard",_clipboard)
+                // console.log("_clipboard",_clipboard)
                 _clipboard.top += 20;
                 _clipboard.left += 20;
                 _clipboard.imgType = clonedObj.imgType, // imgType:0背景,1素材 2自定义商品
@@ -422,11 +422,11 @@ export default {
         let card = this.card;
         var _self = this;
         // this.$store.state.app.objJSON = card._objects
-        console.log("objJSON",this.objJSON)
+        // console.log("objJSON",this.objJSON)
             card.getActiveObject().clone((cloned) => {
                 
                 // let _clipboard = cloned;
-                console.log("cloned",cloned)
+                // console.log("cloned",cloned)
                 _self.paste(cloned);
                 
             })

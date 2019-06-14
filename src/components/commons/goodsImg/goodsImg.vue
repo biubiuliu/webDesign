@@ -1,17 +1,19 @@
 <template>
-    <div class="goods_body">
-        <div class="goodsImgBtn">
+    <div class="goods_body" >
+        <div class="goodsImgBtn"  v-show="this.goodsItem.imgs.length !== 0">
             <Button type='warning' size="small" ghost @click="preImg"><i  class="iconfont iconzuo"></i></Button>
             <Button type='warning' size="small" ghost @click="nextImg"><i  class="iconfont iconyou"></i></Button>
             <Button type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
         </div>
-        <div class="goodsimg">
-            <img :src="goodsImgArr_img[this.index].pic_image" class="pic" :id="this.goodsItem.goods_id" :name="goodsImgArr_img[this.index].id" @click="selectDecorateGoods"  crossorigin="anonymous" alt="图片不存在">
+        <div class="goodsimg" v-if="this.goodsItem.imgs.length !== 0">
+            <img :src="goodsImgArr_img[this.index].pic_image" class="pic" :id="this.goodsItem.goods_id" :name="goodsImgArr_img[this.index].id" @click="selectDecorateGoods"  crossorigin="anonymous"  alt="图片不存在">
+        </div>
+        <div v-else>
+            <h1>抱歉,暂无相关商品图片</h1>
         </div>
     </div>
 </template>
 <script>
-import { goodsList, category } from '@/api/material.js'
 import {mapState, mapGetters, mapActions} from 'vuex'
 export default {
     name: 'goodsImg',
@@ -25,9 +27,13 @@ export default {
     },
     watch: {
         goodsItem: function() { 
-            // if(this.goodsItem.imgs) return
-            this.goodsImgArr_img = this.goodsItem.imgs
-            // console.log("改变",this.goodsImgArr_img);
+            console.log("watch",this.goodsItem)
+            if(this.goodsItem.imgs.length !== 0) {
+                this.goodsImgArr_img = this.goodsItem.imgs
+                
+            }else{
+                alert("==0")
+            }
         },
         $route(to) {
             this.$store.dispatch("setGoodsItem", null)
@@ -45,9 +51,15 @@ export default {
             ]),
     },
     mounted() {
-        this.handlegoodsList(this.getGoods) 
+        console.log("mounted",typeof(this.goodsItem.imgs.length == 0))
+        if(this.goodsItem.imgs.length == 0) return;
         this.goodsImgArr_img = this.goodsItem.imgs
         
+    },
+    updated() {
+        console.log("updata",typeof(this.goodsItem.imgs.length))
+        if(this.goodsItem.imgs.length == 0) return;
+        this.goodsImgArr_img = this.goodsItem.imgs
     },
     methods: {
         ...mapActions([
@@ -73,7 +85,7 @@ export default {
         },
         // 将自定义商品图片渲染到canvas
         selectDecorateGoods(e) {
-            console.log("e.target",e.target)
+            // console.log("e.target",e.target)
             const card = this.card
             if (!card) return
             fabric.Image.fromURL(e.target.src, (img) => {
@@ -85,8 +97,8 @@ export default {
                 cornerStyle: 'circle',
                 borderDashArray: [3,3],
                 angle: 0,
-                left: 100,
-                top: 100,
+                left: Math.random().toFixed(2)*200+100,
+                top: Math.random().toFixed(2)*200+100,
                 scaleX: 200/img.width, 
                 scaleY: 200/img.height ,
                 src:e.target.src,
@@ -101,15 +113,6 @@ export default {
             this.clearGoodsItem()
             this.saveState()
             },{crossOrigin: 'anonymous'})
-        },
-        handlegoodsList(getGoods){
-            let getGoods2 = this.getGoods
-            goodsList(getGoods2.page, getGoods2.style_id, getGoods2.keywords, getGoods2.brand_id, getGoods2.category_id).then(res=>{
-                console.log('------------------', res)
-                
-            }).catch(err=>{
-                console.log( err)
-            })
         },
     },
 }

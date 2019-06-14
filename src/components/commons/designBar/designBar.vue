@@ -197,7 +197,7 @@ export default {
         isProIdfun(){
             if( this.schemeId ){
                 this.handleGetSchemeInfo(this.schemeId)
-                console.log("this.schemeId",this.schemeId)
+                // console.log("this.schemeId",this.schemeId)
             }
             
         },
@@ -217,7 +217,7 @@ export default {
         //是否公开
         isOpenFun(ev) {
             this.imgObject.is_personal = this.switchVal?0:1
-            console.log("是否公开",this.imgObject.is_personal)
+            // console.log("是否公开",this.imgObject.is_personal)
         },
         //保存方案
         saveScheme(){
@@ -226,7 +226,7 @@ export default {
             this.canvasDataArr = this.objJSON.objects
             this.imgObject.img_site_json =  JSON.stringify(this.objJSON)
             //通过toJson数据获取背景素材自定义商品图片
-            console.log("____________",this.objJSON)
+            // console.log("____________",this.objJSON)
 
             this.useBase64Fun()
             let formData = new FormData();
@@ -355,7 +355,7 @@ export default {
         //添加,保存方案
         handleGetSaveScheme(data) {
             getSaveScheme(data).then(res => {
-                console.log('添加,保存方案', res.data)
+                // console.log('添加,保存方案', res.data)
             }).catch(err =>{
                 console.log(err)
             })
@@ -373,13 +373,13 @@ export default {
         handleGetSchemeInfo (proId) {
             getSchemeInfo(proId).then(res => {
                 this.loadObj = res.data.message.img_site_json
-                console.log("这是素材库",this.loadObj)
+                // console.log("这是素材库",this.loadObj)
                 // this.card.loadFromJSON( JSON.stringify(this.loadObj) )
                 this.imgObject = res.data.message
                 // this.setCanvasState(res.data.message.canvas_type)
                 this.card.loadFromJSON(JSON.stringify(this.loadObj), this.card.renderAll(), function(o, object) {
-                    console.log("o",o)
-                    console.log("object",object)
+                    // console.log("o",o)
+                    // console.log("object",object)
                     // `o` = json object
                     // `object` = fabric.Object instance
                     // ... do some stuff ...

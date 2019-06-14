@@ -86,7 +86,6 @@ components: {
             }),
     },
     created() {
-        console.log("goodsItem0.0",this.goodsItem)
         if(this.$route.name =='goodsLib' || this.$route.name =='favorite'){
             this.isShowRNav = true;
         }
@@ -194,7 +193,7 @@ components: {
 
 }
 .canvas_div{
-    margin-top: 60px;
+    margin-top: 20px;
     color: black
 }
 

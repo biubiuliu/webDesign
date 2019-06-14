@@ -25,11 +25,11 @@
                     </Button>  
                 </MenuItem>
                 <MenuItem name="用户名" v-if="username=='请登录'">
-                     <a href="javascript:;" @click="toLogin" style="color:#fff">{{username}}</a>
+                    <a href="javascript:;" @click="toLogin" style="color:#fff">{{username}}</a>
                 </MenuItem>
                 <Submenu name="用户名" v-else>
                     <template slot="title">
-                       {{username}}
+                        {{username}}
                     </template>
                     <MenuItem name="logout">
                         <a href="javascript:;" @click="logout">退出登录</a>
