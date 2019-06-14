@@ -30,7 +30,7 @@
             <ul class="goodsUl flexLayout">
                 <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,index)"  @mouseleave="mouseleave(item,index)">
                     <!-- <span  v-for="(items,index) in item.imgs" :key="index" :id ="items.id" ></span> -->
-                    <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失" crossorigin="anonymous">
+                    <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失" >
                     <div class="iconBox flexLayout">
                         <div @click="iconshoucang1Fun(index)" ><i  class="iconfont iconshoucang1"></i></div>
                         <div @click="iconxiazaiFun(index)"><i  class="iconfont iconxiazai"></i></div>

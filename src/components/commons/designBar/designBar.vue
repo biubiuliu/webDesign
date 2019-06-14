@@ -208,7 +208,7 @@ export default {
                 this.imgObject.canvas_type = parseInt(this.vertical) 
                 // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
                 // this.imgObject = qs.stringify(this.imgObject)
-                this.$Message.info('添加方案成功');
+
                 this.handleGetSaveScheme(this.imgObject)
             },
         shemeInfoModalcancel () {
@@ -355,7 +355,9 @@ export default {
         //添加,保存方案
         handleGetSaveScheme(data) {
             getSaveScheme(data).then(res => {
-                // console.log('添加,保存方案', res.data)
+                console.log('添加,保存方案', res.data)
+                this.$router.push({name:'mydesign'})
+                this.$Message.info(res.data.message);
             }).catch(err =>{
                 console.log(err)
             })

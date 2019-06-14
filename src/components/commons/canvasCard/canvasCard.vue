@@ -41,7 +41,7 @@ name: "CanvasCard",
         // console.log("cvsW",this.cvsW,this.cvsH)
     },
     mounted() {
-        console.log('mounted card');
+        // console.log('mounted card');
         // 会员卡尺寸 85.5*54毫米 (标准)
         const card = this.self = new fabric.Canvas('canvas', {
             backgroundColor: 'white',

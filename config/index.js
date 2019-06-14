@@ -37,7 +37,7 @@ module.exports = {
     },
     baseUrl: {
         dev: 'https://yy.mingdiao.com.cn/collocationServers/public/index.php',
-        pro: 'https://produce.com'
+        pro: 'https://yy.mingdiao.com.cn/collocationServers/public/index.php'
     },
     build: {
         // Template for index.html
@@ -46,7 +46,7 @@ module.exports = {
         // Paths
         assetsRoot: path.resolve(__dirname, '../dist'),
         assetsSubDirectory: 'static',
-        assetsPublicPath: '/',
+        assetsPublicPath: '/fitment/dist/',
 
         /**
          * Source Maps

@@ -184,8 +184,8 @@ export default {
                 scaleY: 200/img.height ,
                 src:e.target.src,
                 imgType:2,
-                goods_id: e.target.name,
-                goodsImg_id:e.target.id,
+                goods_id: e.target.id,
+                goodsImg_id:e.target.name,
                 material_id: e.target.id,
                 // backgroundImgId:e.target.id
             }); 

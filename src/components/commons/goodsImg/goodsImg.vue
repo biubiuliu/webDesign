@@ -5,10 +5,13 @@
             <Button type='warning' size="small" ghost @click="nextImg"><i  class="iconfont iconyou"></i></Button>
             <Button type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
         </div>
+        <div class="goodsImgBtn">
+            <Button v-if="closeGoodsBool" type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
+        </div>
         <div class="goodsimg" v-if="this.goodsItem.imgs.length !== 0">
             <img :src="goodsImgArr_img[this.index].pic_image" class="pic" :id="this.goodsItem.goods_id" :name="goodsImgArr_img[this.index].id" @click="selectDecorateGoods"  crossorigin="anonymous"  alt="图片不存在">
         </div>
-        <div v-else>
+        <div class="goodsimg" v-else>
             <h1>抱歉,暂无相关商品图片</h1>
         </div>
     </div>
@@ -23,16 +26,17 @@ export default {
             getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null},
             goodsImgArr_img:null,
             index: 0,
+            closeGoodsBool:false,
         }
     },
     watch: {
         goodsItem: function() { 
-            console.log("watch",this.goodsItem)
+            // console.log("watch",this.goodsItem)
             if(this.goodsItem.imgs.length !== 0) {
                 this.goodsImgArr_img = this.goodsItem.imgs
-                
+                this.closeGoodsBool = false
             }else{
-                alert("==0")
+                this.closeGoodsBool = true
             }
         },
         $route(to) {
@@ -51,13 +55,13 @@ export default {
             ]),
     },
     mounted() {
-        console.log("mounted",typeof(this.goodsItem.imgs.length == 0))
+        // console.log("mounted",typeof(this.goodsItem.imgs.length == 0))
         if(this.goodsItem.imgs.length == 0) return;
         this.goodsImgArr_img = this.goodsItem.imgs
         
     },
     updated() {
-        console.log("updata",typeof(this.goodsItem.imgs.length))
+        // console.log("updata",typeof(this.goodsItem.imgs.length))
         if(this.goodsItem.imgs.length == 0) return;
         this.goodsImgArr_img = this.goodsItem.imgs
     },

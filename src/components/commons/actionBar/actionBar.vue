@@ -9,8 +9,8 @@
             <Tooltip class="aliIcon" content="水平翻转"><i @click="flipXObject" class="iconfont iconjingxiang1"></i></Tooltip>
             <Tooltip class="aliIcon" content="垂直翻转"><i @click="flipYObject" class="iconfont iconjingxiang2"></i></Tooltip>
             <Tooltip class="aliIcon" content="等比例缩放"><i @click="zoomObject" class="iconfont iconsuofang1"></i></Tooltip>
-            <Tooltip class="aliIcon" content="裁剪" v-if="cutModel"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip>
-            <Tooltip class="aliIcon" content="确定" v-else><i  @click="cutModelOk" class="iconfont iconai50"></i></Tooltip>
+            <!-- <Tooltip class="aliIcon" content="裁剪" v-if="cutModel"><i @click="cutObject" class="iconfont iconjianqie"></i></Tooltip> -->
+            <!-- <Tooltip class="aliIcon" content="确定" v-else><i  @click="cutModelOk" class="iconfont iconai50"></i></Tooltip> -->
             <Tooltip class="aliIcon" content="变形"><i @click="skewControl" class="iconfont iconbianxing"></i></Tooltip>
             <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
             <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
