@@ -1,6 +1,6 @@
 <template style="overflow: hidden">
     <div class="mydesignBody">
-        <!-- <div class="header_select flex" slot="waterfall-head">
+        <div class="header_select flex" slot="waterfall-head" style="display:none">
             <div class="flex selectCusBox">
                 <a class="sort"  href="javascript:;" @mouseenter="selectEnter('sort')" @mouseleave="selectLeave('sort')">
                     {{sortSelectList[sortLi].title}}
@@ -27,8 +27,8 @@
                 <i  class="iconfont iconjia"></i>
                 新建文件
             </Button>
-        </div> -->
-        <div style="z-index:99;padding-top: 0px;">
+        </div>
+        <div style="z-index:99;padding-top: 104px;">
             <div class="parent"  v-if="imgsArr.length">
                 <div  class="child" v-for="(item, index) in imgsArr" :key="index">
                     <!-- <div class="img"> -->
@@ -148,6 +148,7 @@ export default {
     data() {
         return {
             msg: '这是我的设计ss',
+            distance:100,
             sortSelectList:[
                 {title:"排序",id:0},
                 {title:"最新修改",id:"updated_at|desc"},
@@ -175,6 +176,7 @@ export default {
             },
             merchBillModal:false, // 商品清单的modal  
             isShowSpin:true,
+            loading:false
         }
     },
     created() {
@@ -185,7 +187,7 @@ export default {
     },
     mounted () {
         // 添加滚动事件，检测滚动到页面底部
-       window.addEventListener('scroll', this.handleScroll)
+        window.addEventListener('scroll', this.handleScroll)
     },
     methods: {
         handleScroll() {
@@ -196,9 +198,11 @@ export default {
        		// 变量scrollHeight是滚动条的总高度
        		var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
             // 滚动条到底部的条件
+            console.log(scrollTop+windowHeight,scrollHeight)
             if(scrollTop+windowHeight==scrollHeight){
                 // 写后台加载数据的函数
          	   this.handleGetList()
+                return
             }   
         },
 
@@ -244,24 +248,28 @@ export default {
 
         // 数据重组
         handleGetList () {
-            if(this.page!=1&&this.page> this.total_page){
-               
+            if(this.page!=1&&this.page> this.total_page){              
                 return
-            }  
+            } 
+            if(this.loading){
+                return;
+            } 
+            this.loading = true;
             let params = {
                 type:1,                            
                 page:this.page,
                 sorter:this.sortSelectList[this.sortLi].id,
                 dir_id:this.dirSelectList[this.dirLi].id,
-                page_size:15,
+                page_size:10,
             }
             getMeals(params).then(res => {
-                if(res.data.success){
+                this.isShowSpin = false
+                if(res.data.success){                    
                     if(this.page==1){
                         this.imgsArr=[];
                     }
                     this.page = this.page+1;
-                    this.total_page = Math.ceil(res.data.message.total/15) ;  
+                    this.total_page = Math.ceil(res.data.message.total/10) ;  
                     if(res.data.message.data.length){
                         res.data.message.data.map((item,i)=>{
                         var  setDataObj = {
@@ -269,18 +277,19 @@ export default {
                             href: item.done_img_url,  
                             name: item.scheme_name,
                             is_personal:item.is_personal,
-                            time:convertTimeStamp(item.created_at),                                                   
+                            time:convertTimeStamp(item.updated_at),                                                   
                             id: item.id,
                             type:1// 传详情用
                         };
                         this.imgsArr.push(setDataObj);                      
                     });
-                    }                                          
-                }
-                this.isShowSpin = false
+                  }                                          
+                } 
+                this.loading = false;              
             }).catch(err => {
                 console.log(err)
-                this.isShowSpin = false
+                this.isShowSpin = false;
+                this.loading = false;  
             })
         },
 
@@ -499,7 +508,7 @@ export default {
 .mydesignBody{
     background: #f2f2f4;
     color: black;
-    height: 91vh;
+    /* height: 93vh; */
     font-size: 14px;
     position: relative;
 }
@@ -623,7 +632,7 @@ export default {
     -moz-column-count: 5;
     -webkit-column-count: 5;
     column-count: 5;
-    /* padding:104px 60px 40px 60px; */
+    padding:104px 60px 40px 60px;
     padding:0 60px 40px 60px;
     margin-top: 20px;
 }
