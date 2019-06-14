@@ -64,9 +64,9 @@
                             <div class="swiper-slide" v-for="(item,index) in goods_info.item_imgs" :key="index">
                                 <img  :src="item" alt="">
                             </div>  
-                            <!-- <div class="swiper-slide" v-if='!goods_info.item_imgs.length'>
-                                <img  src="../../assets/defalut.png" alt="">
-                            </div>                        -->
+                            <div class="swiper-slide" v-if='goods_info&&goods_info.item_imgs&&goods_info.item_imgs.length==0'>
+                                <img  :src="goods_info.goods_thumb" alt="">
+                            </div>                       
                         </div>
                         <div class="swiper-pagination"></div>
                         <div class="swiper-button-prev"></div><!--左箭头。如果放置在swiper-container外面，需要自定义样式。-->
