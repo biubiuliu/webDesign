@@ -93,7 +93,7 @@ import { getGoodsType,  getBrandList, getMeals, getGoodsList } from '@/api/data.
 import { category,getEnumList } from '@/api/material.js'
 import { convertTimeStamp } from '@/libs/util.js'
 import { mapState } from 'vuex'
-import { getStorage } from '@/libs/util.js'
+import { getStorage,setStorage } from '@/libs/util.js'
 
 export default {
     name: 'discover',
@@ -280,13 +280,18 @@ export default {
         // 获取方案风格、空间类型
         getScreenLabels () {
              Promise.all([getEnumList(), getBrandList()]).then((resultList) => {
-                 if(resultList[0].data.success){
-                    this.roomLabelArr = resultList[0].data.message.space_list;
-                    this.roomStyleArr = resultList[0].data.message.style_list
-                 }
-                 if(resultList[1].data.success){
-                    this.brandLabelArr = resultList[1].data.message;
-                 }
+                 if(resultList[0].data.success&&resultList[1].data.success){
+                    let schemes_choose_list = {
+                        roomLabelArr:resultList[0].data.message.space_list,
+                        roomStyleArr:resultList[0].data.message.style_list,
+                        brandLabelArr:resultList[1].data.message
+                    }
+                    this.roomLabelArr = schemes_choose_list.roomLabelArr;
+                    this.roomStyleArr = schemes_choose_list.roomStyleArr;
+                    this.brandLabelArr = schemes_choose_list.brandLabelArr;
+                    
+                    this.setStorage('schemes_choose_list',schemes_choose_list)
+                 }            
              })
         },
 
@@ -297,6 +302,14 @@ export default {
                     this.roomLabelArr = res.data.message.category;
                     this.roomStyleArr = res.data.message.style;
                     this.brandLabelArr = res.data.message.brand;
+
+                    let goods_choose_list = {
+                        roomLabelArr:res.data.message.category,
+                        roomStyleArr:res.data.message.style,
+                        brandLabelArr:res.data.message.brand
+                    }
+
+                    this.setStorage('goods_choose_list',goods_choose_list)
                 }
             })
         },

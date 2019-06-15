@@ -1,7 +1,8 @@
 import axios from 'axios'
 import store from '@/store'
-import md5 from 'js-md5';
+import md5 from 'js-md5'
 import {getStorage} from './util'
+import router from '@/router/index'
 
 const addErrorLog = errorInfo => {
     const { statusText, status, request: { responseURL } } = errorInfo
@@ -52,6 +53,14 @@ class HttpRequest {
             })
             // 响应拦截
         instance.interceptors.response.use(res => {
+            // 未登录拦截
+            if(res.data.code==0){
+                router.replace({
+                    path: '/login',
+                    query: {redirect: router.currentRoute.fullPath}
+                })
+                return
+            }
             store.state.app.isShowSpin = false; //在这里对返回的数据进行处理
             this.destroy(url)
             const { data, status } = res

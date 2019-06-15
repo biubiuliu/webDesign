@@ -1,7 +1,7 @@
 <template>
     <div class="layout">
         <Layout >
-            <nav-bar class="nvabar"></nav-bar>
+            <nav-bar class="nvabar" :on='on'></nav-bar>
             <Content :style="{marginTop:'60px'}" class="Content">
                 <router-view/>
             </Content>
@@ -25,9 +25,18 @@ name: 'home',
     },
     data(){
         return{
-            aa: 'd'
+            aa: 'd',
+            on: ''
         }
-    }
+    },
+    watch: {
+        '$route' (to, from) {
+            this.on = to.name
+        }
+    },
+    created() {
+        this.on =  this.$route.path.slice(6, this.$route.path.length);
+    },
 }
 </script>
 <style scope>

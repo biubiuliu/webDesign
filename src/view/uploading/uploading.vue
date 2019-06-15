@@ -92,10 +92,7 @@ export default {
                 timestamp : timestamp,
                 sign : md5(login_server+sessionKey+timestamp+randNumber)
             }
-        }else{
-            this.$router.push('/login')
-        }
-        
+        }    
     },
     methods: {
         // mouseenter:鼠标移入元素范围内触发，该事件不冒泡，即鼠标移到其后代元素上时不会触发。

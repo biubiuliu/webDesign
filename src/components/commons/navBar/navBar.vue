@@ -1,20 +1,20 @@
 <template>
     <div :style="{position: 'fixed', width: '100%', minWidth:'800px'}">
-        <Menu mode="horizontal" theme="dark" id="dark" active-name="1">
+        <Menu mode="horizontal" theme="dark" id="dark" active-name="1" class="dark_back">
             <div class="layout-logo">
                 <img src="./logo.png" class="logo-img">
             </div>
             <div class="layout-nav">
-                <MenuItem name="我的设计" to="/home/mydesign">
+                <MenuItem name="我的设计" to="/home/mydesign" :class="{on:on=='mydesign'}">
                     我的设计
                 </MenuItem>
-                <MenuItem name="发现"  to="/home/discover">
+                <MenuItem name="发现"  to="/home/discover" :class="{on:on=='discover'}">
                     发现
                 </MenuItem>
             
-                <!-- <MenuItem name="我的收藏" to="/home/mycollect">
+                <MenuItem name="我的收藏" to="/home/mycollect" :class="{on:on=='mycollect'}">
                     我的收藏 
-                </MenuItem> -->
+                </MenuItem>
                 <MenuItem name="6" class="layout-user">
                     <!-- <Button shape="circle" icon="ios-search"></Button> -->
                 </MenuItem>
@@ -49,6 +49,11 @@ export default {
             username:''
         }
     },
+    props:{
+       on:{
+         type:String
+      }
+    },
     computed: {
         ...mapState({
             schemeId: state =>{
@@ -66,13 +71,15 @@ export default {
         getUserName(){
             let userInfo = getStorage('userInfo');
             this.username = userInfo&&userInfo.mobile?mobilePhoneMask(userInfo.mobile):"请登录"
-            if(!userInfo){
-                this.$router.push({name:'login'})
-            }
         },
         clearSchemeId(){
             this.$store.dispatch("setSchemeId", null)
-            this.$router.push('/designHome/materialLib')
+            //this.$router.push('/designHome/materialLib')
+            // 打开新窗口
+            const {href} = this.$router.resolve({
+                path: '/designHome/materialLib',            
+            })
+            window.open(href, '_blank')
         },
 
         toLogin() {
@@ -115,11 +122,14 @@ export default {
     .ivu-menu-item-selected{
         color:#f90!important
     }
-    .ivu-menu-dark{
-        background: #2e2f34
+    .dark_back{
+        background: #2e2f34!important
     }
     .logo-img{
         width: 100%
+    }
+    .on{
+        color: #f90!important
     }
 </style>
 
