@@ -2,16 +2,12 @@
     <div :style="{position: 'fixed', width: '100%', minWidth:'800px'}">
         <Menu mode="horizontal" theme="dark" id="dark" active-name="1">
             <div class="layout-nav">
-                <MenuItem name="首页"  to="/home/discover">
+                <MenuItem name="首页" @click.native="routerHome">
                     <i  class="iconfont iconzuo"></i>
                     首页
                 </MenuItem>
                 <MenuItem name="画布尺寸" class="canvasSize" @click.native="isShowCvsFun">
                     画布尺寸
-                </MenuItem>
-                
-                <MenuItem name="我的收藏" @click.native="saveScheme">
-                    保存方案
                 </MenuItem>
                 <MenuItem name="恢复" class="layout-user" @click.native="_redo" >
                     <i  class="iconfont iconchexiao1"></i>
@@ -29,7 +25,10 @@
                     <i  class="iconfont iconzhongzhi"></i>
                     预览
                 </MenuItem>
-                <MenuItem name="导出清单" class="layout-user">
+                <MenuItem name="我的收藏" @click.native="saveScheme" class="layout-user">
+                    <Button type="warning">保存方案</Button>
+                </MenuItem>
+                <MenuItem name="导出清单" >
                     <i  class="iconfont iconxiazai"></i>
                     导出清单
                 </MenuItem>
@@ -60,8 +59,15 @@
                 </Card>
                 <div class="moudal" @click="closeMoudalFun"></div>
             </div>
-            
         </transition>
+        <Modal
+            v-model="saveSchemeModal"
+            title="是否保存方案"
+            :mask-closable="false"
+            @on-ok="isSaveSchemeOk"
+            @on-cancel="isSaveSchemeCancel">
+            <p>您有设计未保存,是否继续跳转至首页</p>
+        </Modal>
         <Modal
             v-model="shemeInfoModal"
             title="填写方案"
@@ -121,6 +127,7 @@ export default {
             vertical: '0',
             isShowCvs: false,
             shemeInfoModal:false,
+            saveSchemeModal:false,
             imgObject:{
                 id: null, // 方案id（编辑方案使用）
                 done_img_url: '', // 方案大图url 1
@@ -193,6 +200,18 @@ export default {
             'undo',
             'redo',
         ]),
+        //对话框ok
+        isSaveSchemeOk(){
+            this.$router.push({ path: '/home/discover' });
+        },
+        //对话框cancel
+        isSaveSchemeCancel(){
+            this.saveSchemeModal = false
+        },
+        //跳转主页
+        routerHome(){
+            this.saveSchemeModal = true
+        },
         //判断存在id 调取接口 渲染画布 赋值
         isProIdfun(){
             if( this.schemeId ){
