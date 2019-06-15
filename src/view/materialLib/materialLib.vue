@@ -90,6 +90,7 @@ export default {
         ...mapGetters([
             'card',
             'selectedObj',
+            'setGoodsItem',
         ]),
     },
     watch: {
@@ -101,6 +102,7 @@ export default {
     },
     created() {
         this.handleGetgetmaterial(0)
+        this.$store.dispatch("setGoodsItem", null)
         // console.log('新建设计2',this.schemeId)
     },
     methods: {
