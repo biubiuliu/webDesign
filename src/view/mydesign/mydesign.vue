@@ -28,13 +28,26 @@
                 新建文件
             </Button>
         </div>
-        <div style="z-index:99;padding-top: 104px;">
-            <div class="parent"  v-if="imgsArr.length">
+        <div style="z-index:99;width:100%;margin: 20px auto;">
+            <vue-waterfall-easy ref="waterfall"
+                                style="width:100%; height:100vh"
+                                :imgWidth="340" :imgsArr="imgsArr"
+                                :enablePullDownEvent="true"
+                                @scrollReachBottom="handleGetList"
+                                @click="toDetail"
+                                class="vueWaterfallEasy">
+                                 <div  class="scheme-img-info" slot-scope="props">
+                    <p class="some-info" :title="props.value.name">{{props.value.name}}</p>
+                    <p class="some-info">{{props.value.time}}</p>
+                </div>
+                <div slot="waterfall-over">暂无更多数据</div>
+            </vue-waterfall-easy>
+            <!-- <div class="parent"  v-if="imgsArr.length">
                 <div  class="child" v-for="(item, index) in imgsArr" :key="index">
                     <a  href="javascript:;" @click="toDetail(item)">
-                    <!-- <div class="img"> -->
+
                         <img :src="item.src" alt="" @error="imgError(item)">
-                    <!-- </div>                         -->
+
                         <div  class="scheme-img-info">
                             <p class="some-info" :title='item.name'>{{item.name}}</p>
                             <p class="some-info">{{item.time}}</p>
@@ -45,7 +58,7 @@
                             <a class="midify" href="javascript:;" @click="toDetail(item)">
                                 <i class="iconfont iconiconset0137"></i>
                             </a>
-                            <!-- <a href="javascript:;"  @click="del(item.id)">
+                            <a href="javascript:;"  @click="del(item.id)">
                                 <i class="iconfont iconshanchu"></i>
                             </a>
                             <a href="javascript:;" @click="copy(item.id)">
@@ -72,15 +85,15 @@
                                     <DropdownItem :name="'checkList-'+item.id">查看清单</DropdownItem>
                                     <DropdownItem :name="'isOpen-'+item.id+'-'+item.is_personal">{{item.is_personal==1?'公开':'取消公开'}}</DropdownItem>
                                 </DropdownMenu>
-                            </Dropdown>                               -->
+                            </Dropdown>                               
                         </div>
                     </div>   
                 </div> 
-            </div>            
-            <div v-else class="no-scheme">
+            </div>  -->          
+            <!-- <div v-else class="no-scheme">
                 抱歉 没有找到匹配的结果
             </div>
-            <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div>
+            <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div> -->
         </div>
         <Modal
             v-model="shemeInfoModal"
@@ -189,7 +202,7 @@ export default {
     },
     mounted () {
         // 添加滚动事件，检测滚动到页面底部
-        window.addEventListener('scroll', this.handleScroll)
+        //window.addEventListener('scroll', this.handleScroll)
     },
     methods: {
         handleScroll() {
@@ -250,7 +263,8 @@ export default {
 
         // 数据重组
         handleGetList () {
-            if(this.page!=1&&this.page> this.total_page){              
+            if(this.page!=1&&this.page> this.total_page){     
+                this.$refs.waterfall.waterfallOver()         
                 return
             } 
             if(this.loading){
@@ -262,7 +276,7 @@ export default {
                 page:this.page,
                 sorter:this.sortSelectList[this.sortLi].id,
                 dir_id:this.dirSelectList[this.dirLi].id,
-                page_size:10,
+                page_size:30,
             }
             getMeals(params).then(res => {
                 this.isShowSpin = false
@@ -270,8 +284,12 @@ export default {
                     if(this.page==1){
                         this.imgsArr=[];
                     }
+                    if(res.data.message.total==0){
+                         this.$refs.waterfall.waterfallOver()      
+                    }
+                    
                     this.page = this.page+1;
-                    this.total_page = Math.ceil(res.data.message.total/10) ;  
+                    this.total_page = Math.ceil(res.data.message.total/30) ;  
                     if(res.data.message.data.length){
                         res.data.message.data.map((item,i)=>{
                         var  setDataObj = {
@@ -283,7 +301,10 @@ export default {
                             id: item.id,
                             type:1// 传详情用
                         };
-                        this.imgsArr.push(setDataObj);                      
+                        this.imgsArr.push(setDataObj);   
+                        // if(res.data.message.data.length<30){
+                        //     this.$refs.waterfall.waterfallOver() 
+                        // }                   
                     });
                   }                                          
                 } 
@@ -321,9 +342,13 @@ export default {
         },
 
         // 修改方案
-        toDetail (value){
-            this.$store.dispatch('updataProDetailVal', value)
-            this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
+        toDetail (event, { index, value }){
+            event.preventDefault()
+              if (event.target.tagName.toLowerCase() == 'img') {
+               this.$store.dispatch('updataProDetailVal', value)
+                this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
+            }
+            
         },
 
         // 修改方案信息确定
@@ -543,7 +568,7 @@ export default {
 .vueWaterfallEasy{
     left: 0px;
     z-index: 0;
-    padding-top: 100px;
+    /* padding-top: 100px; */
     box-sizing: border-box;
 }
 .sort,.file{
@@ -602,6 +627,7 @@ export default {
     padding:0 10px;
 }
 .scheme-img-info{
+    border-radius: 5px;
     padding:14px 25px;
     display: flex;
     align-items: center;
@@ -630,32 +656,27 @@ export default {
     line-height: 400px;
 }
 .parent { 
-    width:100%;
-    -moz-column-count: 5;
-    -webkit-column-count: 5;
+    width: 100%;
+    column-gap:10px;
     column-count: 5;
-    padding:104px 60px 40px 60px;
-    padding:0 60px 40px 60px;
-    margin-top: 20px;
+    margin: 0 auto;
 }
 .child {
-    background: #fff;
+   margin-bottom:20px;	 
+   break-inside: avoid;
+   background: #fff;
     margin-bottom:20px;	 
-    -moz-page-break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    break-inside: avoid;
     color:#f2f2f4;
-    /* width: 340px; */
     overflow: hidden;
     box-sizing: border-box;
     border-radius: 10px;
     position: relative;
     border:1px solid #ddd;
-    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); */
 }
 .child img{
     width: 100%;
     display:block; 
+    height: auto;
 }
 .mask{
     display:none;
@@ -748,6 +769,10 @@ export default {
 }
 .merch_bill_title li:nth-child(1),.merch_bill_title li:nth-child(3){
     width: 30%
+}
+.img-box{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 </style>
