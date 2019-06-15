@@ -6,16 +6,14 @@
                 <div class="login_list">
                     <div class="login_text">
                        <h1>专业版新功能上线,即刻开启创作设计</h1> 
-                       <ul>
-                            <li>查看1000+高佣金品牌</li>                          
+                       <ul>                                                
                             <li>画布编辑与模板功能</li>
                             <li>无限再创作功能</li>
                             <li>无限收藏商品</li>
                             <li>无限商品容量</li>
                             <li>无线项目容量</li>
-                            <li>高清大图下载</li>
-                            <li>导出图文PDF</li>
-                            <li>我的单品智能筛选</li>
+                            <li>高清大图下载</li>                            
+                            <li>单品智能筛选</li>
                         </ul>
                     </div>
                     
