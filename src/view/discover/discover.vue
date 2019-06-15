@@ -79,7 +79,7 @@
                     <p class="some-info" :title="props.value.name">{{props.value.name}}</p>
                     <p class="some-info">{{props.value.time||'￥'+props.value.price}}</p>
                 </div>
-                <div slot="waterfall-over">暂无更多数据</div> -->
+                <div slot="waterfall-over">暂无更多数据</div>
              </vue-waterfall-easy>
             <!-- <div v-if="!imgsArr.length" class="no-scheme">
                 抱歉 没有找到匹配的结果
