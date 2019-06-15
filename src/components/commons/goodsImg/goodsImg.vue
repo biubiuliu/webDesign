@@ -1,6 +1,6 @@
 <template>
     <div class="goods_body" >
-        <div class="goodsImgBtn"  v-show="this.goodsItem.imgs.length !== 0">
+        <div class="goodsImgBtn"  v-show="this.goodsItem !== null && this.goodsItem.imgs.length !== 0">
             <Button type='warning' size="small" ghost @click="preImg"><i  class="iconfont iconzuo"></i></Button>
             <Button type='warning' size="small" ghost @click="nextImg"><i  class="iconfont iconyou"></i></Button>
             <Button type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
@@ -8,7 +8,7 @@
         <div class="goodsImgBtn">
             <Button v-if="closeGoodsBool" type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
         </div>
-        <div class="goodsimg" v-if="this.goodsItem.imgs.length !== 0">
+        <div class="goodsimg" v-if=" this.goodsItem !== null && this.goodsItem.imgs.length !== 0">
             <img :src="goodsImgArr_img[this.imgIndex].pic_image" class="pic" :id="this.goodsItem.goods_id" :name="goodsImgArr_img[this.imgIndex].id" @click="selectDecorateGoods"  crossorigin="anonymous"  alt="图片不存在">
         </div>
         <div class="goodsimg" v-else>
@@ -31,8 +31,9 @@ export default {
     },
     watch: {
         goodsItem: function() { 
-            // console.log("watch",this.goodsItem)
-            if(this.goodsItem.imgs.length !== 0) {
+            this.index = 0
+            console.log("watch",this.goodsItem)
+            if( this.goodsItem !== null && this.goodsItem.imgs.length !== 0) {
                 this.goodsImgArr_img = this.goodsItem.imgs
                 this.closeGoodsBool = false
             }else{
@@ -58,14 +59,20 @@ export default {
             ]),
     },
     mounted() {
-        // console.log("mounted",typeof(this.goodsItem.imgs.length == 0))
-        if(this.goodsItem.imgs.length == 0) return;
+
+        console.log("mounted",this.goodsItem)
+        if(this.goodsItem == null ) return;
+        if( this.goodsItem.imgs.length == 0) return;
         this.goodsImgArr_img = this.goodsItem.imgs
+
+        // if(this.goodsItem.imgs.length == 0) return;
+        // this.goodsImgArr_img = this.goodsItem.imgs
         
     },
     updated() {
         // console.log("updata",typeof(this.goodsItem.imgs.length))
-        if(this.goodsItem.imgs.length == 0) return;
+        if( this.goodsItem == null) return;
+        if( this.goodsItem.imgs.length == 0) return;
         this.goodsImgArr_img = this.goodsItem.imgs
     },
     methods: {
@@ -79,8 +86,10 @@ export default {
             this.$store.dispatch("setImgIndex", this.index)
             if( this.index == this.goodsImgArr_img.length){
                 this.index = 0;
+                this.$store.dispatch("setImgIndex", this.index)
             }
-            // console.log("nextImg--------------",this.imgIndex)
+            console.log("nextImg-index--------------",this.index)
+            console.log("nextImg--------------",this.imgIndex)
             document.getElementsByClassName('pic').src = this.goodsImgArr_img[this.index];
         },
         preImg(){
@@ -88,8 +97,10 @@ export default {
             this.$store.dispatch("setImgIndex", this.index)
             if(this.index < 0){
                 this.index = this.goodsImgArr_img.length-1;
+                this.$store.dispatch("setImgIndex", this.index)
             }
-            // console.log("preImg--------------",this.imgIndex)
+            console.log("preImg-index--------------",this.index)
+            console.log("preImg--------------",this.imgIndex)
             document.getElementsByClassName('pic').src = this.goodsImgArr_img[this.index];
         },
         clearGoodsItem(){
