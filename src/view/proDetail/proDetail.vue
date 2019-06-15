@@ -24,19 +24,22 @@
             <div slot="waterfall-head">
                 <div class="discoverTitle" v-if="goods_list.length">
                     <div>单品列表</div>
-                    <div class="parent">
+                    <div class="parent">                         
                         <div  class="child" v-for="(item, index) in goods_list" :key="index" @click="linkDetailFun(item)">
-                            <div>               
-                                <img :src="item.goods_img" alt="" @error="imgError(item,2)">
-                            </div>
-                            <div class="img-info">
-                                <p class="some-info">{{item.goods_name}}</p>
-                                <p class="some-info">{{'￥'+item.shop_price}}</p>
-                            </div>
-                            <a href="javascript:;" class="collect_box" @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
-                                <i class="iconfont iconshoucang" :class="{collected:item.is_collect}"></i>
-                            </a>                           
+                            <a  href="javascript:;">
+                                <div>               
+                                    <img :src="item.goods_img" alt="" @error="imgError(item,2)">
+                                </div>
+                                <div class="img-info">
+                                    <p class="some-info">{{item.goods_name}}</p>
+                                    <p class="some-info">{{'￥'+item.shop_price}}</p>
+                                </div>
+                                <a href="javascript:;" class="collect_box" @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
+                                    <i class="iconfont iconshoucang" :class="{collected:item.is_collect}"></i>
+                                </a> 
+                             </a>                          
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -44,13 +47,15 @@
                 <div class="discoverTitle">推荐方案</div>
                 <div class="parent">
                     <div  class="child" v-for="(item, index) in recommend_list" :key="index" @click="linkDetailFun(item)">
-                        <div>               
-                            <img :src="item.done_img_url" alt="" @error="imgError(item,1)">
-                        </div>
-                        <div class="scheme-img-info">
-                            <p class="some-info">{{item.scheme_name}}</p>
-                            <p class="some-info">{{item.time}}</p>
-                        </div>
+                        <a  href="javascript:;">
+                            <div>               
+                                <img :src="item.done_img_url" alt="" @error="imgError(item,1)">
+                            </div>
+                            <div class="scheme-img-info">
+                                <p class="some-info" :title="item.scheme_name">{{item.scheme_name}}</p>
+                                <p class="some-info">{{item.time}}</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -31,13 +31,15 @@
         <div style="z-index:99;padding-top: 104px;">
             <div class="parent"  v-if="imgsArr.length">
                 <div  class="child" v-for="(item, index) in imgsArr" :key="index">
+                    <a  href="javascript:;" @click="toDetail(item)">
                     <!-- <div class="img"> -->
                         <img :src="item.src" alt="" @error="imgError(item)">
                     <!-- </div>                         -->
-                    <div  class="scheme-img-info">
-                        <p class="some-info" :title='item.name'>{{item.name}}</p>
-                        <p class="some-info">{{item.time}}</p>
-                    </div>
+                        <div  class="scheme-img-info">
+                            <p class="some-info" :title='item.name'>{{item.name}}</p>
+                            <p class="some-info">{{item.time}}</p>
+                        </div>
+                    </a>
                     <div class="mask">
                         <div style="position:relative">
                             <a class="midify" href="javascript:;" @click="toDetail(item)">
@@ -665,7 +667,7 @@ export default {
     background: rgba(0,0,0,0.2)
 }
 .child:hover .mask{
-   display:block;
+   /* display:block; */
 }
 .midify{
     background: #ff9a00;
