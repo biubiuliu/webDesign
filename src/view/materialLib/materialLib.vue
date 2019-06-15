@@ -190,7 +190,6 @@ export default {
                 // backgroundImgId:e.target.id
             }); 
             card.add(img).setActiveObject(img)
-            // img.crossOrigin = 'Anonymous';   
             this.saveState()
             },{crossOrigin: 'anonymous'})
         },
