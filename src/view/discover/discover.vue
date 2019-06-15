@@ -76,7 +76,7 @@
                     <div class="discoverTitle">搜到{{total}}个结果</div>
                 </div>
                 <div :class="{'scheme-img-info':changeblue==0}" class="img-info" slot-scope="props">
-                    <p class="some-info">{{props.value.name}}</p>
+                    <p class="some-info" :title="props.value.name">{{props.value.name}}</p>
                     <p class="some-info">{{props.value.time||'￥'+props.value.price}}</p>
                 </div>
                 <div slot="waterfall-over">暂无更多数据</div> -->
