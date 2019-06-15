@@ -35,7 +35,7 @@
                         <img :src="item.src" alt="" @error="imgError(item)">
                     <!-- </div>                         -->
                     <div  class="scheme-img-info">
-                        <p class="some-info">{{item.name}}</p>
+                        <p class="some-info" :title='item.name'>{{item.name}}</p>
                         <p class="some-info">{{item.time}}</p>
                     </div>
                     <div class="mask">
