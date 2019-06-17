@@ -67,7 +67,8 @@ export default {
             getmaterialData:{
                 is_personal: 0,
                 page: 1,
-                type: null 	//1代表素材列表，2代表背景图列表，3代表自定义商品列表
+                type: null, 	// 1代表素材列表，2代表背景图列表，3代表自定义商品列表
+                material_type:null, // 获取素材时传对应的分类
             },
             // 分页
             pages: {
