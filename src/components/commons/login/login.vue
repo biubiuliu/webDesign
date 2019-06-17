@@ -163,8 +163,7 @@ export default {
                     console.log(res.data.message)
                 })
             }
-        }
-    
+        } 
 }
 </script>
 <style scoped>

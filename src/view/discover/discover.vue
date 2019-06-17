@@ -290,7 +290,7 @@ export default {
                     this.roomStyleArr = schemes_choose_list.roomStyleArr;
                     this.brandLabelArr = schemes_choose_list.brandLabelArr;
                     
-                    this.setStorage('schemes_choose_list',schemes_choose_list)
+                    setStorage('schemes_choose_list',schemes_choose_list)
                  }            
              })
         },
@@ -309,7 +309,7 @@ export default {
                         brandLabelArr:res.data.message.brand
                     }
 
-                    this.setStorage('goods_choose_list',goods_choose_list)
+                    setStorage('goods_choose_list',goods_choose_list)
                 }
             })
         },
