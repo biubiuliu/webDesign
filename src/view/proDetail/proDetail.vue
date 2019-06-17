@@ -73,10 +73,8 @@
                                 <img  :src="goods_info.goods_thumb" alt="">
                             </div>                       
                         </div>
-                        <div class="swiper-pagination"></div>
-                        <div class="swiper-button-prev"></div><!--左箭头。如果放置在swiper-container外面，需要自定义样式。-->
-                        <div class="swiper-button-next"></div><!--右箭头。如果放置在swiper-container外面，需要自定义样式。-->                       
-                   </div>                   
+                        <div class="swiper-pagination"></div>                     
+                   </div> 
                 </div>
                 <div class="detail_list">
                    <P class="right_title">{{goods_info.goods_name}}</P>
@@ -121,6 +119,7 @@ export default {
     data() {
         return {
             msg: '方案详情页',
+            value2: 0,
             selectList:[
                 {title:"方案",id:"1"},
                 {title:"单品",id:"2"},
@@ -235,13 +234,15 @@ export default {
 
 
         linkMaterialLib () {
-            if(this.scheme_info.is_self){
-                this.$store.dispatch("setSchemeId", this.proId)
-                this.$router.push({name:'materialLib', query: {id: this.proId} })
-            }else{
-                this.loading= true;
-                this.copy();
-            }
+            this.$store.dispatch("setSchemeId", this.proId)
+            this.$router.push({name:'materialLib', query: {id: this.proId} })
+            // if(this.scheme_info.is_self){
+            //     this.$store.dispatch("setSchemeId", this.proId)
+            //     this.$router.push({name:'materialLib', query: {id: this.proId} })
+            // }else{
+            //     this.loading= true;
+            //     this.copy();
+            // }
         },
 
         // 复制方案
@@ -295,7 +296,7 @@ export default {
 </script>
 <style scoped>
 .proDetailBody{
-    background: #EDF0F2
+    background: #f5f7f9
 }
 .discoverTitle{
     font-size: 20px;
@@ -400,7 +401,7 @@ margin-top: 20px;;
     margin-top: 20px;
 }
 .child {
-    background: #f2f2f2;;
+    background: #f5f7f9;
     margin-bottom:20px;	 
     -moz-page-break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -510,7 +511,7 @@ margin-top: 20px;;
     height: 100%
 }
 .swiper-slide{
-    background: #f2f2f2;
+    background: #fff;
 }
 #thumbs{
     margin-top: 20px;

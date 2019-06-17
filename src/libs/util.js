@@ -34,7 +34,7 @@ export const convertTimeStamp = (timestamp) => {
     return d_days > 0 && d_days < 3 ? `${d_days}天前` :
       d_days <= 0 && d_hours > 0 ? `${d_hours}小时前` :
         d_hours <= 0 && d_minutes > 0 ? `${d_minutes}分钟前` :
-          d_seconds < 60 ? `${d_seconds < 0 ? 1 : d_seconds}秒前` :
+          d_seconds < 60 ? `刚刚` :
             d_days >= 3 && d_days < 30 ? `${M}-${D} ${H}:${m}` :
               d_days >= 30 ? `${Y}-${M}-${D} ${H}:${m}` : '' + timestamp;
   }

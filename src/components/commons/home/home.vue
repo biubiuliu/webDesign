@@ -45,7 +45,7 @@ name: 'home',
     }
     .layout{
         /* border: 1px solid #d7dde4; */
-        background: #f2f2f2; 
+        background: #f5f7f9; 
         position: relative;
         border-radius: 4px;
         /* overflow: hidden; */

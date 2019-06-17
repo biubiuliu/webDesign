@@ -1,6 +1,6 @@
 <template style="overflow: hidden">
     <div class="mydesignBody">
-        <div class="header_select flex" slot="waterfall-head" style="display:none">
+        <div class="header_select flex" slot="waterfall-head">
             <div class="flex selectCusBox">
                 <a class="sort"  href="javascript:;" @mouseenter="selectEnter('sort')" @mouseleave="selectLeave('sort')">
                     {{sortSelectList[sortLi].title}}
@@ -12,7 +12,7 @@
                         </li>                       
                     </ul>
                 </a>
-                <a class="file"  href="javascript:;" @mouseenter="selectEnter('dir')" @mouseleave="selectLeave('dir')">
+                <a class="file" v-if="dirSelectList.length>1" href="javascript:;" @mouseenter="selectEnter('dir')" @mouseleave="selectLeave('dir')">
                     {{dirSelectList[dirLi].dir_name}}
                     <i class="iconfont iconxiala-"></i>
                     <ul class="dir-ul">
@@ -29,75 +29,57 @@
             </Button>
         </div>
         <div style="z-index:99;width:100%;margin: 20px auto;">
-            <vue-waterfall-easy ref="waterfall"
-                                style="width:100%; height:93vh"
-                                :imgWidth="340" :imgsArr="imgsArr"
-                                :enablePullDownEvent="true"
-                                @scrollReachBottom="handleGetList"
-                                @click="toDetail"
-                                class="vueWaterfallEasy">
-                                 <div  class="scheme-img-info" slot-scope="props">
-                    <p class="some-info" :title="props.value.name">{{props.value.name}}</p>
-                    <p class="some-info">{{props.value.time}}</p>
-                </div>
-                <div slot="waterfall-over">暂无更多数据</div>
-            </vue-waterfall-easy>
-            <!-- <div class="parent"  v-if="imgsArr.length">
-                <div  class="child" v-for="(item, index) in imgsArr" :key="index">
-                    <a  href="javascript:;" @click="toDetail(item)">
-
-                        <img :src="item.src" alt="" @error="imgError(item)">
-
+            <Waterfall id='vueWaterfall' @loadmore="handleGetList" :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
+                 <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
+                     <div class="item">
+                        <img :src="item.src" alt="加载错误">
                         <div  class="scheme-img-info">
-                            <p class="some-info" :title='item.name'>{{item.name}}</p>
+                            <p class="some-info" :title="item.name">{{item.name}}</p>
                             <p class="some-info">{{item.time}}</p>
                         </div>
-                    </a>
-                    <div class="mask">
-                        <div style="position:relative">
-                            <a class="midify" href="javascript:;" @click="toDetail(item)">
-                                <i class="iconfont iconiconset0137"></i>
-                            </a>
-                            <a href="javascript:;"  @click="del(item.id)">
-                                <i class="iconfont iconshanchu"></i>
-                            </a>
-                            <a href="javascript:;" @click="copy(item.id)">
-                                <i class="iconfont iconfuzhi1"></i>
-                            </a>                                 
-                            <Dropdown trigger="click"  @on-click="operation" style=" position: absolute;right: 63px;top: 100px;z-index:99">
-                                <a href="javascript:;">
-                                    <i class="iconfont icongengduo"></i>
+                        <div class="mask">
+                            <div style="position:relative">
+                                <a class="midify" href="javascript:;" @click="toDetail(item)">
+                                    <i class="iconfont iconiconset0137"></i>
                                 </a>
-                                <DropdownMenu slot="list">
-                                    <Dropdown placement="left-start"  v-if='moveDirList.length'>
-                                        <DropdownItem>
-                                            <i class="iconfont iconzuo"></i>
-                                            移动到
-                                        </DropdownItem>
-                                        <DropdownMenu slot="list">
-                                            <DropdownItem  v-for="(m,n) in moveDirList"  :key="n" :name="`${item.id}`+'_'+`${m.id}`" >
-                                                {{m.dir_name}}
-                                            </DropdownItem>                                             
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                    <DropdownItem :name="'download-'+item.id">导出高清图</DropdownItem>
-                                    <DropdownItem :name="'modify-'+item.id">修改信息</DropdownItem>
-                                    <DropdownItem :name="'checkList-'+item.id">查看清单</DropdownItem>
-                                    <DropdownItem :name="'isOpen-'+item.id+'-'+item.is_personal">{{item.is_personal==1?'公开':'取消公开'}}</DropdownItem>
-                                </DropdownMenu>
-                            </Dropdown>                               
+                                <a href="javascript:;"  @click="del(item.id)">
+                                    <i class="iconfont iconshanchu"></i>
+                                </a>
+                                <a href="javascript:;" @click="copy(item)">
+                                    <i class="iconfont iconfuzhi1"></i>
+                                </a>                                 
+                                <Dropdown trigger="click"  @on-click="operation" style=" position: absolute;right: 63px;top: 100px;z-index:99">
+                                    <a href="javascript:;">
+                                        <i class="iconfont icongengduo"></i>
+                                    </a>
+                                    <DropdownMenu slot="list">
+                                        <Dropdown placement="left-start"  v-if='moveDirList.length'>
+                                            <DropdownItem>
+                                                <i class="iconfont iconzuo"></i>
+                                                移动到
+                                            </DropdownItem>
+                                            <DropdownMenu slot="list">
+                                                <DropdownItem  v-for="(m,n) in moveDirList"  :key="n" :name="`${item.id}`+'_'+`${m.id}`" >
+                                                    {{m.dir_name}}
+                                                </DropdownItem>                                             
+                                            </DropdownMenu>
+                                        </Dropdown>
+                                        <DropdownItem :name="'download-'+item.id">导出高清图</DropdownItem>
+                                        <DropdownItem :name="'modify-'+item.id">修改信息</DropdownItem>
+                                        <DropdownItem :name="'checkList-'+item.id">查看清单</DropdownItem>
+                                        <DropdownItem :name="'isOpen-'+item.id+'-'+item.is_personal">{{item.is_personal==1?'公开':'取消公开'}}</DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>                               
+                            </div>
                         </div>
-                    </div>   
-                </div> 
-            </div>  -->          
-            <!-- <div v-else class="no-scheme">
-                抱歉 没有找到匹配的结果
-            </div>
-            <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div> -->
+                     </div>                   
+                 </WaterfallItem>
+            </Waterfall>      
+            <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div>
         </div>
         <Modal
             v-model="shemeInfoModal"
-            title="修改方案"
+            title="修改方案"          
             @on-ok="shemeInfoModalok">
            <Form :model="shemeInfo" >
                 <FormItem>
@@ -125,18 +107,8 @@
                 </FormItem>
             </Form>
         </Modal>
-        <Modal v-model="merchBillModal">
-             <ul class="merch_bill_title">
-                <li>单品名称</li>
-                <li>数量</li>
-                <li>规格属性</li>
-                <li>价格</li>
-            </ul>
-            <ul>              
-                <li>
-
-                </li>
-            </ul>
+        <Modal v-model="merchBillModal" width="1050" style="font-size:14px">
+            <Table :columns="columns" :data="goodsList" class="table"  :loading="tableLoading"></Table>
             <div slot="footer" class="modal_footer">
                 <span>总价</span>
                 <span>￥1000</span>
@@ -151,18 +123,33 @@
 </template>
 <script>
 import vueWaterfallEasy from 'vue-waterfall-easy'
-import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList, delScheme } from '@/api/data.js'
+import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList, delScheme, copyScheme } from '@/api/data.js'
 import { getEnumList } from  '@/api/material.js'
 import { convertTimeStamp } from '@/libs/util.js'
+import {Waterfall, WaterfallItem} from 'vue2-waterfall';
+import discoverVue from '../discover/discover.vue';
 
 export default {
     name: 'mydesign',
     components: {
-        vueWaterfallEasy
+        vueWaterfallEasy,
+        Waterfall, 
+        WaterfallItem
     },
     data() {
         return {
             msg: '这是我的设计ss',
+            layout:{
+                gutterWidth:20,
+                gutterHeight:20,
+                resizable:true,
+                align:'left',
+                fixWidth:'',
+                minCol:5,
+                maxCol:5,
+                percent:'',
+                width:340,
+            },
             distance:100,
             sortSelectList:[
                 {title:"排序",id:0},
@@ -189,9 +176,93 @@ export default {
                 phone: "", // 手机
                 address: "", //	地址
             },
+            goodsList:[],
+            columns: [
+                {
+                    title: '单品名称',
+                    key: 'goods_name',
+                    width: 415,
+                    render: (h, params) => {
+                         return h('div',{
+                             style:{
+                                 display:'flex',
+                                 alignItems:'center'
+                                }
+                             },[
+                             h("img",{  
+                                attrs: {
+                                    src: params.row.goods_thumb
+                                },
+                                style: {
+                                    width: "100px",
+                                    height: "100px",
+                                    marginRight: "6px"
+                                },
+                            },''),
+                            h("div",{},[
+                                h("p",{
+                                    style:{
+                                        lineHeight:'28px',
+                                        fontSize:'14px',
+                                        color:'rgb(134, 142, 150)',
+                                    }
+                                },params.row.goods_name),
+                                h("p",{
+                                    style:{
+                                        lineHeight:'28px',
+                                        fontSize:'14px',
+                                         color:'rgb(134, 142, 150)',
+                                    }
+                                },'品牌 '+params.row.brand_name),
+                                h("p",{
+                                    style:{
+                                        lineHeight:'28px',
+                                        fontSize:'14px',
+                                        color:'rgb(134, 142, 150)',
+                                    }
+                                },'分类 '+params.row.style_name),]),
+                         ])   
+                    },
+                },
+                {
+                    title: '数量',
+                    key: 'num',
+                    width: 175,
+                    render: (h, params) => {
+                         return h('div',{
+                             style:{
+                                 lineHeight:'28px',
+                                 fontSize:'14px',
+                                 color:'rgb(134, 142, 150)',
+                                }
+                             },params.row.num)
+                    }
+                },
+                {
+                    title: '规格属性',
+                    skus: 'address',
+                    width: 250,
+                },
+                {
+                    title: '价格',
+                    key: 'shop_price',
+                    width: 175,
+                     render: (h, params) => {
+                         return h('div',{
+                             style:{
+                                 lineHeight:'28px',
+                                 fontSize:'14px',
+                                 color:'#f90',
+                                 fontWeight: 700
+                                }
+                             },'￥'+params.row.shop_price)
+                    }
+                }
+            ],
             merchBillModal:false, // 商品清单的modal  
             isShowSpin:true,
-            loading:false
+            loading:false,
+            tableLoading:true,
         }
     },
     created() {
@@ -200,9 +271,14 @@ export default {
         this.handleGetList();
         this.handleGetEnumList();
     },
+    computed:{
+	      itemWidth(){  
+	            return ((document.documentElement.clientWidth-120)/5)  //计算宽度
+	      },
+    },
     mounted () {
         // 添加滚动事件，检测滚动到页面底部
-        //window.addEventListener('scroll', this.handleScroll)
+        window.addEventListener('scroll', this.handleScroll)
     },
     methods: {
         handleScroll() {
@@ -263,8 +339,7 @@ export default {
 
         // 数据重组
         handleGetList () {
-            if(this.page!=1&&this.page> this.total_page){     
-                this.$refs.waterfall.waterfallOver()         
+            if(this.page!=1&&this.page> this.total_page){                    
                 return
             } 
             if(this.loading){
@@ -276,7 +351,6 @@ export default {
                 page:this.page,
                 sorter:this.sortSelectList[this.sortLi].id,
                 dir_id:this.dirSelectList[this.dirLi].id,
-                page_size:30,
             }
             getMeals(params).then(res => {
                 this.isShowSpin = false
@@ -284,12 +358,9 @@ export default {
                     if(this.page==1){
                         this.imgsArr=[];
                     }
-                    if(res.data.message.total==0){
-                         this.$refs.waterfall.waterfallOver()      
-                    }
                     
                     this.page = this.page+1;
-                    this.total_page = Math.ceil(res.data.message.total/30) ;  
+                    this.total_page = Math.ceil(res.data.message.total/15) ;  
                     if(res.data.message.data.length){
                         res.data.message.data.map((item,i)=>{
                         var  setDataObj = {
@@ -301,10 +372,7 @@ export default {
                             id: item.id,
                             type:1// 传详情用
                         };
-                        this.imgsArr.push(setDataObj);   
-                        // if(res.data.message.data.length<30){
-                        //     this.$refs.waterfall.waterfallOver() 
-                        // }                   
+                        this.imgsArr.push(setDataObj);                   
                     });
                   }                                          
                 } 
@@ -342,13 +410,12 @@ export default {
         },
 
         // 修改方案
-        toDetail (event, { index, value }){
-            event.preventDefault()
-              if (event.target.tagName.toLowerCase() == 'img') {
-               this.$store.dispatch('updataProDetailVal', value)
-                this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
-            }
-            
+        toDetail (item){
+            this.$store.dispatch('updataProDetailVal', item)
+            const {href} = this.$router.resolve({
+                path: 'proDetail/'+item.id+'/'+item.type,            
+            })
+            window.open(href, '_blank')     
         },
 
         // 修改方案信息确定
@@ -397,8 +464,19 @@ export default {
         },
 
         // 拷贝
-        copy (id) {
-             this.$Message.info('拷贝');
+        copy (item) {
+             //this.$Message.info('拷贝');
+             copyScheme({id:item.id}).then(res=>{
+                if(res.data.success){  
+                    var data = JSON.parse(JSON.stringify(item)) ;
+                    data.name = item.name+'-副本';
+                    data.time = '刚刚';              
+                    this.imgsArr.unshift(data);
+                    this.$Message.info('已拷贝')
+                }else{
+                    this.$Message.error('不能操作当前方案')
+                }
+            })
         },
 
         // 移动到文件夹
@@ -432,11 +510,14 @@ export default {
 
         // 获取商品清单
         getGoodsList (name) {
+            this.merchBillModal = true;
             var id = name.split("-")[1];
             getSchemeGoodsList(id).then(res => {
                 if(res.data.success){                  
-                   
+                   this.goodsList = res.data.message;
                 }
+                   
+                this.tableLoading = false
             })
         },
 
@@ -538,6 +619,7 @@ export default {
     /* height: 93vh; */
     font-size: 14px;
     position: relative;
+    padding: 104px 60px 20px 60px;
 }
 .header_select{
     position: fixed;
@@ -565,6 +647,15 @@ export default {
     position: absolute;
     width: 100px;
 }
+.vueWaterfall{
+    width: 100%;
+    max-width: 100%!important
+}
+.waterfall-item img{
+    width: 100%;
+    display:block; 
+    height: auto;
+}
 .vueWaterfallEasy{
     left: 0px;
     z-index: 0;
@@ -578,6 +669,7 @@ export default {
 }
 .sort{
     margin-right: 40px;
+    margin-left: 25px;
 }
 
 .on{
@@ -611,7 +703,7 @@ export default {
     color: #666;
 }
 .sort-ul li:hover,.dir-ul li:hover{
-    background: #f2f2f2!important;
+    background: #f5f7f9!important;
     color: #666!important;
 }
 .sortSelect,.dirSelect{
@@ -627,9 +719,8 @@ export default {
     padding:0 10px;
 }
 .scheme-img-info{
-    border-radius: 5px;
-    padding:14px 25px;
-    display: flex;
+    padding:10px 25px;
+    /* display: flex; */
     align-items: center;
     background: #fff;
 }
@@ -644,7 +735,7 @@ export default {
 }
 .scheme-img-info .some-info:nth-child(2) {
     flex: 1;
-    text-align: right;
+    text-align: left;
     color: #999;
     font-size: 14px;
 }
@@ -655,28 +746,11 @@ export default {
     color: #7e8e98;
     line-height: 400px;
 }
-.parent { 
-    width: 100%;
-    column-gap:10px;
-    column-count: 5;
-    margin: 0 auto;
-}
-.child {
-   margin-bottom:20px;	 
-   break-inside: avoid;
-   background: #fff;
-    margin-bottom:20px;	 
-    color:#f2f2f4;
-    overflow: hidden;
-    box-sizing: border-box;
-    border-radius: 10px;
+.item{
     position: relative;
-    border:1px solid #ddd;
-}
-.child img{
-    width: 100%;
-    display:block; 
-    height: auto;
+    border-radius:4px;
+    overflow: hidden;
+    box-shadow:0 1px 4px rgba(6,31,50,.12)
 }
 .mask{
     display:none;
@@ -687,8 +761,8 @@ export default {
     right: 0;
     background: rgba(0,0,0,0.2)
 }
-.child:hover .mask{
-   /* display:block; */
+.item:hover .mask{
+   display:block;
 }
 .midify{
     background: #ff9a00;
@@ -731,7 +805,6 @@ export default {
     color: #666;
 }
 .modal_footer{
-    border-top: 1px solid #ddd;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -774,5 +847,7 @@ export default {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
-
+.waterfall-item{
+    box-sizing: content-box!important
+}
 </style>

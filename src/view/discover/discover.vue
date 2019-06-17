@@ -1,13 +1,13 @@
 <template style="overflow: hidden">
     <div>
         <div class="waterfall">
-            <vue-waterfall-easy ref="waterfall"
+            <!-- <vue-waterfall-easy ref="waterfall"
                                 style="width:100%; height:100vh"
                                 :imgWidth="290" :imgsArr="imgsArr"
                                 :enablePullDownEvent="true"
                                 @scrollReachBottom="handleGetGoodsType"
                                 @click="linkDetailFun"
-                                class="vueWaterfallEasy">
+                                class="vueWaterfallEasy"> -->
                 <div slot="waterfall-head">
                     <Content  class="discover">
                             <div class="bg-div"></div>
@@ -75,12 +75,15 @@
                 <div slot="waterfall-head">
                     <div class="discoverTitle">搜到{{total}}个结果</div>
                 </div>
-                <div :class="{'scheme-img-info':changeblue==0}" class="img-info" slot-scope="props">
-                    <p class="some-info" :title="props.value.name">{{props.value.name}}</p>
-                    <p class="some-info">{{props.value.time||'￥'+props.value.price}}</p>
+                <div style="padding:10px 170px">
+                    <schemeList :imgsArr = 'imgsArr' :padding='padding'/>
                 </div>
-                <div slot="waterfall-over">暂无更多数据</div>
-             </vue-waterfall-easy>
+                <Spin fix v-if="isShowSpin">
+                    <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                    <div>Loading</div>
+                </Spin>
+                <!-- <div slot="waterfall-over">暂无更多数据</div>
+             </vue-waterfall-easy> -->
             <!-- <div v-if="!imgsArr.length" class="no-scheme">
                 抱歉 没有找到匹配的结果
             </div> -->
@@ -94,11 +97,13 @@ import { category,getEnumList } from '@/api/material.js'
 import { convertTimeStamp } from '@/libs/util.js'
 import { mapState } from 'vuex'
 import { getStorage,setStorage } from '@/libs/util.js'
+import schemeList from '@/components/commons/schemeList/schemeList'
 
 export default {
     name: 'discover',
     components: {
-        vueWaterfallEasy
+        vueWaterfallEasy,
+        schemeList
     },
     computed: {
         ...mapState({
@@ -110,6 +115,7 @@ export default {
     data() {
         return {
             msg: '创建精彩设计',
+            padding:170,
             selectList:[
                 {title:"方案",id:"1"},
                 {title:"单品",id:"2"},
@@ -127,14 +133,36 @@ export default {
             seriesId:0,// 品牌下面的系列id
             keywords:'',
             page:1,
-            total:0
+            total:0,
+            isShowSpin:true,
+            loading:false,
         }
     },
     created() {
         this.getScreenLabels();
         this.handleGetGoodsType();
     },
+    mounted () {
+        // 添加滚动事件，检测滚动到页面底部
+        window.addEventListener('scroll', this.handleScroll)
+    },
     methods: {
+         handleScroll() {
+            // 变量scrollTop是滚动条滚动时，距离顶部的距离
+       		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
+       		// 变量windowHeight是可视区的高度
+       		var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+       		// 变量scrollHeight是滚动条的总高度
+       		var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
+            // 滚动条到底部的条件
+            //console.log(scrollTop+windowHeight,scrollHeight)
+            if(scrollTop+windowHeight==scrollHeight){
+                // 写后台加载数据的函数
+         	   this.handleGetGoodsType()
+                return
+            }   
+        },
+
         selectTrol() {
             var project = document.getElementById('project')
                 project.style.display = 'block';
@@ -177,7 +205,7 @@ export default {
         // 数据重组
         handleGetGoodsType () {
             if(this.page!=1&&this.page> Math.ceil(this.total/30)){
-                this.$refs.waterfall.waterfallOver()
+                //this.$refs.waterfall.waterfallOver()
                 return
             }  
             this.changeblue==0? this.getMeals():this.getGoods();
@@ -196,14 +224,19 @@ export default {
                 page:this.page,
                 page_size:30
             }
+            if(this.loading){
+                return;
+            } 
+            this.loading = true;
             getMeals(params).then(res => {
+                this.isShowSpin = false
                 if(res.data.success){
                     if(this.page==1){
                         this.imgsArr=[];
                     }
                     this.total = res.data.message.total
                     if(!res.data.message.data.length){
-                          this.$refs.waterfall.waterfallOver();
+                          
                           return
                     }
                     res.data.message.data.map((item,i)=>{
@@ -221,7 +254,9 @@ export default {
                     })
                     this.page=this.page +1;                 
                 }
+                this.loading = false;
             }).catch(err => {
+                this.loading = false;
                 console.log(err)
             })
         },
@@ -236,6 +271,10 @@ export default {
                 category_id:this.spaceLabelId,
                 series_id:this.seriesId,
             }
+            if(this.loading){
+                return;
+            } 
+            this.loading = true;
             getGoodsList(params).then(res => {
                 if(res.data.success){
                     if(this.page==1){
@@ -243,7 +282,7 @@ export default {
                     }
                     this.total = res.data.message.total
                     if(!res.data.message.data.length){
-                          this.$refs.waterfall.waterfallOver();
+                          //this.$refs.waterfall.waterfallOver();
                           return
                     }
                     res.data.message.data.map((item,i)=>{
@@ -259,6 +298,10 @@ export default {
                     })
                     this.page = this.page +1;
                 }
+                this.loading = false;
+            }).catch(err => {
+                this.loading = false;
+                console.log(err)
             })
         },
 
@@ -279,40 +322,58 @@ export default {
 
         // 获取方案风格、空间类型
         getScreenLabels () {
-             Promise.all([getEnumList(), getBrandList()]).then((resultList) => {
-                 if(resultList[0].data.success&&resultList[1].data.success){
-                    let schemes_choose_list = {
-                        roomLabelArr:resultList[0].data.message.space_list,
-                        roomStyleArr:resultList[0].data.message.style_list,
-                        brandLabelArr:resultList[1].data.message
-                    }
-                    this.roomLabelArr = schemes_choose_list.roomLabelArr;
-                    this.roomStyleArr = schemes_choose_list.roomStyleArr;
-                    this.brandLabelArr = schemes_choose_list.brandLabelArr;
-                    
-                    setStorage('schemes_choose_list',schemes_choose_list)
-                 }            
-             })
+             var data = this.judegStorage('schemes_choose_list');
+              if(!data) { 
+                Promise.all([getEnumList(), getBrandList()]).then((resultList) => {
+                    if(resultList[0].data.success&&resultList[1].data.success){
+                        let schemes_choose_list = {
+                            roomLabelArr:resultList[0].data.message.space_list,
+                            roomStyleArr:resultList[0].data.message.style_list,
+                            brandLabelArr:resultList[1].data.message
+                        }
+                        this.roomLabelArr = schemes_choose_list.roomLabelArr;
+                        this.roomStyleArr = schemes_choose_list.roomStyleArr;
+                        this.brandLabelArr = schemes_choose_list.brandLabelArr;
+                        
+                        setStorage('schemes_choose_list',schemes_choose_list)
+                    }            
+                })
+             }
         },
 
         // 获取商品的筛选标签
-        getGoodsLabels () {    
-            category().then(res => {
-                if(res.data.success){
-                    this.roomLabelArr = res.data.message.category;
-                    this.roomStyleArr = res.data.message.style;
-                    this.brandLabelArr = res.data.message.brand;
+        getGoodsLabels () {
+            var data = this.judegStorage('goods_choose_list');  
+            if(!data) {            
+                category().then(res => {
+                    if(res.data.success){
+                        this.roomLabelArr = res.data.message.category;
+                        this.roomStyleArr = res.data.message.style;
+                        this.brandLabelArr = res.data.message.brand;
 
-                    let goods_choose_list = {
-                        roomLabelArr:res.data.message.category,
-                        roomStyleArr:res.data.message.style,
-                        brandLabelArr:res.data.message.brand
+                        let goods_choose_list = {
+                            roomLabelArr:res.data.message.category,
+                            roomStyleArr:res.data.message.style,
+                            brandLabelArr:res.data.message.brand
+                        }
+
+                        setStorage('goods_choose_list',goods_choose_list)
                     }
-
-                    setStorage('goods_choose_list',goods_choose_list)
-                }
-            })
+                })
+            }
         },
+
+        // 判断是否本地存储
+        judegStorage(value){
+           var data = getStorage(value,1000*60*60);
+           if(data){
+                this.roomLabelArr = data.roomLabelArr;
+                this.roomStyleArr = data.roomStyleArr;
+                this.brandLabelArr = data.brandLabelArr;
+           }
+           return data;
+        },
+
 
         // 筛选表签
         changeChooseLableFun (type,id) {
@@ -451,18 +512,18 @@ export default {
 .waterfall{
      /* height:100vh;  */
     /* overflow: hidden; */
-    background: #fff;
+    /* background: #fff; */
 }
 .discoverTitle{
     font-size: 30px;
     color: #5a5656;
     text-align: left;
-    margin: 0 9%
+    margin: 0 170px;
 }
 .discoverLable{
     color: #5a5656;
     text-align: left;
-    margin: 10px 9%;
+    margin: 10px 170px;
     font-size: 16px;
 }
 .roomlabel{

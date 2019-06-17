@@ -44,31 +44,32 @@
             </div>
         </div>
         <div class="parent">
-            <div  class="child" v-for="(item, index) in dataArr" :key="index" @click="linkDetailFun(item)">
-                <div :class="{'goods-img':isSelect==2}">               
-                    <img :src="item.src" alt="" @error="imgError(item)">
-                </div>
-                <div class="img-info" :class="{'scheme-img-info':isSelect==1}">
-                    <p class="some-info">{{item.name}}</p>
-                    <p class="some-info">{{isSelect==1?item.time:'￥'+item.price}}</p>
-                </div>
-            </div>
-        </div>
-        <div v-if="!dataArr.length" class="no-scheme">
+            <schemeList :imgsArr = 'goodsArr' v-if="isSelect==2"/> 
+            <schemeList :imgsArr = 'schemeArr' v-else/>  
+            <Spin fix v-if="isShowSpin" style="top:120px">
+                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div>
+            </Spin>
+        </div>    
+        <div v-if="!goodsArr.length&&isSelect==2" class="no-scheme">
+                暂无更多数据
+        </div> 
+        <div v-if="!schemeArr.length&&isSelect==1" class="no-scheme">
                 暂无更多数据
         </div>
+         
     </div>
 </template>
 <script>
-import vueWaterfallEasy from 'vue-waterfall-easy'
 import { getCollectList , getCollectScreen } from '@/api/data.js'
 import { convertTimeStamp } from '@/libs/util.js'
 import { mapState } from 'vuex'
+import schemeList from '@/components/commons/schemeList/schemeList'
 
 export default {
     name: 'mycollect',
     components: {
-        vueWaterfallEasy
+        schemeList
     },
     computed: {
         ...mapState({
@@ -81,13 +82,16 @@ export default {
         return {
             msg: '这是收藏',
             isSelect:2,
-            dataArr:[],
+            goodsArr:[],
+            schemeArr:[],
             mycollectModel:false,
             selectCatArr:[],
             selectStyleArr:[],   
             beforeSelectCat:[],
             beforeSelectStyle:[],     
-            type:1
+            type:1,
+            isShowSpin:true,
+            loading:false,
         }
     },
     created() {
@@ -137,10 +141,11 @@ export default {
 
         // 数据重组
         handleGetGoodsType (cat_ids,style_type) {
+            this.isShowSpin = true;
             var getData = this.isSelect == 1 ? getCollectList(this.isSelect):getCollectList(this.isSelect,style_type,cat_ids);
-            getData.then(res => {  
-                this.dataArr = [];   
-                if(res.data.success){                                          
+            getData.then(res => {   
+                if(res.data.success){ 
+                    this.isSelect == 1 ?this.schemeArr=[]:this.goodsArr=[];                                            
                     if(res.data.message.length){                                                
                         res.data.message.map((item,i)=>{                      
                             var  setDataObj = {
@@ -148,16 +153,17 @@ export default {
                                 href: item.img_url,  
                                 name: item.name,                                                  
                                 id: item.id,
-                                price:item.shop_price,
-                                time:convertTimeStamp(item.created_at),
+                                info:item.shop_price?item.shop_price:convertTimeStamp(item.created_at),
                                 type:this.isSelect,
                             };
-                            this.dataArr.push(setDataObj);                                          
+                           this.isSelect == 1 ?this.schemeArr.push(setDataObj):this.goodsArr.push(setDataObj);                                          
                         });
                     }  
-                }                                                
+                }   
+                this.isShowSpin =false;                                             
             }).catch(err => {
                 console.log(err)
+                this.isShowSpin = false;
             })
         },
 
@@ -221,9 +227,6 @@ export default {
     padding: 0 60px;
     position: relative;
     background: #fff;
-}
-.vueWaterfallEasy,.parent{
-    padding-top: 60px;
 }
 .collecttion{
     width: 80px;
@@ -305,9 +308,6 @@ export default {
 }
 .parent { 
     width:100%;
-    -moz-column-count: 5;
-    -webkit-column-count: 5;
-    column-count: 5;
     padding:60px 60px 40px 60px;
     margin-top: 20px;
 }
