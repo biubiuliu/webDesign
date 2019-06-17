@@ -32,7 +32,7 @@
         <div slot="footer">
             <Button type="primary" @click="skewModelOk">确定</Button>
         </div>
-        <canvas class="canvasCut" style="visibility: hidden;" id="canvas_crop"></canvas>
+        <canvas class="canvasCut" style="visibility: hidden; background:red" id="canvas_crop"></canvas>
     </Modal>
     
     <!-- <Modal
@@ -72,6 +72,8 @@ export default {
             selection_object_left : 0,
             selection_object_top : 0,
             isCropping : false,
+            oCoords:{},
+            aCoords:{},
         }
     },
     created() {
@@ -156,12 +158,12 @@ export default {
                 fill: 'rgba(0,0,0,0)',
                 originX: 'left',
                 originY: 'top',
-                stroke: '#ccc',
+                // stroke: '#ccc',
                 //strokeDashArray: [2, 2],
                 strokWidth: 5,
                 //opacity: 1,
-                width: 1,
-                height: 1,
+                width: .5,
+                height: .5,
                 borderColor: '#36fd00',
                 cornerColor: 'green',
                 hasRotatingPoint: false,
@@ -176,12 +178,23 @@ export default {
             el.height = card.getActiveObject().height * card.getActiveObject().scaleY;
             card.add(el);
             card.setActiveObject(el);
+            card.renderAll()
+            
+            // this.$store.dispatch('setSelectedObj', null)
                 this.isCropping = true;
+                console.log("card.getActiveObject()",card.getActiveObject(el))
         },
+        
         cropImage(png, left, top, height, width) {
             var card = this.card
+
         //将图片放进一个新的canvas中，经裁剪后导出一个新的图片。
         //如果用户选框大于原图片，则将选框缩至原图片大小
+        // console.log("top",top)
+        this.oCoords = png.oCoords
+        this.aCoords = png.aCoords
+        // console.log("png.top.oCoords", png.oCoords)
+        // console.log("png.top.aCoords", png.aCoords)
             if (top < png.top) {
                 height = height - (png.top - top);
                 top = png.top;
@@ -206,6 +219,8 @@ export default {
                 canvas_crop.setHeight(height);
                 canvas_crop.setWidth(width);
                 canvas_crop.renderAll();
+
+                console.log("img",img)
                 fabric.Image.fromURL(canvas_crop.toDataURL('png'), (croppedImg)=> {
                     
                     croppedImg.set({
@@ -216,26 +231,27 @@ export default {
                         cornerStyle: 'circle',
                         borderDashArray: [3,3],
                         angle: 0,
-                        // scaleX: card.width / img.width /2, 
-                        // scaleY: card.width / img.height /2,
-                        left: left,
-                        top: top,
-                        // src:e.target.src,
-                        imgType:0, // imgType:0背景,1素材 2自定义商品
-                        goods_id: null,
-                        goodsImg_id:null,
-                        material_id: null,
+                        // // scaleX: card.width / img.width /2, 
+                        // // scaleY: card.width / img.height /2,
+                        left: Math.random().toFixed(2)*200 + 100,
+                        top: Math.random().toFixed(2)*200 + 100,
+                        // // src:e.target.src,
+                        // imgType:0, // imgType:0背景,1素材 2自定义商品
+                        // goods_id: null,
+                        // goodsImg_id:null,
+                        // material_id: null,
                         // backgroundImgId:e.target.id
                     }); 
                     
-                    _this.controlsVisibility = croppedImg.aCoords
-                    card.add(croppedImg).renderAll();
                     card.remove(img).renderAll();
+                    card.add(croppedImg).renderAll();
                     
-                    // console.log("cropImage",croppedImg.aCoords)
-                    // console.log("img",img.aCoords)
+                    console.log("croppedImg",croppedImg)
+                    // this.el = croppedImg
+                    console.log("card",this.card)
+                    
                     // console.log("this.controlsVisibility",_this.controlsVisibility)
-                    // console.log("cropImage",canvas_crop.toDataURL('png'))
+                    // console.log("cropImage",canvas_crop.toDataURL('png')) // 裁剪后的图片base64
                 });
             });
         
@@ -250,6 +266,7 @@ export default {
             // console.log("selectedObj",this.selectedObj)
             // console.log("object",this.object)
             let el = this.selectedObj
+            // console.log('this.el', el.aCoords)
             let object = this.object
             let canvas = this.card
             let lastActive = this.lastActive

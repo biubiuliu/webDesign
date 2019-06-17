@@ -70,34 +70,35 @@
         </Modal>
         <Modal
             v-model="shemeInfoModal"
-            title="填写方案"
-            @on-ok="shemeInfoModalok"
-            @on-cancel="shemeInfoModalcancel">
+            title="填写方案">
             <div>
-                <Form :model="imgObject" >
-                    <FormItem>
+                <Form :model="imgObject"  ref="imgObject" :rules="imgRuleValidate">
+                    <FormItem prop="scheme_name">
                         <Input v-model="imgObject.scheme_name" placeholder="填写方案名称"></Input>
                     </FormItem>
-                    <FormItem>
+                    <FormItem >
                         <Row>
                             <Col span="10">
-                            <!-- @on-open-change ="handleGetEnumList(1)" -->
+                            <FormItem prop="space_type" >
                                 <Select v-model="imgObject.space_type"  placeholder="#选择空间#">
                                     <Option v-for="(item,index) in selectRoomArr" :key="index" :value="item.id" >{{item.name}}</Option>
 
                                 </Select>
+                            </FormItem>
                             </Col>
                             <Col span="10" offset="4">
+                            <FormItem prop="style_type">
                                 <Select v-model="imgObject.style_type"  placeholder="#选择风格#">
                                     <Option v-for="(item,index) in selectStyleArr" :key="index" :value="item.id" >{{item.name}}</Option>
                                 </Select>
+                            </FormItem>
                             </Col>
                         </Row>
                     </FormItem>
-                    <FormItem>
+                    <FormItem prop="customer_name">
                         <Input v-model="imgObject.customer_name" placeholder="填写客户名称"></Input>
                     </FormItem>
-                    <FormItem>
+                    <FormItem prop="phone" >
                         <Input v-model="imgObject.phone" placeholder="填写客户手机号"></Input>
                     </FormItem>
                     <FormItem label="是否公开">
@@ -106,13 +107,18 @@
                             <span slot="close" >个人</span>
                         </i-switch>
                     </FormItem>
-                    <FormItem>
+                    <FormItem  prop="address">
                         <Input v-model="imgObject.address" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="填写客户楼盘地址"></Input>
                     </FormItem>
                 </Form>
             </div>
+                <div slot='footer'>
+                    <Button type="default" @click="shemeInfoModalcancel">取消</Button>
+                    <Button type="primary" @click="shemeInfoModalok('imgObject')">确定</Button>
+                </div>
         </Modal>
     </div>
+
 </template>
 <script>
 import { mapState, mapGetters, mapActions  } from 'vuex';
@@ -143,6 +149,27 @@ export default {
                 customer_name: null,
                 img_site_json:null
                 
+            },
+            // 表单验证
+            imgRuleValidate:{
+                scheme_name: [
+                    { required: true, message: '方案名称不能为空', trigger: 'blur' }
+                ],
+                customer_name: [
+                    { required: true, message: '客户名称不能为空', trigger: 'blur' }
+                    ],
+                phone: [
+                    { required: true, message: '客户手机不能为空', trigger: 'blur' }
+                ],
+                space_type: [
+                    { type: 'number', required: true, message: '空间类型', trigger: 'change' }
+                ],
+                style_type: [
+                    { type: 'number', required: true, message: '空间风格', trigger: 'change' }
+                ],
+                address: [
+                    { required: true, message: '详细地址', trigger: 'blur' }
+                ],
             },
             switchVal:true, //控制switch
             imgFile:{},
@@ -203,6 +230,8 @@ export default {
         //对话框ok
         isSaveSchemeOk(){
             this.$router.push({ path: '/home/discover' });
+
+            
         },
         //对话框cancel
         isSaveSchemeCancel(){
@@ -220,17 +249,24 @@ export default {
             }
             
         },
-        shemeInfoModalok () {
-                this.toJson()
-                this.imgObject.id = this.schemeId ? this.schemeId : null
-                this.imgObject.canvas_type = parseInt(this.vertical) 
-                // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
-                // this.imgObject = qs.stringify(this.imgObject)
+        shemeInfoModalok (name) {
+            this.$refs[name].validate((valid) => {
+                if (valid) {
+                    this.toJson()
+                    this.imgObject.id = this.schemeId ? this.schemeId : null
+                    this.imgObject.canvas_type = parseInt(this.vertical) 
+                    // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
+                    // this.imgObject = qs.stringify(this.imgObject)
 
-                this.handleGetSaveScheme(this.imgObject)
-            },
+                    this.handleGetSaveScheme(this.imgObject)
+                } else {
+                    this.$Message.error('Fail!');
+                }
+            })
+        },
         shemeInfoModalcancel () {
-            this.$Message.info('你点击了取消');
+            this.shemeInfoModal = false,
+            this.$Message.info('你取消保存');
         },
         //是否公开
         isOpenFun(ev) {
