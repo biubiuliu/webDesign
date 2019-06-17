@@ -52,10 +52,10 @@
             </Spin>
         </div>    
         <div v-if="!goodsArr.length&&isSelect==2" class="no-scheme">
-                暂无更多数据
+                还没有收藏的商品哦~
         </div> 
         <div v-if="!schemeArr.length&&isSelect==1" class="no-scheme">
-                暂无更多数据
+                还没有收藏的方案哦~
         </div>
          
     </div>
@@ -153,7 +153,8 @@ export default {
                                 href: item.img_url,  
                                 name: item.name,                                                  
                                 id: item.id,
-                                info:item.shop_price?item.shop_price:convertTimeStamp(item.created_at),
+                                price:item.shop_price,
+                                time:convertTimeStamp(item.created_at),
                                 type:this.isSelect,
                             };
                            this.isSelect == 1 ?this.schemeArr.push(setDataObj):this.goodsArr.push(setDataObj);                                          

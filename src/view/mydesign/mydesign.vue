@@ -4,7 +4,7 @@
             <div class="flex selectCusBox">
                 <a class="sort"  href="javascript:;" @mouseenter="selectEnter('sort')" @mouseleave="selectLeave('sort')">
                     {{sortSelectList[sortLi].title}}
-                    <i class="iconfont iconxiala-"></i>
+                    <span><i class="iconfont iconxiala- iconblock"></i></span>
                     <ul class="sort-ul">
                         <li  v-for="(item, index) in sortSelectList" :key="index"
                             :class="{sortSelect:sortLi==index}" @click="changeSelect(index,item,'sort')">
@@ -14,7 +14,7 @@
                 </a>
                 <a class="file" v-if="dirSelectList.length>1" href="javascript:;" @mouseenter="selectEnter('dir')" @mouseleave="selectLeave('dir')">
                     {{dirSelectList[dirLi].dir_name}}
-                    <i class="iconfont iconxiala-"></i>
+                    <span><i class="iconfont iconxiala- iconblock"></i></span>
                     <ul class="dir-ul">
                         <li  v-for="(item, index) in dirSelectList" :key="index"
                             :class="{dirSelect:dirLi==index}" @click="changeSelect(index,item,'dir')">
@@ -76,6 +76,7 @@
                  </WaterfallItem>
             </Waterfall>      
             <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div>
+            <div class="no-scheme"  v-if="!imgsArr.length">没有设计哦，快去设计吧~</div>
         </div>
         <Modal
             v-model="shemeInfoModal"
@@ -353,7 +354,8 @@ export default {
                 dir_id:this.dirSelectList[this.dirLi].id,
             }
             getMeals(params).then(res => {
-                this.isShowSpin = false
+                this.isShowSpin = false;
+                this.loading = false;  
                 if(res.data.success){                    
                     if(this.page==1){
                         this.imgsArr=[];
@@ -375,8 +377,7 @@ export default {
                         this.imgsArr.push(setDataObj);                   
                     });
                   }                                          
-                } 
-                this.loading = false;              
+                }                            
             }).catch(err => {
                 console.log(err)
                 this.isShowSpin = false;
@@ -616,7 +617,7 @@ export default {
 .mydesignBody{
     background: #f2f2f4;
     color: black;
-    /* height: 93vh; */
+    /* height: 90vh; */
     font-size: 14px;
     position: relative;
     padding: 104px 60px 20px 60px;
@@ -678,7 +679,12 @@ export default {
 .sort:hover .sort-ul,.file:hover .dir-ul{
     display: block;
 }
-.sort:hover .iconfont{
+.iconblock{
+    display: inline-block;
+}
+.sort:hover .iconblock,.file:hover .iconblock{
+    transform-origin:center center;
+    transition: transform .2s ease-in-out;
     transform:rotate(180deg)
 }
 .sort-ul,.dir-ul{

@@ -77,16 +77,15 @@
                 </div>
                 <div style="padding:10px 170px">
                     <schemeList :imgsArr = 'imgsArr' :padding='padding'/>
+                    <div v-if="imgsArr.length&&page>total_page" class="more">暂无更多数据</div>
+                    <div v-if="!imgsArr.length" class="no-scheme">
+                        抱歉 没有找到匹配的结果
+                    </div>
                 </div>
                 <Spin fix v-if="isShowSpin">
                     <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                     <div>Loading</div>
                 </Spin>
-                <!-- <div slot="waterfall-over">暂无更多数据</div>
-             </vue-waterfall-easy> -->
-            <!-- <div v-if="!imgsArr.length" class="no-scheme">
-                抱歉 没有找到匹配的结果
-            </div> -->
         </div>
     </div>
 </template>
@@ -134,6 +133,7 @@ export default {
             keywords:'',
             page:1,
             total:0,
+            total_page:1,
             isShowSpin:true,
             loading:false,
         }
@@ -191,7 +191,7 @@ export default {
             this.brandLableId=0;
             this.seriesId=0;
             this.page = 1;
-            this.total = 1;
+            //this.total = 1;
             this.keywords = '';
             if(index==1){
                 this.getGoodsLabels();
@@ -213,8 +213,8 @@ export default {
 
         // 获取方案
         getMeals(){
+            console.log(1111)
             let params = {
-                user_id:'',
                 style_type:this.styleLableId,
                 space_type:this.spaceLabelId,
                 is_personal:0,
@@ -224,13 +224,17 @@ export default {
                 page:this.page,
                 page_size:30
             }
+            console.log('loading',this.loading)
             if(this.loading){
                 return;
             } 
+            
             this.loading = true;
             getMeals(params).then(res => {
+                this.loading = false;
                 this.isShowSpin = false
                 if(res.data.success){
+                    this.total_page = Math.ceil(res.data.message.total/30) ;  
                     if(this.page==1){
                         this.imgsArr=[];
                     }
@@ -254,7 +258,7 @@ export default {
                     })
                     this.page=this.page +1;                 
                 }
-                this.loading = false;
+                
             }).catch(err => {
                 this.loading = false;
                 console.log(err)
@@ -270,13 +274,16 @@ export default {
                 brand_id:this.brandLableId,
                 category_id:this.spaceLabelId,
                 series_id:this.seriesId,
+                page_size:30
             }
             if(this.loading){
                 return;
             } 
             this.loading = true;
             getGoodsList(params).then(res => {
+                this.loading = false;
                 if(res.data.success){
+                    this.total_page = Math.ceil(res.data.message.total/30) ;  
                     if(this.page==1){
                         this.imgsArr=[];
                     }
@@ -297,8 +304,7 @@ export default {
                         this.imgsArr.push(setDataObj);                      
                     })
                     this.page = this.page +1;
-                }
-                this.loading = false;
+                }               
             }).catch(err => {
                 this.loading = false;
                 console.log(err)
@@ -381,17 +387,20 @@ export default {
                case 0:
                    this.spaceLabelId=id;
                    this.page = 1;
+                   //this.total = 1;
                    this.handleGetGoodsType();
                    break;          
                case 1:
                     this.styleLableId=id;                   
                     this.page = 1;
+                    //this.total = 1;
                     this.handleGetGoodsType();
                     break;                 
                case 2:
                     this.brandLableId=id;
                     this.seriesId = 0;
                     this.page = 1;
+                    //this.total = 1;
                     this.handleGetGoodsType();
                     break;
                default:
@@ -613,8 +622,6 @@ export default {
     font-size: 24px;
     color: #7e8e98;
     line-height: 400px;
-    position: absolute;
-    bottom: 0px;
 }
 .parent { 
     width:80%;
@@ -642,5 +649,13 @@ export default {
 }
 .waterfall::-webkit-scrollbar{
     display: none;
+}
+.more{
+    display: block;
+    text-align: center;
+    margin: 10px auto;
+    line-height: 40px;
+    width: 150px;
+    color: #666;
 }
 </style>

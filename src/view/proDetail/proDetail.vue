@@ -25,37 +25,15 @@
                 <div class="discoverTitle" v-if="goods_list.length">
                     <div>单品列表</div>
                     <div class="parent">                         
-                        <div  class="child" v-for="(item, index) in goods_list" :key="index" @click="linkDetailFun(item)">
-                            <a  href="javascript:;">
-                                <div>               
-                                    <img :src="item.goods_img" alt="" @error="imgError(item,2)">
-                                </div>
-                                <div class="img-info">
-                                    <p class="some-info">{{item.goods_name}}</p>
-                                    <p class="some-info">{{'￥'+item.shop_price}}</p>
-                                </div>
-                                <a href="javascript:;" class="collect_box" @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
-                                    <i class="iconfont iconshoucang" :class="{collected:item.is_collect}"></i>
-                                </a> 
-                             </a>                          
-                        </div>
-                        
+                        <schemeList :imgsArr='goods_list' :padding='padding' :showCollect='true' :isPro='true'/>
                     </div>
                 </div>
             </div>
-            <div slot="waterfall-head" v-if="recommend_list.length">
-                <div class="discoverTitle">推荐方案</div>
-                <div class="parent">
-                    <div  class="child" v-for="(item, index) in recommend_list" :key="index" @click="linkDetailFun(item)">
-                        <a  href="javascript:;">
-                            <div>               
-                                <img :src="item.done_img_url" alt="" @error="imgError(item,1)">
-                            </div>
-                            <div class="scheme-img-info">
-                                <p class="some-info" :title="item.scheme_name">{{item.scheme_name}}</p>
-                                <p class="some-info">{{item.time}}</p>
-                            </div>
-                        </a>
+            <div slot="waterfall-head">
+                <div class="discoverTitle" v-if="recommend_list.length">
+                    <div>推荐方案</div>
+                    <div class="parent">
+                        <schemeList :imgsArr='recommend_list' :padding='padding' :isPro='true'/>
                     </div>
                 </div>
             </div>
@@ -89,17 +67,21 @@
             <div class="desc" v-if="goods_info.goods_desc">
                 <p class="desc_title">商品详情</p>
                 <div v-html="goods_info.goods_desc"></div>
-            </div>
+            </div>            
         </div>
+        <Spin fix v-if="isShowSpin">
+            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+            <div>Loading</div>
+        </Spin>
     </div>
 </template>
 <script>
-import vueWaterfallEasy from 'vue-waterfall-easy'
 import { getSchemeRelated,getGoodsDetail,isCollect,copyScheme } from '@/api/data.js'
 import { mapState,mapActions } from 'vuex'
 import { convertTimeStamp } from '@/libs/util.js'
 import Swiper from 'swiper'; 
 import 'swiper/dist/css/swiper.min.css';
+import schemeList from '@/components/commons/schemeList/schemeList'
 
 export default {
     name: 'proDetail',
@@ -114,12 +96,12 @@ export default {
         })
     },
     components: {
-        vueWaterfallEasy
+        schemeList
     },
     data() {
         return {
             msg: '方案详情页',
-            value2: 0,
+            padding:60,
             selectList:[
                 {title:"方案",id:"1"},
                 {title:"单品",id:"2"},
@@ -137,7 +119,8 @@ export default {
             proId: null, // 方案id
             type:1,
             goods_info:{},
-            loading:false
+            loading:false,
+            isShowSpin:true
         }
     },
 
@@ -186,19 +169,27 @@ export default {
                     let data =  res.data.message;
                     this.scheme_info = data.scheme_info;
                     data.goods_list.map((item)=>{
+                         item.id = item.goods_id
                          item.type = 2
+                         item.name = item.goods_name
+                         item.src = item.goods_img
+                         item.price = item.shop_price
                     })
                     this.goods_list = data.goods_list;
                     data.recommend_list.map((item)=>{
                         item.time = convertTimeStamp(item.updated_at)
                         item.type = 1
+                        item.src = item.done_img_url
+                        item.name = item.scheme_name
                     })
                     this.recommend_list = data.recommend_list;
                     this.scheme_info = data.scheme_info;
                     this.user_info = data.user_info;
                 }
+                this.isShowSpin = false
             }).catch(err => {
                 console.log(err)
+                this.isShowSpin = false
             })
         },
 
@@ -217,8 +208,10 @@ export default {
                             },
                         });
                     })
+                    this.isShowSpin = false;
                 }else{
                     this.$Message.error(res.data.message)
+                    this.isShowSpin = false
                 }
             })
         },
@@ -296,7 +289,7 @@ export default {
 </script>
 <style scoped>
 .proDetailBody{
-    background: #f5f7f9
+    background: #edf0f2
 }
 .discoverTitle{
     font-size: 20px;
@@ -394,10 +387,10 @@ margin-top: 20px;;
 }
 .parent { 
     width:100%;
-    -moz-column-count: 5;
+    /* -moz-column-count: 5;
     -webkit-column-count: 5;
-    column-count: 5;
-    padding:10px 60px 40px 60px;
+    column-count: 5; */
+    padding:10px 0 40px 0;
     margin-top: 20px;
 }
 .child {
