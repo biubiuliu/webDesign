@@ -1,70 +1,42 @@
 <template>
     <div class="goodList_body">
-         <Tabs value="name1">
-            <TabPane label="品牌" name="name1">
-                <div  class="vertical">
-                    <Button class="roomlabel" @click="changeChooseLableFun(1,0)" :class="{choose:brandLableId==0}">全部</Button>
-                    <Button class="roomlabel" @click="changeChooseLableFun(1,item.bid)" :class="{choose:brandLableId==item.bid}" 
-                        v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name">
-                        {{item.name}}
-                    </Button>
+        <div class="goodsList">
+            <div v-for="(item,index) in goodsListArr" :key=index class="goodsTabs" @click="changeGoodsNav(item.id)" :class="{goodsNavActive:goodsNav==item.id}">{{item.title}}</div>
+        </div>
+        <div  class="vertical"  v-show="goodsNav == 0">
+            <Button class="roomlabel" @click="changeChooseLableFun(1,0)" :class="{choose:brandLableId==0}">全部</Button>
+            <Button class="roomlabel" @click="changeChooseLableFun(1,item.bid)" :class="{choose:brandLableId==item.bid}" 
+                v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name">
+                {{item.name}}
+            </Button>
+        </div>
+        <div  class="vertical" v-show="goodsNav == 1">
+            <Button class="roomlabel" @click="changeChooseLableFun(0,0)" :class="{choose:styleLableId==0}">全部</Button>
+            <Button class="roomlabel" @click="changeChooseLableFun(0,item.id)" :class="{choose:styleLableId==item.id}" 
+                v-for="(item,index) in styleArr" :key="index">
+                {{item.name||item.style_name}}
+            </Button>
+        </div>
+        <div class="vertical" v-show="goodsNav == 2">
+            <Button class="roomlabel" @click="changeChooseLableFun(2,0)" :class="{choose:spaceLabelId==0}">全部</Button>
+            <Button class="roomlabel" @click="changeChooseLableFun(2,item.id||item.cat_id)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
+                v-for="(item,index) in classifyArr" :key="index">
+                {{item.name||item.cat_name}}
+                <div class="brand_lable">
+                    <!-- <li  v-for="(itemSon ,index) in item.son" :key="index"  :label="itemSon.cat_name"   :value="itemSon.cat_id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.id)">
+                        {{m.series_name}}
+                    </li> -->
+                    <li v-for="(m,n) in item.son" :key="n" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.cat_id)">
+                        {{m.cat_name}}
+                    </li>
                 </div>
-            </TabPane>
-            <TabPane label="风格" name="name2">
-                <div  class="vertical">
-                    <Button class="roomlabel" @click="changeChooseLableFun(0,0)" :class="{choose:styleLableId==0}">全部</Button>
-                    <Button class="roomlabel" @click="changeChooseLableFun(0,item.id)" :class="{choose:styleLableId==item.id}" 
-                        v-for="(item,index) in styleArr" :key="index">
-                        {{item.name||item.style_name}}
-                    </Button>
-                </div>
-            </TabPane>
-            <TabPane label="分类" name="name3">
-                <div class="vertical">
-                    <Button class="roomlabel" @click="changeChooseLableFun(2,0)" :class="{choose:spaceLabelId==0}">全部</Button>
-                    <Button class="roomlabel" @click="changeChooseLableFun(2,item.id||item.cat_id)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
-                        v-for="(item,index) in classifyArr" :key="index">
-                        {{item.name||item.cat_name}}
-                        <div class="brand_lable">
-                            <!-- <li  v-for="(itemSon ,index) in item.son" :key="index"  :label="itemSon.cat_name"   :value="itemSon.cat_id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.id)">
-                                {{m.series_name}}
-                            </li> -->
-                            <li v-for="(m,n) in item.son" :key="n" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.cat_id)">
-                                {{m.cat_name}}
-                            </li>
-                        </div>
-                    </Button>
-                </div>
-            </TabPane>
-        </Tabs>
-
+            </Button>
+        </div>
 
         <Spin fix v-if="this.$store.state.app.isShowSpin">
             <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
             <div>Loading</div>
         </Spin>
-        <!-- <div class="select_box">
-            <Select v-model="selsectBrand" size="small"  style="width:100px" placeholder="品牌" clearable id="select1"
-                    @on-change="ChangebrandOpt">
-                <Option v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name" class="option">
-                    <span>{{item.name}}</span>
-                </Option>
-            </Select>
-            <Select v-model="selsectStyle" size="small"  placeholder="风格" clearable style="width:100px" id="select2"
-                    @on-change="ChangeStyleOpt">
-                <Option v-for="(item ,index) in styleArr" :key="index" :value="item.id" :label="item.style_name" class="option">
-                    <span>{{item.style_name}}</span>
-                </Option>
-            </Select>
-            <Select v-model="selsectClassify" size="small"  placeholder="分类" clearable style="width:100px" id="select3"
-                    @on-change="ChangeClassifyOpt">
-                <OptionGroup v-for="(item ,index) in classifyArr" :key="index"  :label="item.cat_name">
-                    <Option v-for="(itemSon ,index) in item.son" :key="index"  :label="itemSon.cat_name"   :value="itemSon.cat_id"  class="option">
-                        <span>{{itemSon.cat_name}}</span>
-                    </Option>
-                </OptionGroup>
-            </Select>
-        </div> -->
         <div>
             <ul class="goodsUl flexLayout">
                 <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,index)"  @mouseleave="mouseleave(item,index)">
@@ -122,6 +94,12 @@ export default {
             styleLableId:0,// 选择的风格标签id
             brandLableId:0,// 选择的品牌标签id
             seriesId:0,// 分类下面的系列id
+            goodsNav:0,
+            goodsListArr:[
+                {title:'品牌',id:'0'},
+                {title:'风格',id:'1'},
+                {title:'分类',id:'2'}
+            ]
 
         }
     },
@@ -194,6 +172,24 @@ export default {
            this.seriesId = series_id
            this.ChangeClassifyOpt(series_id)
        },
+       //改变nav
+       changeGoodsNav(id){
+           this.goodsNav = id
+           switch (id) {
+               case 0:
+
+                   break;
+               case 1:
+
+                   break;
+               case 2:
+
+                   break;
+           
+               default:
+                   break;
+           }
+       },
         //品牌列表改变
         ChangebrandOpt(value){
             this.getGoods.brand_id = value
@@ -241,41 +237,23 @@ export default {
 }
 </script>
 <style scoped>
-.goodList_body /deep/ .ivu-tabs {
-    position: absolute;
-    height: 100vh;
-    z-index: 99;
-    color: #808695 !important;
+.goodsList{
+    display:flex;
+    justify-content:space-around;
+    width: 100%;
+    border-bottom: 1px solid #666;
+    padding: 20px 0;
+    cursor: pointer;
 }
-.goodList_body /deep/ .ivu-tabs-nav {
-    float: none !important; 
+.goodsNavActive{
+    color: #f90;
+    border-bottom: 1px solid #f90;
 }
-.goodList_body /deep/ .ivu-tabs-nav .ivu-tabs-tab:hover {
-    color: #f90
-}
-.goodList_body /deep/ .ivu-tabs-tab-active {
-    color: #f90
-}
-
-.goodList_body /deep/ .ivu-tabs-ink-bar {
-    left: 20% ; 
-    background-color:#f90
-}
-.goodList_body /deep/ .ivu-tabs-tabpane {
-   float: left
-}
-.select_box /deep/ .ivu-select-selection {
-    color: white;
-    background: #293039;
-    border: 0;
-}
-.select_box  /deep/ .ivu-select-item-selected {
-    /* background: #f90; */
-    color: black;    
-}
-.select_box  /deep/ .ivu-select-item:hover {
-    background: #f90;
-
+.goodsTabs{
+    font-size: 20px;
+    height: 50px;
+    line-height: 50px;
+    flex: 1;
 }
 .option{
     text-align: left;
