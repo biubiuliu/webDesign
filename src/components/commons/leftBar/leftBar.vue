@@ -1,32 +1,32 @@
 <template>
     <div class="leftBar">
-            <ul class="leftBar_box">
-                <li>
-                    <router-link to="/designHome/materialLib" tag="div">
-                        <i  class="iconfont iconsucaiku"></i>
-                        素材库
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/designHome/goodsLib" tag="div">
-                        <i  class="iconfont iconshangpin"></i>
-                        商品库
-                    </router-link>
-                </li>
-                <li>
-                    <router-link to="/designHome/favorite" tag="div">
-                            <i  class="iconfont iconshoucang1"></i>
-                            收藏
-                    </router-link>
-                </li>
-               <li>
-                   <router-link to="/designHome/uploading" tag="div">
+        <ul class="leftBar_box">
+            <li>
+                <router-link to="/designHome/materialLib" tag="div">
+                    <i  class="iconfont iconsucaiku"></i>
+                    素材库
+                </router-link>
+            </li>
+            <li>
+                <router-link to="/designHome/goodsLib" tag="div">
+                    <i  class="iconfont iconshangpin"></i>
+                    商品库
+                </router-link>
+            </li>
+            <li>
+                <router-link to="/designHome/favorite" tag="div">
+                        <i  class="iconfont iconshoucang1"></i>
+                        收藏
+                </router-link>
+            </li>
+            <li>
+                <router-link to="/designHome/uploading" tag="div">
                         <i  class="iconfont iconupload"></i>
                         上传
-                   </router-link>
-                </li>
-               <li class="leftBar_bottom">快捷键</li>
-           </ul>
+                </router-link>
+            </li>
+            <li class="leftBar_bottom">快捷键</li>
+        </ul>
     </div>
 </template>
 <script>
