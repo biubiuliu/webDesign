@@ -36,9 +36,9 @@
                                     </Input>
                                 </Col>
                                 <Col span="8" offset="2">
-                                    <Button  class="sendCode" @click="send()" v-if="!sendMsgDisabled">                                       
+                                    <a href="javascript:;" class="sendCode" @click="send()" v-if="!sendMsgDisabled">                                       
                                          发送验证码
-                                    </Button>
+                                    </a>
                                     <Button disabled v-else class="sendedCode">
                                         {{time+'秒后获取'}}
                                     </Button>
@@ -122,7 +122,6 @@ export default {
                         let _this=this;
                         setTimeout(function()  {
                               let redirect = decodeURIComponent(_this.$route.query.redirect || '/home/discover');  //获取登录成功后要跳转的路由。
-                              console.log(redirect);
                               _this.$router.push({
                                 path: redirect
                               })
@@ -160,7 +159,7 @@ export default {
             // 获取验证码
             getVerificationCode(){
                 getCode(this.formInline.mobile).then(res =>{
-                    console.log(res.data.message)
+                    
                 })
             }
         } 
@@ -287,6 +286,9 @@ ul>li{
     font-size: 16px;
     border: none;
     background: #ff9a00;
+    line-height: 40px;
+    display: block;
+    border-radius: 3px;
 }
 .sendedCode{
     font-size: 16px;

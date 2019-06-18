@@ -25,7 +25,7 @@
                 <div class="discoverTitle" v-if="goods_list.length">
                     <div>单品列表</div>
                     <div class="parent">                         
-                        <schemeList :imgsArr='goods_list' :padding='padding' :showCollect='true' :isPro='true'/>
+                        <schemeList :imgsArr='goods_list' :padding='padding' :showCollect='true' :isPro='true' />
                     </div>
                 </div>
             </div>

@@ -32,7 +32,7 @@
             <Waterfall id='vueWaterfall' @loadmore="handleGetList" :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
                  <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
                      <div class="item">
-                        <img :src="item.src" alt="加载错误">
+                        <img :src='item.src' alt="加载错误">
                         <div  class="scheme-img-info">
                             <p class="some-info" :title="item.name">{{item.name}}</p>
                             <p class="some-info">{{item.time}}</p>
@@ -42,7 +42,7 @@
                                 <a class="midify" href="javascript:;" @click="toDetail(item)">
                                     <i class="iconfont iconiconset0137"></i>
                                 </a>
-                                <a href="javascript:;"  @click="del(item.id)">
+                                <a href="javascript:;"  @click="del(item.id,item.name)">
                                     <i class="iconfont iconshanchu"></i>
                                 </a>
                                 <a href="javascript:;" @click="copy(item)">
@@ -108,14 +108,7 @@
                 </FormItem>
             </Form>
         </Modal>
-        <Modal v-model="merchBillModal" width="1050" style="font-size:14px">
-            <Table :columns="columns" :data="goodsList" class="table"  :loading="tableLoading"></Table>
-            <div slot="footer" class="modal_footer">
-                <span>总价</span>
-                <span>￥1000</span>
-                <div class="print">打印</div>
-            </div>
-        </Modal>   
+        <goodsMerchBill :visible='merchBillModal' :data='goodsList' :loading='tableLoading' v-on:visible="changeVisible"/>
         <Spin fix v-if="isShowSpin">
                 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                 <div>Loading</div>
@@ -123,19 +116,19 @@
      </div>   
 </template>
 <script>
-import vueWaterfallEasy from 'vue-waterfall-easy'
 import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList, delScheme, copyScheme } from '@/api/data.js'
 import { getEnumList } from  '@/api/material.js'
-import { convertTimeStamp } from '@/libs/util.js'
+import { convertTimeStamp,downloadIamge } from '@/libs/util.js'
 import {Waterfall, WaterfallItem} from 'vue2-waterfall';
 import discoverVue from '../discover/discover.vue';
+import goodsMerchBill from '@/components/commons/goodsMerchBill/goodsMerchBill'
 
 export default {
     name: 'mydesign',
     components: {
-        vueWaterfallEasy,
         Waterfall, 
-        WaterfallItem
+        WaterfallItem,
+        goodsMerchBill
     },
     data() {
         return {
@@ -177,93 +170,12 @@ export default {
                 phone: "", // 手机
                 address: "", //	地址
             },
-            goodsList:[],
-            columns: [
-                {
-                    title: '单品名称',
-                    key: 'goods_name',
-                    width: 415,
-                    render: (h, params) => {
-                         return h('div',{
-                             style:{
-                                 display:'flex',
-                                 alignItems:'center'
-                                }
-                             },[
-                             h("img",{  
-                                attrs: {
-                                    src: params.row.goods_thumb
-                                },
-                                style: {
-                                    width: "100px",
-                                    height: "100px",
-                                    marginRight: "6px"
-                                },
-                            },''),
-                            h("div",{},[
-                                h("p",{
-                                    style:{
-                                        lineHeight:'28px',
-                                        fontSize:'14px',
-                                        color:'rgb(134, 142, 150)',
-                                    }
-                                },params.row.goods_name),
-                                h("p",{
-                                    style:{
-                                        lineHeight:'28px',
-                                        fontSize:'14px',
-                                         color:'rgb(134, 142, 150)',
-                                    }
-                                },'品牌 '+params.row.brand_name),
-                                h("p",{
-                                    style:{
-                                        lineHeight:'28px',
-                                        fontSize:'14px',
-                                        color:'rgb(134, 142, 150)',
-                                    }
-                                },'分类 '+params.row.style_name),]),
-                         ])   
-                    },
-                },
-                {
-                    title: '数量',
-                    key: 'num',
-                    width: 175,
-                    render: (h, params) => {
-                         return h('div',{
-                             style:{
-                                 lineHeight:'28px',
-                                 fontSize:'14px',
-                                 color:'rgb(134, 142, 150)',
-                                }
-                             },params.row.num)
-                    }
-                },
-                {
-                    title: '规格属性',
-                    skus: 'address',
-                    width: 250,
-                },
-                {
-                    title: '价格',
-                    key: 'shop_price',
-                    width: 175,
-                     render: (h, params) => {
-                         return h('div',{
-                             style:{
-                                 lineHeight:'28px',
-                                 fontSize:'14px',
-                                 color:'#f90',
-                                 fontWeight: 700
-                                }
-                             },'￥'+params.row.shop_price)
-                    }
-                }
-            ],
+            goodsList:[],          
             merchBillModal:false, // 商品清单的modal  
             isShowSpin:true,
             loading:false,
             tableLoading:true,
+            total:0
         }
     },
     created() {
@@ -282,6 +194,9 @@ export default {
         window.addEventListener('scroll', this.handleScroll)
     },
     methods: {
+        changeVisible (event) {
+            this.merchBillModal = event
+        },
         handleScroll() {
             // 变量scrollTop是滚动条滚动时，距离顶部的距离
        		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
@@ -364,6 +279,7 @@ export default {
                     this.page = this.page+1;
                     this.total_page = Math.ceil(res.data.message.total/15) ;  
                     if(res.data.message.data.length){
+                        
                         res.data.message.data.map((item,i)=>{
                         var  setDataObj = {
                             src: item.done_img_url,
@@ -374,6 +290,7 @@ export default {
                             id: item.id,
                             type:1// 传详情用
                         };
+                        //setDataObj.src = setDataObj.src+"?m="+Math.random()
                         this.imgsArr.push(setDataObj);                   
                     });
                   }                                          
@@ -389,9 +306,10 @@ export default {
         getDir () {
             getDirList().then(res=>{
                 if(res.data.success){  
-                    this.dirSelectList = [{dir_name:"文件",id:''}],                         
-                    this.dirSelectList = this.dirSelectList.concat(res.data.message);   
-                    this.moveDirList =  res.data.message                      
+                    console.log();
+                    this.dirSelectList = [{dir_name:"文件",id:''}];                         
+                    this.dirSelectList = this.dirSelectList.concat(res.data.message.reverse());   
+                    this.moveDirList =  res.data.message;                    
                 }
             })
         },
@@ -412,9 +330,10 @@ export default {
 
         // 修改方案
         toDetail (item){
-            this.$store.dispatch('updataProDetailVal', item)
+            this.$store.dispatch("setSchemeId", item.id)
+            //this.$router.push({name:'materialLib', query: {id: this.proId} })
             const {href} = this.$router.resolve({
-                path: 'proDetail/'+item.id+'/'+item.type,            
+                name: 'materialLib',         
             })
             window.open(href, '_blank')     
         },
@@ -446,10 +365,10 @@ export default {
         },
 
         // 删除方案
-        del (id) {
+        del (id,name) {
             this.$Modal.confirm({
                     title: '提示',
-                    content: '<p>是否删除该方案'+id+'</p>',
+                    content: '<p>是否删除'+name+'方案？</p>',
                     onOk: () => {
                         delScheme({ids:id.toString()}).then(res=>{
                             if(res.data.success){                               
@@ -471,7 +390,8 @@ export default {
                 if(res.data.success){  
                     var data = JSON.parse(JSON.stringify(item)) ;
                     data.name = item.name+'-副本';
-                    data.time = '刚刚';              
+                    data.time = '刚刚';  
+                    data.id = res.data.message.id;            
                     this.imgsArr.unshift(data);
                     this.$Message.info('已拷贝')
                 }else{
@@ -487,14 +407,16 @@ export default {
 
         // 下载图片
         down (name){
+            this.$Message.info('正在导出请稍等');
             var a = document.createElement('a')
             var event = new MouseEvent('click') 
-            a.download = name || '下载图片名称'  
+            a.download = name || '下载图片名称'
             this.imgsArr.forEach((item)=>{
                 if(item.id==parseInt(name.split("-")[1])){
                     a.href=item.src
+                    //downloadIamge(item.src,name);
                 }
-            })                 
+            })               
             a.dispatchEvent(event)            
         },
 
@@ -511,14 +433,19 @@ export default {
 
         // 获取商品清单
         getGoodsList (name) {
+            this.tableLoading = true;
             this.merchBillModal = true;
             var id = name.split("-")[1];
             getSchemeGoodsList(id).then(res => {
-                if(res.data.success){                  
+                if(res.data.success){ 
+                                              
                    this.goodsList = res.data.message;
                 }
                    
                 this.tableLoading = false
+            }).catch(err => {
+                console.log(err)
+                this.tableLoading = false;
             })
         },
 
@@ -615,9 +542,9 @@ export default {
 </script>
 <style scoped>
 .mydesignBody{
+    height: 93vh;
     background: #f2f2f4;
     color: black;
-    /* height: 90vh; */
     font-size: 14px;
     position: relative;
     padding: 104px 60px 20px 60px;
@@ -810,45 +737,7 @@ export default {
     width: 150px;
     color: #666;
 }
-.modal_footer{
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-.modal_footer span:first-child{
-    font-size: 18px;
-    color: #333;
-}
-.modal_footer span:nth-child(2){
-    font-size: 18px;
-    color: #ff9a00;
-    font-weight: 700;
-    margin: 0 20px;
-}
-.print{
-    width: 150px;
-    height: 50px;
-    background: #ff9a00;
-    color: #fff;
-    font-size: 14px;
-    line-height: 50px;
-    text-align: center;
-}
-.merch_bill_title{
-    background: #e4e4e4;
-    line-height: 56px;
-    color:#333;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    text-align: center
-}
-.merch_bill_title li:nth-child(1),.merch_bill_title li:nth-child(3){
-    width: 30%
-}
-.merch_bill_title li:nth-child(1),.merch_bill_title li:nth-child(3){
-    width: 30%
-}
+
 .img-box{
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;

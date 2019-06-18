@@ -1,9 +1,9 @@
 
 <template>
-    <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
+    <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='maxCol||5' class="vueWaterfall">
         <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
             <a href='javascript:;' class="item"  @click="toDetail(item)">
-                <img :src="item.src" alt="加载错误">
+                <img :src="item.src" :lazy-src='item.src' alt="加载错误">
                 <div  class="scheme-img-info">
                     <p class="some-info" :title="item.name">{{item.name}}</p>
                     <p class="some-info">{{item.price?"￥"+item.price:item.time}}</p>
@@ -57,7 +57,6 @@ export default {
     computed:{
         itemWidth(){  
             var width = this.padding*2||120
-            console.log((document.documentElement.clientWidth-width)/5)
             return ((document.documentElement.clientWidth-width)/5)  //计算宽度
         },
     },
