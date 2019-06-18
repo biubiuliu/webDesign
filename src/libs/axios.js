@@ -54,7 +54,7 @@ class HttpRequest {
             // 响应拦截
         instance.interceptors.response.use(res => {
             // 未登录拦截
-            if(res.data.code==0){
+            if(res.data.code==401){
                 router.replace({
                     path: '/login',
                     query: {redirect: router.currentRoute.fullPath}

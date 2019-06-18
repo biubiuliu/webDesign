@@ -191,7 +191,7 @@ export default {
             this.brandLableId=0;
             this.seriesId=0;
             this.page = 1;
-            //this.total = 1;
+           // this.isShowSpin = true;
             this.keywords = '';
             if(index==1){
                 this.getGoodsLabels();
@@ -213,7 +213,6 @@ export default {
 
         // 获取方案
         getMeals(){
-            console.log(1111)
             let params = {
                 style_type:this.styleLableId,
                 space_type:this.spaceLabelId,
@@ -224,7 +223,6 @@ export default {
                 page:this.page,
                 page_size:30
             }
-            console.log('loading',this.loading)
             if(this.loading){
                 return;
             } 
@@ -232,7 +230,7 @@ export default {
             this.loading = true;
             getMeals(params).then(res => {
                 this.loading = false;
-                this.isShowSpin = false
+                this.isShowSpin = false;
                 if(res.data.success){
                     this.total_page = Math.ceil(res.data.message.total/30) ;  
                     if(this.page==1){
@@ -261,6 +259,7 @@ export default {
                 
             }).catch(err => {
                 this.loading = false;
+                this.isShowSpin = false;
                 console.log(err)
             })
         },
@@ -281,6 +280,7 @@ export default {
             } 
             this.loading = true;
             getGoodsList(params).then(res => {
+                this.isShowSpin = false;
                 this.loading = false;
                 if(res.data.success){
                     this.total_page = Math.ceil(res.data.message.total/30) ;  
@@ -306,6 +306,7 @@ export default {
                     this.page = this.page +1;
                 }               
             }).catch(err => {
+                this.isShowSpin = false
                 this.loading = false;
                 console.log(err)
             })
@@ -321,8 +322,6 @@ export default {
                 }
                 this.$store.dispatch('updataProDetailVal', value)
                 this.$router.push({path:'proDetail/'+value.id+'/'+value.type})
-                console.log('img clicked', value)
-                console.log(' vuex', this.proDetailVal)
             }
         },
 
