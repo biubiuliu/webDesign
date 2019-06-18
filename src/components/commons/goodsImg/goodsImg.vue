@@ -1,9 +1,9 @@
 <template>
     <div class="goods_body" >
         <div class="goodsImgBtn"  v-show="this.goodsItem !== null && this.goodsItem.imgs.length !== 0">
-            <Button type='warning' size="small" ghost @click="preImg"><i  class="iconfont iconzuo"></i></Button>
-            <Button type='warning' size="small" ghost @click="nextImg"><i  class="iconfont iconyou"></i></Button>
-            <Button type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
+            <Button type='warning' size="small" ghost @click="preImg"  title="上一张"><i  class="iconfont iconzuo"></i></Button>
+            <Button type='warning' size="small" ghost @click="nextImg"  title="下一张"><i  class="iconfont iconyou"></i></Button>
+            <Button type='warning' size="small" ghost @click="clearGoodsItem"  title="关闭"><i class="iconfont iconguanbi"></i></Button>
         </div>
         <div class="goodsImgBtn">
             <Button v-if="closeGoodsBool" type='warning' size="small" ghost @click="clearGoodsItem"><i class="iconfont iconguanbi"></i></Button>
@@ -109,7 +109,7 @@ export default {
         // 将自定义商品图片渲染到canvas
         selectDecorateGoods(e) {
             this.index = 0
-            // console.log("e.target",e.target)
+            console.log("e.target",e.target)
             const card = this.card
             if (!card) return
             fabric.Image.fromURL(e.target.src, (img) => {
@@ -124,7 +124,7 @@ export default {
                 left: Math.random().toFixed(2)*200+100,
                 top: Math.random().toFixed(2)*200+100,
                 scaleX: 200/img.width, 
-                scaleY: 200/img.height ,
+                scaleY: 200/img.height,
                 src:e.target.src,
                 imgType:2,
                 goods_id: e.target.id,
@@ -144,8 +144,9 @@ export default {
 <style scoped>
 .goodsimg{
     width: 530px;
-    height: 530px;
+    height:530px;
     margin: 0 auto;
+    line-height: 530px;
     background: white;
 }
 .goodsImgBtn{
@@ -158,6 +159,7 @@ export default {
 img{
     cursor: pointer;
     width: 100%;
-    height: 100%;
+    height: auto;
+
 }
 </style>

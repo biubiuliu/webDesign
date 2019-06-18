@@ -22,9 +22,17 @@
             <div class="comm_body" v-if="this.materialBgImgArr">
                 <div class="materialBg_title">
                     <span>素材</span>
-                    <span @click="bgMateial"  class="allCursor">{{isAll?'全部':'取消'}}  <i class="iconfont iconyou"></i> </span>
+                    <span v-if="this.isAll" ></span>
+                    <span @click="bgMateial" v-else class="allCursor" >取消<i class="iconfont iconyou"></i> </span>
                 </div>
-                <ul class="reuseUl">
+               
+                <ul class="reuseUl" v-show="this.isAll">
+                    <li  @click="bgMateial(item)" class="reuseLiCard" v-for="item in materialCardArr" :key='item.id' :class="item.bgColor">
+                        <i :class="item.icon"></i>
+                        <p>{{item.name}}</p>
+                    </li>
+                </ul>
+                 <ul class="reuseUl" v-show="!this.isAll">
                     <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
                         <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
                     </li>
@@ -52,7 +60,7 @@
 <script>
 import { fabric } from 'fabric'
 import {mapState, mapGetters, mapActions} from 'vuex'
-import { getmaterial, getmaterialList } from '@/api/material.js'
+import { getmaterial, getmaterialList} from '@/api/material.js'
 
 export default {
     name: 'materialLib',
@@ -64,6 +72,13 @@ export default {
             goodsBgImgArr:[],
             materialBgImgArr:[],
             isAll:true,
+            materialCardArr:[
+                {name:'图形',id:'1',icon:'iconfont iconjihegeometric12', bgColor:'reuserLibgColor0'},
+                {name:'色卡',id:'2',icon:'iconfont iconzhuti_tiaosepan_o', bgColor:'reuserLibgColor1'},
+                {name:'灯光',id:'3',icon:'iconfont icondengguang', bgColor:'reuserLibgColor2'},
+                {name:'阴影',id:'4',icon:'iconfont iconbackground', bgColor:'reuserLibgColor3'},
+                {name:'透视',id:'5',icon:'iconfont icontoumingdutiaojie', bgColor:'reuserLibgColor4'},
+            ],
             getmaterialData:{
                 is_personal: 0,
                 page: 1,
@@ -75,7 +90,8 @@ export default {
                 total: null, 	      // 总条数
                 per_page: 40,       // 每页多少条
                 current_page: 1 ,  // 当前第几页
-            }
+            },
+
             
         }
     },
@@ -223,11 +239,12 @@ export default {
             this.handleGetgetmaterial(0)
         },
         //bgMateial 全部素材
-        bgMateial(){
+        bgMateial(item){
             window.event? window.event.cancelBubble = true : e.stopPropagation();
             this.isAll = !this.isAll
             if(!this.isAll){
                 this.getmaterialData.type = 1
+                this.getmaterialData.material_type = item.id
                 this.handleGetmaterialList(this.getmaterialData)
                 return;
             }
@@ -314,6 +331,7 @@ export default {
             })
         },
 
+
     },
     
 }
@@ -369,6 +387,32 @@ export default {
     list-style: none;
     margin:10px 0 0 10px
 
+}
+.reuseLiCard{
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+    list-style: none;
+    margin:10px 0 0 10px
+
+}
+.reuserLibgColor0{
+    background: #58BA8B;
+}
+.reuserLibgColor1{
+    background: #678AED;
+}
+.reuserLibgColor2{
+    background: #F8BF34;
+}
+.reuserLibgColor3{
+    background: #5A6D8D;
+}
+.reuserLibgColor4{
+    background: #A08E80;
+}
+.reuseLiCard i{
+    font-size: 30px
 }
 .reuseLi>img{
     width: 70px;

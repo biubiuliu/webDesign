@@ -5,18 +5,18 @@ import home from '@/components/commons/home/home'
 import login from '@/components/commons/login/login'
 import designHome from '@/components/commons/designHome/designHome'
 import Preview from '@/view/Preview/Preview'
-import {getStorage} from '@/libs/util'
+import { getStorage } from '@/libs/util'
 const userInfo = getStorage('userInfo')
-const sessionKey = userInfo&&userInfo.sessionKey?userInfo.sessionKey:'';
+const sessionKey = userInfo && userInfo.sessionKey ? userInfo.sessionKey : '';
 
 Vue.use(Router)
 
- var router = new Router({
+var router = new Router({
     routes: [{
             path: '/',
             redirect: '/home/discover',
             meta: {
-                requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+                requireAuth: true, // 添加该字段，表示进入这个路由是需要登录的
             },
         },
         {
@@ -32,7 +32,7 @@ Vue.use(Router)
                     path: 'discover',
                     name: 'discover',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/discover/discover.vue')
@@ -41,7 +41,7 @@ Vue.use(Router)
                     path: 'mydesign',
                     name: 'mydesign',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/mydesign/mydesign.vue')
@@ -50,7 +50,7 @@ Vue.use(Router)
                     path: 'mycollect',
                     name: 'mycollect',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/mycollect/mycollect.vue')
@@ -59,7 +59,7 @@ Vue.use(Router)
                     path: 'proDetail/:id/:type',
                     name: 'proDetail',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/proDetail/proDetail.vue')
@@ -74,7 +74,7 @@ Vue.use(Router)
                     path: 'materialLib',
                     name: 'materialLib',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/materialLib/materialLib.vue')
@@ -83,7 +83,7 @@ Vue.use(Router)
                     path: 'goodsLib',
                     name: 'goodsLib',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/goodsLib/goodsLib.vue')
@@ -92,7 +92,7 @@ Vue.use(Router)
                     path: 'favorite',
                     name: 'favorite',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/favorite/favorite.vue')
@@ -101,7 +101,7 @@ Vue.use(Router)
                     path: 'uploading',
                     name: 'uploading',
                     meta: {
-                        requireAuth: true,  
+                        requireAuth: true,
                     },
                     component: () =>
                         import ('@/view/uploading/uploading.vue')
@@ -125,18 +125,17 @@ Vue.use(Router)
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.meta.requireAuth) {  // 判断该路由是否需要登录权限
-        if (sessionKey) {  // 通过vuex state获取当前的token是否存在
+    if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
+        if (sessionKey) { // 通过vuex state获取当前的token是否存在
             next();
-        }
-        else {
+        } else {
             next({
                 path: '/login',
-                query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
+                query: { redirect: to.fullPath } // 将跳转的路由path作为参数，登录成功后跳转到该路由
             })
         }
         next();
-    }else {
+    } else {
         next();
     }
 })

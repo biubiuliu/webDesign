@@ -1,5 +1,9 @@
 <template>
     <div class="goodList_body">
+        <div class="goodsSearch">
+            <Input search size="large" v-model="keyworldVal" placeholder="搜索你喜欢的" @on-search="searchGoodsList" />
+        </div>
+        
         <div class="goodsList">
             <div v-for="(item,index) in goodsListArr" :key=index class="goodsTabs" @click="changeGoodsNav(item.id)" :class="{goodsNavActive:goodsNav==item.id}">{{item.title}}</div>
         </div>
@@ -23,9 +27,6 @@
                 v-for="(item,index) in classifyArr" :key="index">
                 {{item.name||item.cat_name}}
                 <div class="brand_lable">
-                    <!-- <li  v-for="(itemSon ,index) in item.son" :key="index"  :label="itemSon.cat_name"   :value="itemSon.cat_id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.id)">
-                        {{m.series_name}}
-                    </li> -->
                     <li v-for="(m,n) in item.son" :key="n" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.cat_id)">
                         {{m.cat_name}}
                     </li>
@@ -37,42 +38,54 @@
             <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
             <div>Loading</div>
         </Spin>
-        <div>
+        <div v-if="this.goodsImgArr.length !== 0">
             <ul class="goodsUl flexLayout">
-                <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,index)"  @mouseleave="mouseleave(item,index)">
+                <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,item.goods_id)"  @mouseleave="mouseleave(item,item.goods_id)">
                     <!-- <span  v-for="(items,index) in item.imgs" :key="index" :id ="items.id" ></span> -->
                     <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失"  >
-                    <div class="iconBox flexLayout">
-                        <div @click="iconshoucang1Fun(index)" ><i  class="iconfont iconshoucang1"></i></div>
-                        <div @click="iconxiazaiFun(index)"><i  class="iconfont iconxiazai"></i></div>
+                    <div class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
+                        <div @click.stop="iconshoucang1Fun(item.goods_id)" ><i  class="iconfont iconshoucang1 collectActive"></i></div>
+                        <div @click.stop="iconxiazaiFun(item,item.goods_id)"><i  class="iconfont iconxiazai"></i></div>
                     </div>
                     
                 </li>
             </ul>
-            <Spin fix v-if="isShowSpin">
+            <!-- <Spin fix v-if="isShowSpin">
                 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                 <div>Loading</div>
-            </Spin>
+            </Spin> -->
+        </div>
+        <div v-else>
+            <br/><br/><br/><br/>
+            <h1>抱歉! 没有搜索到{{this.keyworldVal}}</h1>
         </div>
         <div class="goodsModalBox">
             <Modal
                 title="下载的商品"
                 v-model="goodsLibModal"
+                @on-ok="goodsLibModalOk" 
+                @on-cancel="goodsLibModalCancel"
+                ok-text="下载"
                 :styles="{left: '80px',top: '180px',margin:'0',width:'340px'}">
-                <ul class="flexLayout">
-                    <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index">
-                        <CheckboxGroup v-model="social"  class="checkBoxLeftTop">
-                            <Checkbox :label="index">&nbsp;</Checkbox>
+                <ul class="flexLayout" v-if="goodsImgSonArr.length !== 0">
+                    <li class="goodsLiM" v-for="(item,index) in goodsImgSonArr" :key="index">
+                        <CheckboxGroup v-model="social" @on-change="CheckboxFun(social)" true-value="true"  class="checkBoxLeftTop">
+                            <Checkbox :label="item.pic_image">&nbsp;</Checkbox>
                         </CheckboxGroup>
-                        <img class="goodsImg" :src="item.goods_thumb" alt="图片丢失">
+                        <a :href="item.pic_image" download="image" target="blank">
+                            <img class="goodsImg" :src="item.pic_image" alt="图片丢失">
+                        </a>
                     </li>
                 </ul>
+                    <div v-else>
+                        <h4>抱歉! 暂无相关图片</h4>
+                    </div>
             </Modal>
         </div>
     </div>
 </template>
 <script>
-import { goodsList, category } from '@/api/material.js'
+import { goodsList, category, isCollect } from '@/api/material.js'
 import {mapState, mapGetters, mapActions} from 'vuex'
 export default {
     name: 'goodsLib',
@@ -80,6 +93,7 @@ export default {
         return {
             msg: '这是商品库',
             goodsImgArr:[],
+            goodsImgSonArr:[],
             selsectBrand:[],
             selsectStyle:[],
             selsectClassify:[],
@@ -95,11 +109,20 @@ export default {
             brandLableId:0,// 选择的品牌标签id
             seriesId:0,// 分类下面的系列id
             goodsNav:0,
+            collectionDown:0, // 收藏 下载 id
             goodsListArr:[
                 {title:'品牌',id:'0'},
                 {title:'风格',id:'1'},
                 {title:'分类',id:'2'}
-            ]
+            ],
+            keyworldVal: null , // 搜索关键字
+            // 收藏参数
+            isCollectData:{
+                id: null,//方案 id / 商品id
+                type: 2,	//1：收藏方案 2：收藏商品
+                is_cancel: 0 ,	//0（默认）：收藏 1： 取消收藏
+            },
+            downloadNum:0,
 
         }
     },
@@ -130,10 +153,12 @@ export default {
          * start function
          */
         mouseenter(item,index) {
-
+            this.collectionDown = index
+            // console.log("mouseenter",item, index)
         },
         mouseleave(item,index) {
-
+            this.collectionDown = 0
+            // console.log("mouseleave",item, index)
         },
         goodsImgDownFun(item,index) {
             this.modal9 = true;
@@ -141,10 +166,14 @@ export default {
             this.$store.dispatch("setImgIndex", 0)
         },
         iconshoucang1Fun(index) {
+            this.isCollectData.id = index
+            this.handleGetisCollect(this.isCollectData);
             console.log("收藏", index)
         },
-        iconxiazaiFun(index) {
-            console.log( "下载", index)
+        iconxiazaiFun(item, index) {
+            this.goodsImgSonArr = item.imgs
+            this.goodsLibModal = true;
+            // console.log( "下载", item.imgs, index)
         },
                 // 筛选表签
         changeChooseLableFun (type,id) {
@@ -166,41 +195,80 @@ export default {
                 default:
                     break;
             }
-       },
-    changeChooseSeriesFun (type,id,series_id) {
-           this.brandLableId = id;
-           this.seriesId = series_id
-           this.ChangeClassifyOpt(series_id)
-       },
-       //改变nav
-       changeGoodsNav(id){
-           this.goodsNav = id
-           switch (id) {
-               case 0:
+        },
+        //批量下载
+        　　
+ 
+            　　
+            
+        circularWindow(){ //循环弹窗
+    　　　　setTimeout(()=>{
+    　　　　　　this.jumpDownloadWindow(this.downloadNum);
+    　　　　},500);//次数设置一下延时，不然有的手机会因为反应不过来而出现误差
+    　　},
+        jumpDownloadWindow(i){//弹出下载窗口
+        　　　　var fileFrame = document.createElement("iframe");
+        　　　　fileFrame.src = this.social[i];//文件路径
+        　　　　fileFrame.style.display = "none";
+        　　　　document.body.appendChild(fileFrame);
+        
+        　　　　this.downloadNum++;
+        　　　　if(this.downloadNum!=this.social.length){
+        　　　　　　this.circularWindow();
+    　　　　}
+    
+    　　},
+        download(name, href){
+            var a = document.createElement("a"), //创建a标签           
+                e = document.createEvent("mouseevents"); //创建鼠标事件对象       
+                e.initEvent("click", false, false); //初始化事件对象       
+                a.href = href; //设置下载地址          
+                a.download = name; //设置下载文件名       
+                a.dispatchEvent(e); //给指定的元素，执行事件click事件    
+        },
+        CheckboxFun(params){
+            console.log("批量下载选中", params)
+        },
+        goodsLibModalOk(){
+            //方法执行次数
+            // this.circularWindow(this.downloadNum);
+            for (let index = 0; index < this.social.length; index++) {
+                this.download( index + '.jpg', this.social[index]);
+                alert("ok ",this.social[index] )
+            }
+            
+        },
+        goodsLibModalCancel(){
+            this.social = []
+            console.log("关闭 ")
+        },
+        changeChooseSeriesFun (type,id,series_id) {
+            this.brandLableId = id;
+            this.seriesId = series_id
+            this.ChangeClassifyOpt(series_id)
+        },
+        //改变nav
+        changeGoodsNav(id){
+            this.goodsNav = id
 
-                   break;
-               case 1:
-
-                   break;
-               case 2:
-
-                   break;
-           
-               default:
-                   break;
-           }
-       },
+        },
+        //搜索商品
+        searchGoodsList(){
+            this.getGoods.keywords = this.keyworldVal
+            this.handlegoodsList(this.getGoods)
+            console.log('keyworldVal',this.keyworldVal)
+        },
         //品牌列表改变
         ChangebrandOpt(value){
             this.getGoods.brand_id = value
             this.handlegoodsList(this.getGoods)
         },
-         //风格列表改变
+            //风格列表改变
         ChangeStyleOpt(value){
             this.getGoods.style_id = value
             this.handlegoodsList(this.getGoods)
         },
-         //分类列表改变
+            //分类列表改变
         ChangeClassifyOpt(value){
             this.getGoods.category_id = value
             this.handlegoodsList(this.getGoods)
@@ -229,6 +297,14 @@ export default {
                 console.log( err)
             })
         },
+        //收藏
+        handleGetisCollect(data){
+            isCollect(data).then( res => {
+                console.log(res)
+            }).catch( err => {
+                console.log(err)
+            })
+        }
         /**
          * end api
          */
@@ -242,15 +318,34 @@ export default {
     justify-content:space-around;
     width: 100%;
     border-bottom: 1px solid #666;
-    padding: 20px 0;
+    padding: 10px 0 0 10px;
     cursor: pointer;
+}
+.goodsSearch{
+    width: 100%;
+    height: auto;
+    padding: 20px  30px 0;
 }
 .goodsNavActive{
     color: #f90;
     border-bottom: 1px solid #f90;
 }
+.collectActive{
+    color: #f90;
+}
+.collectionDownActive{
+    display: flex  !important;
+    flex-direction: row  !important;
+    justify-content: space-between  !important;
+    flex-wrap: wrap  !important;
+    width: 100%;
+    cursor: pointer;
+    position: absolute;
+    padding: 0 5px;
+    top: 5px;
+}
 .goodsTabs{
-    font-size: 20px;
+    font-size: 18px;
     height: 50px;
     line-height: 50px;
     flex: 1;
@@ -271,7 +366,7 @@ export default {
 .flexLayout{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-around;
     flex-wrap: wrap;
 }
 .goodsUl{
@@ -283,11 +378,19 @@ export default {
     margin-top: 10px;
     background: white
 }
+.goodsLiM{
+    position: relative;
+    margin-top: 10px;
+    background:#F8F8F8;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+}
 .iconBox{
     width: 100%;
+    cursor: pointer;
     position: absolute;
     padding: 0 5px;
     top: 5px;
+    display: none;
 }
 i{
     font-size: 10px
@@ -341,7 +444,7 @@ i{
 .brand_lable{
     position: absolute;
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: -5px 1px 3px rgba(0, 0, 0, 0.3);
     left: 0;
     top: 32px;
     width: 100%;
@@ -352,14 +455,14 @@ i{
     word-wrap:break-word;
     line-height: 30px;
     width: 100%;
+    
 }
 .vertical{
     margin: 0;
+    padding: 0px 20px;
+    text-align: left
 }
-.vertical span{
-    font-size: 12px;
-    color: #333;
-}
+
 .choose{
     background-color: #ff9a00;
     color: #fff;
