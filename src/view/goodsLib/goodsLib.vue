@@ -22,15 +22,19 @@
             </Button>
         </div>
         <div class="vertical" v-show="goodsNav == 2">
-            <Button class="roomlabel" @click="changeChooseLableFun(2,0)" :class="{choose:spaceLabelId==0}">全部</Button>
-            <Button class="roomlabel" @click="changeChooseLableFun(2,item.id||item.cat_id)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
-                v-for="(item,index) in classifyArr" :key="index">
+            <Button class="roomlabel" @click="changeChooseLableFun(2,0,null)" :class="{choose:spaceLabelId==0}">全部</Button>
+            <Button class="roomlabel" @click="changeChooseLableFun(2,item.id||item.cat_id,item)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
+                v-for="(item,index) in classifyArr" :key="index" v-show="isClassifySon" >
                 {{item.name||item.cat_name}}
-                <div class="brand_lable">
+                <!-- <div class="brand_lable">
                     <li v-for="(m,n) in item.son" :key="n" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.cat_id)">
                         {{m.cat_name}}
                     </li>
-                </div>
+                </div> -->
+                
+            </Button>
+            <Button v-show="!isClassifySon" class="roomlabel" v-for="m in classifySonArr" :key="m.cat_id" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,m.parent_id,m.cat_id)">
+                {{m.cat_name}}
             </Button>
         </div>
 
@@ -87,6 +91,7 @@
 <script>
 import { goodsList, category, isCollect } from '@/api/material.js'
 import {mapState, mapGetters, mapActions} from 'vuex'
+import { constants } from 'fs';
 export default {
     name: 'goodsLib',
     data() {
@@ -101,6 +106,7 @@ export default {
             styleArr:[],
             classifyArr:[],
             classifySonArr:[],
+            isClassifySon:true,
             goodsLibModal: false,
             social:[],
             getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null},
@@ -176,7 +182,7 @@ export default {
             // console.log( "下载", item.imgs, index)
         },
                 // 筛选表签
-        changeChooseLableFun (type,id) {
+        changeChooseLableFun (type,id,item) {
             console.log("0.0",type,id)
             switch (type) {
                 case 0:
@@ -190,6 +196,13 @@ export default {
                 case 2:
                     this.spaceLabelId=id; 
                     this.seriesId = 0;
+                    console.log("沙发 ",item)
+                    if(id === 0 ){
+                        this.isClassifySon = true
+                    }else{
+                        this.isClassifySon = false
+                        this.classifySonArr = item.son
+                    }
                     this.ChangeClassifyOpt(id)
                     break;
                 default:
@@ -272,6 +285,7 @@ export default {
         ChangeClassifyOpt(value){
             this.getGoods.category_id = value
             this.handlegoodsList(this.getGoods)
+            // console.log("分类",value)
         },
         /**
          * end function
@@ -281,7 +295,7 @@ export default {
             let getGoods2 = this.getGoods
             goodsList(getGoods2.page, getGoods2.style_id, getGoods2.keywords, getGoods2.brand_id, getGoods2.category_id).then(res=>{
                 this.goodsImgArr = res.data.message.data
-                // console.log('------------------', res)
+                // console.log('------------------', this.goodsImgArr)
                 
             }).catch(err=>{
                 console.log( err)
@@ -293,6 +307,7 @@ export default {
                 this.brandArr = res.data.message.brand
                 this.styleArr = res.data.message.style
                 this.classifyArr = res.data.message.category
+                // this.classifySonArr = res.data.message.category
             }).catch(err=>{
                 console.log( err)
             })
