@@ -1,9 +1,13 @@
 <template>
     <div class="goodList_body">
+        <!-- v-if="this.$store.state.app.isShowSpin" -->
+        <Spin class="spin" fix  v-if="this.$store.state.app.isShowSpin">
+            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+            <div>Loading</div>
+        </Spin>
         <div class="goodsSearch">
             <Input search size="large" v-model="keyworldVal" placeholder="搜索你喜欢的" @on-search="searchGoodsList" />
         </div>
-        
         <div class="goodsList">
             <div v-for="(item,index) in goodsListArr" :key=index class="goodsTabs" @click="changeGoodsNav(item.id)" :class="{goodsNavActive:goodsNav==item.id}">{{item.title}}</div>
         </div>
@@ -26,38 +30,36 @@
             <Button class="roomlabel" @click="changeChooseLableFun(2,item.id||item.cat_id,item)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
                 v-for="(item,index) in classifyArr" :key="index" v-show="isClassifySon" >
                 {{item.name||item.cat_name}}
-                <!-- <div class="brand_lable">
-                    <li v-for="(m,n) in item.son" :key="n" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.cat_id)">
-                        {{m.cat_name}}
-                    </li>
-                </div> -->
-                
             </Button>
             <Button v-show="!isClassifySon" class="roomlabel" v-for="m in classifySonArr" :key="m.cat_id" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,m.parent_id,m.cat_id)">
                 {{m.cat_name}}
             </Button>
         </div>
 
-        <Spin fix v-if="this.$store.state.app.isShowSpin">
-            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-            <div>Loading</div>
-        </Spin>
+        
         <div v-if="this.goodsImgArr.length !== 0">
             <ul class="goodsUl flexLayout">
                 <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,item.goods_id)"  @mouseleave="mouseleave(item,item.goods_id)">
-                    <!-- <span  v-for="(items,index) in item.imgs" :key="index" :id ="items.id" ></span> -->
                     <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失"  >
-                    <div class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
-                        <div @click.stop="iconshoucang1Fun(item.goods_id)" ><i  class="iconfont iconshoucang1 collectActive"></i></div>
+                    <div v-if="!uploadData.goods_img" class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
+                        <div @click.stop="iconshoucang1Fun(item.goods_id,item.is_collect)" >
+                            {{item.is_collect}}
+                            <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
+                            <i v-else class="iconfont iconshoucang1"></i>
+                        </div>
                         <div @click.stop="iconxiazaiFun(item,item.goods_id)"><i  class="iconfont iconxiazai"></i></div>
+                    </div>
+                    <div v-if="uploadData.goods_img"  class="iconBoxSingel">
+                        <div @click.stop="changeRadio(item.goods_id)" >
+                            <RadioGroup v-model="uploadSingle">
+                                <Radio :label="item.goods_id">&nbsp;</Radio>
+                            </RadioGroup>
+                        </div>
                     </div>
                     
                 </li>
             </ul>
-            <!-- <Spin fix v-if="isShowSpin">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
-            </Spin> -->
+            <Button v-if="this.uploadData.goods_img" class="confirmBtn" @click="confirmUpload" type="warning">确定</Button>
         </div>
         <div v-else>
             <br/><br/><br/><br/>
@@ -89,7 +91,7 @@
     </div>
 </template>
 <script>
-import { goodsList, category, isCollect } from '@/api/material.js'
+import { goodsList, category, isCollect, customGoods } from '@/api/material.js'
 import {mapState, mapGetters, mapActions} from 'vuex'
 import { constants } from 'fs';
 export default {
@@ -129,6 +131,13 @@ export default {
                 is_cancel: 0 ,	//0（默认）：收藏 1： 取消收藏
             },
             downloadNum:0,
+            uploadSingle:'',
+            uploadData:{
+                goods_id: null,
+                is_personal:this.$route.query.is_personal,
+                goods_img:this.$route.query.url,
+                
+            },
 
         }
     },
@@ -171,10 +180,21 @@ export default {
             this.$store.dispatch("setGoodsItem", item)
             this.$store.dispatch("setImgIndex", 0)
         },
-        iconshoucang1Fun(index) {
+        iconshoucang1Fun(index,is_collect) {
             this.isCollectData.id = index
+            is_collect == 0 ? this.isCollectData.is_cancel = 1 : this.isCollectData.is_cancel = 0
             this.handleGetisCollect(this.isCollectData);
-            console.log("收藏", index)
+            console.log("is_collect", is_collect)
+            console.log("收藏", this.isCollectData.is_cancel)
+        },
+        changeRadio(index){
+            console.log("选中", index)
+            this.uploadData.goods_id = index,
+            console.log("选中穿过来得参数", this.uploadData)
+        },
+        //确定上传自定义
+        confirmUpload(){
+            this.handleCustomGoods(this.uploadData)
         },
         iconxiazaiFun(item, index) {
             this.goodsImgSonArr = item.imgs
@@ -210,10 +230,7 @@ export default {
             }
         },
         //批量下载
-        　　
- 
-            　　
-            
+
         circularWindow(){ //循环弹窗
     　　　　setTimeout(()=>{
     　　　　　　this.jumpDownloadWindow(this.downloadNum);
@@ -315,6 +332,20 @@ export default {
         //收藏
         handleGetisCollect(data){
             isCollect(data).then( res => {
+                // console.log(res)
+            }).catch( err => {
+                console.log(err)
+            })
+        },
+        //上传自定义图片
+        handleCustomGoods(data){
+            customGoods(data).then( res => {
+                if(res.data.success){
+                    this.$router.push({  
+                        path: 'goodsLib',           
+                    })
+                    this.uploadData = {}
+                }
                 console.log(res)
             }).catch( err => {
                 console.log(err)
@@ -328,6 +359,9 @@ export default {
 }
 </script>
 <style scoped>
+.spin{
+    height: 100%;
+}
 .goodsList{
     display:flex;
     justify-content:space-around;
@@ -398,6 +432,27 @@ export default {
     margin-top: 10px;
     background:#F8F8F8;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+}
+.iconBoxSingel /deep/ .ivu-radio-inner{
+    border:1px solid #f90
+}
+.iconBoxSingel /deep/ .ivu-radio-inner:after{
+   background-color:  #f90
+}
+.confirmBtn{
+    position: fixed;;
+    left: 90px;
+    bottom: 0;
+    width: 320px
+}
+.iconBoxSingel{
+    width: 25%;
+    height: 25%;
+    cursor: pointer;
+    position: absolute;
+    padding: 0 5px;
+    top: 5px;
+    left: 0;
 }
 .iconBox{
     width: 100%;

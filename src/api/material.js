@@ -25,14 +25,10 @@ export const getSaveScheme = (imgObject) => {
         })
     }
     //上传自定义图片
-export const customGoods = (data) => {
+export const customGoods = (uploadData) => {
         return axios.request({
             url: '/api/v1/add/customGoods',
-            data: {
-                goods_id,
-                goods_img,
-                is_personal
-            },
+            data: uploadData,
             method: 'post',
         })
     }
