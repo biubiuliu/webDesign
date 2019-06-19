@@ -168,13 +168,13 @@ export default {
             }
 
             backgroundImg(data).then(res => {
-               if(res.data.success){
-                    this.$Message.success('移动成功')
-                    var index =  this.uploadSrcArr.indexOf(img_url);
-                    this.uploadSrcArr.splice(index, 1);
-               }else{
-                   this.$Message.error(res.data.message);
-               }
+                if(res.data.success){
+                        this.$Message.success('移动成功')
+                        var index =  this.uploadSrcArr.indexOf(img_url);
+                        this.uploadSrcArr.splice(index, 1);
+                }else{
+                    this.$Message.error(res.data.message);
+                }
             })
         },
 
@@ -186,13 +186,13 @@ export default {
             }
 
             addMaterial(data).then(res => {
-               if(res.data.success){
+                if(res.data.success){
                     this.$Message.success('移动成功')
                     var index =  this.uploadSrcArr.indexOf(img_url);
                     this.uploadSrcArr.splice(index, 1);
-               }else{
+                }else{
                     this.$Message.error(res.data.message);
-               }
+                }
             })
         },
     }, 

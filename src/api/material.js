@@ -84,9 +84,25 @@ export const getEnumList = () => {
 
 // 添加素材
 export const addMaterial = (params) => {
+        return axios.request({
+            url: '/api/v1/add/materialInfo',
+            data: params,
+            method: 'post',
+        })
+    }
+    // 收藏
+export const isCollect = (params) => {
+        return axios.request({
+            url: '/api/v1/add/collect',
+            method: 'post',
+            data: params
+        })
+    }
+    // 收藏列表
+export const getCollectList = (data) => {
     return axios.request({
-        url: '/api/v1/add/materialInfo',
-        data: params,
-        method: 'post',
+        url: '/api/v1/get/collectList',
+        method: 'get',
+        params: data,
     })
 }
