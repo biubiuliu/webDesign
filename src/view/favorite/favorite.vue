@@ -33,10 +33,10 @@ export default {
         return {
             msg: '这是收藏',
             keyworldVal:'',
-            favoriteNav:1,
+            favoriteNav:2,
             favoriteListArr:[
-                {title:'商品收藏',id:'1'},
-                {title:'方案收藏',id:'2'},
+                {title:'商品收藏',id:'2'},
+                {title:'方案收藏',id:'1'},
             ],
             collectListData:{
                 type: 2,//	1：方案图片列表 2：商品图片列表

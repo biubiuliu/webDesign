@@ -74,9 +74,7 @@ export default {
             file: null,
             changehide:0,
             uploadSrcArr:[],
-            headers:{
-
-            }
+            headers:{},
         }
     },
     created() {
@@ -93,6 +91,9 @@ export default {
                 sign : md5(login_server+sessionKey+timestamp+randNumber)
             }
         }    
+    },
+    updated() {
+        
     },
     methods: {
         // mouseenter:鼠标移入元素范围内触发，该事件不冒泡，即鼠标移到其后代元素上时不会触发。
@@ -130,7 +131,7 @@ export default {
                 case 'custom':
                     this.$router.push({  
                         path: 'goodsLib',     
-                        params: { 
+                        query: { 
                             is_personal:0,  
                             url: img,                             
                         }            
@@ -148,7 +149,7 @@ export default {
                 case 'custom-personal':
                     this.$router.push({  
                         path: 'goodsLib',     
-                        params: {  
+                        query: {  
                             is_personal:1,  
                             url: img,                            
                         }            
