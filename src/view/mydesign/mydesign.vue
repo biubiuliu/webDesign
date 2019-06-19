@@ -28,6 +28,7 @@
                 新建文件
             </Button>
         </div>
+        <!-- 列表 -->
         <div style="z-index:99;width:100%;margin: 20px auto;">
             <Waterfall id='vueWaterfall' @loadmore="handleGetList" :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
                  <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
@@ -37,18 +38,18 @@
                             <p class="some-info" :title="item.name">{{item.name}}</p>
                             <p class="some-info">{{item.time}}</p>
                         </div>
-                        <div class="mask">
+                        <a class="mask">
                             <div style="position:relative">
-                                <a class="midify" href="javascript:;" @click="toDetail(item)">
+                                <a class="midify" href="javascript:;" @click.stop="toDetail(item)">
                                     <i class="iconfont iconiconset0137"></i>
                                 </a>
-                                <a href="javascript:;"  @click="del(item.id,item.name)">
+                                <a href="javascript:;"  @click.stop="del(item.id,item.name)">
                                     <i class="iconfont iconshanchu"></i>
                                 </a>
-                                <a href="javascript:;" @click="copy(item)">
+                                <a href="javascript:;" @click.stop="copy(item)">
                                     <i class="iconfont iconfuzhi1"></i>
                                 </a>                                 
-                                <Dropdown trigger="click"  @on-click="operation" style=" position: absolute;right: 63px;top: 100px;z-index:99">
+                                <Dropdown trigger="click" @on-click="operation" style=" position: absolute;right: 63px;top: 100px;z-index:99">
                                     <a href="javascript:;">
                                         <i class="iconfont icongengduo"></i>
                                     </a>
@@ -71,19 +72,20 @@
                                     </DropdownMenu>
                                 </Dropdown>                               
                             </div>
-                        </div>
+                        </a>
                      </div>                   
                  </WaterfallItem>
             </Waterfall>      
             <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div>
             <div class="no-scheme"  v-if="!imgsArr.length">没有设计哦，快去设计吧~</div>
         </div>
+        <!-- 修改方案 -->
         <Modal
             v-model="shemeInfoModal"
             title="修改方案"          
-            @on-ok="shemeInfoModalok">
-           <Form :model="shemeInfo" >
-                <FormItem>
+        >
+           <Form :model="shemeInfo" ref="shemeInfo" :rules="ruleInline">
+                <FormItem prop="scheme_name">
                     <Input v-model="shemeInfo.scheme_name" placeholder="填写方案名称"></Input>
                 </FormItem>
                 <FormItem>
@@ -100,18 +102,36 @@
                         </Col>
                     </Row>
                 </FormItem>
-                <FormItem>
+                <FormItem prop="phone">
                     <Input v-model="shemeInfo.phone" placeholder="填写客户手机号"></Input>
                 </FormItem>
-                <FormItem>
+                <FormItem prop="address">
                     <Input v-model="shemeInfo.address" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="填写客户楼盘地址"></Input>
                 </FormItem>
             </Form>
+            <div slot="footer">
+                <Button type="primary" style="background:#f90;border-color: #f90"  @click="shemeInfoModalok('shemeInfo')">确定</Button>
+                <Button @click="cancel('shemeInfo')">取消</Button>
+            </div>
         </Modal>
+        <!-- 添加文件夹 -->
+        <Modal  v-model="addDirModal" title="添加文件夹" :mask-closable='false'>
+             <Form :model="addDir" ref="addDir" :rules="dirRule">
+                <FormItem prop="add_dir_name">
+                    <Input v-model="addDir.add_dir_name" placeholder="填写文件名称"></Input>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="primary" style="background:#f90;border-color: #f90"  @click="addDirOk('addDir')">确定</Button>
+                <Button @click="cancel('addDir')">取消</Button>
+            </div>
+        </Modal>  
+        <!-- 清单 -->
         <goodsMerchBill :visible='merchBillModal' :data='goodsList' :loading='tableLoading' v-on:visible="changeVisible"/>
+        <!-- loading -->
         <Spin fix v-if="isShowSpin">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
+            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+            <div>Loading</div>
         </Spin>
      </div>   
 </template>
@@ -131,6 +151,15 @@ export default {
         goodsMerchBill
     },
     data() {
+        const validatePhone = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('手机号不能为空'));
+            } else if (!/^1[34578]\d{9}$/.test(value)) {
+                callback('手机号格式不正确');
+            } else {
+                callback();
+            }   
+        };
         return {
             msg: '这是我的设计ss',
             layout:{
@@ -146,7 +175,7 @@ export default {
             },
             distance:100,
             sortSelectList:[
-                {title:"排序",id:0},
+                // {title:"排序",id:0},
                 {title:"最新修改",id:"updated_at|desc"},
                 {title:"最新创建",id:"created_at|desc"},
             ],
@@ -154,8 +183,7 @@ export default {
             moveDirList:[],      
             sortLi:0, // 排序筛选
             dirLi:0, // 文件夹筛选
-            modal:false,// 新建文件弹框
-            add_dir_name:'',
+            modal:false,// 新建文件弹框           
             imgsArr: [],
             page:1, 
             total_page:1,
@@ -169,6 +197,26 @@ export default {
                 style_type: null, // 风格类型
                 phone: "", // 手机
                 address: "", //	地址
+            },
+            ruleInline: {
+                    scheme_name: [
+                        { required: true, message: '请输入方案名称', trigger: 'blur' }
+                    ],
+                    phone: [
+                        { required: true,validator:validatePhone,trigger:'blur'},            
+                    ],
+                    address:[
+                         { required: true, message: '请输入地址', trigger: 'blur' },
+                    ],
+            },
+            addDirModal:false,
+            addDir:{
+                add_dir_name:''
+            },
+            dirRule: {
+                add_dir_name: [
+                    { required: true, message: '请输入文件名称', trigger: 'blur' }
+                ],
             },
             goodsList:[],          
             merchBillModal:false, // 商品清单的modal  
@@ -315,15 +363,16 @@ export default {
         },
 
         // 添加文件
-        addDir (name) {
+        addDirFun (name) {
             addSchemeDir(name).then(res => {
                 if(res.data.success){
                     this.$Message.success('添加成功');
-                    this.add_dir_name = '';
+                    this.addDir.add_dir_name = '';
+                    this.addDirModal = false;
                     this.getDir()
                 }else{
                     this.$Message.error(res.data.message); 
-                    this.add_dir_name = ''
+                    //this.add_dir_name = ''
                 }
             })
         },
@@ -338,30 +387,53 @@ export default {
             window.open(href, '_blank')     
         },
 
+        toProDetail(item){
+            this.$store.dispatch('updataProDetailVal', item)
+            
+            const {href} = this.$router.resolve({
+                path: 'proDetail/'+item.id+'/'+item.type,            
+            })
+            window.open(href, '_blank')
+        },
+
         // 修改方案信息确定
-        shemeInfoModalok () {         
-            console.log(this.shemeInfo) 
-            let params = {
-                id:this.shemeInfo.id,
-                scheme_name:this.shemeInfo.scheme_name,
-                space_type:this.shemeInfo.space_type,
-                style_type:this.shemeInfo.style_type,
-                phone:this.shemeInfo.phone,
-                address:this.shemeInfo.address
-            } 
-            modifySchemeInfo(params).then(res=>{
-                if(res.data.success){
-                    this.$Message.success(res.data.message);
-                    this.imgsArr.map((item) => {
-                        item.name = item.id == this.shemeInfo.id? 
-                        this.shemeInfo.scheme_name:item.name;
-                        item.type=1;
-                    })                 
-                }else{
-                    this.$Message.error(res.data.message);
-                }
+        shemeInfoModalok (name) {         
+             this.$refs[name].validate((valid) => {
+                 console.log(valid)
+                    if (valid) {
+                       let params = {
+                            id:this.shemeInfo.id,
+                            scheme_name:this.shemeInfo.scheme_name,
+                            space_type:this.shemeInfo.space_type,
+                            style_type:this.shemeInfo.style_type,
+                            phone:this.shemeInfo.phone,
+                            address:this.shemeInfo.address
+                        } 
+                        modifySchemeInfo(params).then(res=>{
+                            if(res.data.success){
+                                this.$Message.success(res.data.message);
+                                this.imgsArr.map((item) => {
+                                    item.name = item.id == this.shemeInfo.id? 
+                                    this.shemeInfo.scheme_name:item.name;
+                                    item.type=1;
+                                })                 
+                            }else{
+                                this.$Message.error(res.data.message);
+                            }
+                            this.shemeInfoModal = false
+                        })    
+                    }
+                })                
+        },
+
+        cancel (name) {
+            this.$refs[name].resetFields();
+            if(name=='shemeInfo'){
                 this.shemeInfoModal = false
-            })         
+            }else{
+                this.addDirModal = false
+            }
+            
         },
 
         // 删除方案
@@ -381,7 +453,7 @@ export default {
                         //this.$Message.info('Clicked cancel');
                     }
             });
-        },
+        }, 
 
         // 拷贝
         copy (item) {
@@ -513,37 +585,24 @@ export default {
         },
 
         // 弹框
-        handleRender () {
-            this.$Modal.confirm({
-                render: (h) => {
-                    return h('Input', {
-                        props: {
-                            value: this.add_dir_name,
-                            autofocus: true,
-                            placeholder: '请输入文件夹名称'
-                        },
-                        on: {
-                            input: (val) => {
-                                this.add_dir_name = val;
-                            }
-                        }
-                    })
-                },
-                onOk: () =>{
-                   this.addDir(this.add_dir_name)
-                },
-                onCancel: () =>{
-                   this.add_dir_name = ""
+        addDirOk(name){
+            this.$refs[name].validate((valid) => {
+                if (valid) {
+                    this.addDirFun(this.addDir.add_dir_name)
                 }
             })
         },
+
+        handleRender(){
+            this.addDirModal = true
+        }
     },  
 }
 </script>
 <style scoped>
 .mydesignBody{
     height: 93vh;
-    background: #f2f2f4;
+    background: #fff;
     color: black;
     font-size: 14px;
     position: relative;
@@ -555,7 +614,7 @@ export default {
     left: 0;
     right: 0;
     z-index: 1; 
-    background: #f2f2f4;
+    background: #fff;
 }
 .flex{
     display: flex;
@@ -683,8 +742,12 @@ export default {
     position: relative;
     border-radius:4px;
     overflow: hidden;
-    box-shadow:0 1px 4px rgba(6,31,50,.12)
+    box-shadow:0 1px 4px rgba(6,31,50,.2);
+    border: 1px none #444;
 }
+/* .item:hover{
+    box-shadow: 0 1px 5px rgba(6, 31, 50, .2);
+} */
 .mask{
     display:none;
     position: absolute;
@@ -692,7 +755,7 @@ export default {
     left: 0;
     bottom: 0;
     right: 0;
-    background: rgba(0,0,0,0.2)
+    background: rgb(41,48,54,0.12)
 }
 .item:hover .mask{
    display:block;

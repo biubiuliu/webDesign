@@ -6,8 +6,6 @@ import login from '@/components/commons/login/login'
 import designHome from '@/components/commons/designHome/designHome'
 import Preview from '@/view/Preview/Preview'
 import {getStorage} from '@/libs/util'
-const userInfo = getStorage('userInfo')
-const sessionKey = userInfo&&userInfo.sessionKey?userInfo.sessionKey:'';
 
 Vue.use(Router)
 
@@ -15,9 +13,6 @@ Vue.use(Router)
     routes: [{
             path: '/',
             redirect: '/home/discover',
-            meta: {
-                requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-            },
         },
         {
             path: '/login',
@@ -126,10 +121,11 @@ Vue.use(Router)
 
 router.beforeEach((to, from, next) => {
     if (to.meta.requireAuth) {  // 判断该路由是否需要登录权限
-        if (sessionKey) {  // 通过vuex state获取当前的token是否存在
+        const userInfo = getStorage('userInfo')
+        const sessionKey = userInfo&&userInfo.sessionKey?userInfo.sessionKey:'';
+        if (sessionKey) {  
             next();
-        }
-        else {
+        }else {
             next({
                 path: '/login',
                 query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由

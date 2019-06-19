@@ -18,14 +18,14 @@
                     <goods-img v-show="this.goodsItem"></goods-img>
                 </div>
             </div>
-            <!-- <div class="block" id="routerVR" v-if="isShowRNav">
+            <div class="block" id="routerVR" v-if="isShowRNav&&this.goodsItem">
                 <div class="drawers_bodyR" id="trolR">
-                    <router-view class="drawers_div" ></router-view>
+                    <goods-info :id="this.goodsItem.goods_id"/>
                     <div class="drawes_trolR">
                         <div class="btn_drawerR" @click="drawerTrolR"><i id="AliconR" :class="rightIcon"></i></div>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
     </div>
 </template>
@@ -41,6 +41,8 @@ import goodsLib from '@/view/goodsLib/goodsLib'
 import favorite from '@/view/favorite/favorite'
 import uploading from '@/view/uploading/uploading'
 
+// 商品信息
+import goodsInfo from  '@/components/commons/goodsInfo/goodsInfo'
 
 import {mapState} from 'vuex'
 export default {
@@ -55,7 +57,8 @@ components: {
     materialLib,
     goodsLib,
     favorite,
-    uploading
+    uploading,
+    goodsInfo
 },
     watch: {
         $route(to) {
@@ -112,8 +115,8 @@ components: {
             var routerVR = document.getElementById('routerVR')
             var AliconR = document.getElementById('AliconR')
             if(this.buttonControlR !==false){
-                trolR.style.width = '400px';
-                routerVR.style.width = '400px';
+                trolR.style.width = '320px';
+                routerVR.style.width = '320px';
                 this.rightIcon = 'iconfont iconyou '
             }else{
                 trolR.style.width = '0px';
@@ -154,7 +157,7 @@ components: {
     margin: 60px  0px 0 0;
     position: fixed;
     right: 0px;
-    width: 400px;
+    width: 320px;
     height: 100%;
     transition-property:width;
     transition-duration:.5s;

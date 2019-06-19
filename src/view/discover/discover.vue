@@ -520,7 +520,7 @@ export default {
 .waterfall{
      /* height:100vh;  */
     /* overflow: hidden; */
-    /* background: #fff; */
+    background: #fff;
 }
 .discoverTitle{
     font-size: 30px;

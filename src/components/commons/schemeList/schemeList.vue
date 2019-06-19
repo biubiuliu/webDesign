@@ -3,7 +3,9 @@
     <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='maxCol||5' class="vueWaterfall">
         <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
             <a href='javascript:;' class="item"  @click="toDetail(item)">
-                <img :src="item.src" :lazy-src='item.src' alt="加载错误">
+                <div style="background:#f2f2f2">
+                    <img :src="item.src" :lazy-src='item.src' alt="加载错误">
+                </div>
                 <div  class="scheme-img-info">
                     <p class="some-info" :title="item.name">{{item.name}}</p>
                     <p class="some-info">{{item.price?"￥"+item.price:item.time}}</p>
@@ -149,7 +151,10 @@ export default {
     border-radius:4px;
     overflow: hidden;
     background: #f6f6f6;
-    box-shadow:0 1px 4px rgba(6,31,50,.12)
+    box-shadow:0 1px 4px rgba(6,31,50,.2)
+}
+.item:hover{
+    box-shadow: 0 1px 5px rgba(6, 31, 50, .3);
 }
 .collect_box{
     display: none;
