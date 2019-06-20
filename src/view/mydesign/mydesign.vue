@@ -242,9 +242,11 @@ export default {
         window.addEventListener('scroll', this.handleScroll)
     },
     methods: {
+        
         changeVisible (event) {
             this.merchBillModal = event
         },
+
         handleScroll() {
             // 变量scrollTop是滚动条滚动时，距离顶部的距离
        		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
