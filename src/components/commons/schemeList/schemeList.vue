@@ -58,8 +58,9 @@ export default {
     },
     computed:{
         itemWidth(){  
-            var width = this.padding*2||120
-            return ((document.documentElement.clientWidth-width)/5)  //计算宽度
+            var width = this.padding*2||120;
+            var num = this.maxCol? this.maxCol:5;
+            return ((document.documentElement.clientWidth-width)/num)  //计算宽度
         },
     },
     created() {

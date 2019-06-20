@@ -757,7 +757,7 @@ export default {
     left: 0;
     bottom: 0;
     right: 0;
-    background: rgb(41,48,54,0.12)
+    background: rgb(0,0,0,0.12)
 }
 .item:hover .mask{
    display:block;

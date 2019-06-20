@@ -25,7 +25,7 @@
                 <div class="discoverTitle" v-if="goods_list.length">
                     <div>单品列表</div>
                     <div class="parent">                         
-                        <schemeList :imgsArr='goods_list' :padding='padding' :showCollect='true' :isPro='true' />
+                        <schemeList :imgsArr='goods_list' :padding='padding' :showCollect='true' :isPro='true'/>
                     </div>
                 </div>
             </div>
@@ -102,6 +102,7 @@ export default {
         return {
             msg: '方案详情页',
             padding:60,
+            maxCol:6,
             selectList:[
                 {title:"方案",id:"1"},
                 {title:"单品",id:"2"},

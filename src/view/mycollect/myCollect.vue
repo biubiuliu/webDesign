@@ -281,6 +281,9 @@ export default {
 }
 .col_checkbox{ 
     margin-top: 10px;
+    padding-top: 10px;
+    max-height: 400px;
+    overflow-y: scroll;
 }
 .col_checkbox label{ 
     margin-right: 10px;
