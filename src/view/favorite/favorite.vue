@@ -9,7 +9,7 @@
         <div class="comm_body">
             <ul class="reuseUl">
                 <li class="reuseLi" v-for="item in goodsCollectArr"  :key="item.id" >
-                    <img :src="item.img_url" alt="图片丢失" :id="item.id">
+                    <img :src="item.img_url" alt="图片丢失" :id="item.id"  @click="selectDecorateGoods"  crossorigin="anonymous">
                 </li>
             </ul>
         </div>
@@ -21,14 +21,24 @@
 </template>
 <script>
 import { getCollectList } from '@/api/material.js'
-import {mapState } from 'vuex'
+import {mapState, mapGetters, mapActions} from 'vuex'
 export default {
     name: 'favorite',
-    ...mapState({
-        isShowSpin: state =>{
+    computed: {
+        ...mapState({
+            isShowSpin: state =>{
             return state.app.isShowSpin
-        },
-    }),
+            },
+            schemeId: state =>{
+            return state.app.schemeId
+            },
+        }),
+        ...mapGetters([
+            'card',
+            'selectedObj',
+            'setGoodsItem',
+        ]),
+    },
     data() {
         return {
             msg: '这是收藏',
@@ -50,6 +60,9 @@ export default {
         this.handelgetCollectList(this.collectListData)
     },
     methods: {
+        ...mapActions([
+            'saveState',
+        ]),
         //模糊查询
         searchGoodsList(){
 
@@ -59,6 +72,34 @@ export default {
             this.favoriteNav = id
             this.collectListData.type = id
             this.handelgetCollectList(this.collectListData)
+        },
+        // 将商品收藏图片渲染到canvas
+        selectDecorateGoods(e) {
+            const card = this.card
+            if (!card) return
+            fabric.Image.fromURL(e.target.src, (img) => {
+            img.set({
+                borderColor: '#f90',
+                cornerColor: '#f90',
+                cornerSize: 10,
+                transparentCorners: false,
+                cornerStyle: 'circle',
+                borderDashArray: [3,3],
+                angle: 0,
+                left: Math.random().toFixed(2)*200 + 100,
+                top: Math.random().toFixed(2)*200 + 100,
+                scaleX: 200/img.width, 
+                scaleY: 200/img.height ,
+                src:e.target.src,
+                imgType:2,
+                goods_id: e.target.id,
+                goodsImg_id:e.target.name,
+                material_id: e.target.id,
+                // backgroundImgId:e.target.id
+            }); 
+            card.add(img).setActiveObject(img)
+            this.saveState()
+            },{crossOrigin: 'anonymous'})
         },
         /**api-start */
         handelgetCollectList(data){

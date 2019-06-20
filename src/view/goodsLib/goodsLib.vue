@@ -43,7 +43,6 @@
                     <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失"  >
                     <div v-if="!uploadData.goods_img" class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
                         <div @click.stop="iconshoucang1Fun(item.goods_id,item.is_collect)" >
-                            {{item.is_collect}}
                             <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
                             <i v-else class="iconfont iconshoucang1"></i>
                         </div>
@@ -182,8 +181,9 @@ export default {
         },
         iconshoucang1Fun(index,is_collect) {
             this.isCollectData.id = index
-            is_collect == 0 ? this.isCollectData.is_cancel = 1 : this.isCollectData.is_cancel = 0
+            is_collect == 0 ? this.isCollectData.is_cancel = 0 : this.isCollectData.is_cancel = 1
             this.handleGetisCollect(this.isCollectData);
+            this.handlegoodsList(this.getGoods);
             console.log("is_collect", is_collect)
             console.log("收藏", this.isCollectData.is_cancel)
         },
