@@ -13,9 +13,12 @@
         </div>
         <div  class="vertical"  v-show="goodsNav == 0">
             <Button class="roomlabel" @click="changeChooseLableFun(1,0)" :class="{choose:brandLableId==0}">全部</Button>
-            <Button class="roomlabel" @click="changeChooseLableFun(1,item.bid)" :class="{choose:brandLableId==item.bid}" 
-                v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name">
+            <Button class="roomlabel" @click="changeChooseLableFun(1,item.bid,item)" :class="{choose:brandLableId==item.bid}" 
+                v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name" v-show="isClassifySon">
                 {{item.name}}
+            </Button>
+             <Button v-show="!isClassifySon" class="roomlabel" v-for="m in brandSonArr" :key="m.id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,m.id)">
+                {{m.series_name}}
             </Button>
         </div>
         <div  class="vertical" v-show="goodsNav == 1">
@@ -104,6 +107,7 @@ export default {
             selsectStyle:[],
             selsectClassify:[],
             brandArr:[],
+            brandSonArr:[],
             styleArr:[],
             classifyArr:[],
             classifySonArr:[],
@@ -214,15 +218,23 @@ export default {
                 case 0:
                     this.styleLableId=id; 
                     this.ChangeStyleOpt(id)
+                     
                     break;          
                 case 1:
                     this.brandLableId=id; 
+                    if(id === 0 ){
+                        this.isClassifySon = true
+                    }else{
+                        this.isClassifySon = false
+                        this.brandSonArr = item.series_list
+                    }
                     this.ChangebrandOpt(id)
+                    
+                    console.log("品牌 ",this.brandSonArr)
                     break;                 
                 case 2:
                     this.spaceLabelId=id; 
                     this.seriesId = 0;
-                    console.log("沙发 ",item)
                     if(id === 0 ){
                         this.isClassifySon = true
                     }else{
