@@ -41,14 +41,14 @@
             <ul class="goodsUl flexLayout">
                 <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,item.goods_id)"  @mouseleave="mouseleave(item,item.goods_id)">
                     <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失"  >
-                    <div v-if="!uploadData.goods_img" class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
+                    <div v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1 ? false :true" class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
                         <div @click.stop="iconshoucang1Fun(item.goods_id,item.is_collect)" >
                             <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
                             <i v-else class="iconfont iconshoucang1"></i>
                         </div>
                         <div @click.stop="iconxiazaiFun(item,item.goods_id)"><i  class="iconfont iconxiazai"></i></div>
                     </div>
-                    <div v-if="uploadData.goods_img"  class="iconBoxSingel">
+                    <div v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1"  class="iconBoxSingel">
                         <div @click.stop="changeRadio(item.goods_id)" >
                             <RadioGroup v-model="uploadSingle">
                                 <Radio :label="item.goods_id">&nbsp;</Radio>
@@ -58,7 +58,7 @@
                     
                 </li>
             </ul>
-            <Button v-if="this.uploadData.goods_img" class="confirmBtn" @click="confirmUpload" type="warning">确定</Button>
+            <Button v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1" class="confirmBtn" @click="confirmUpload" type="warning">确定</Button>
         </div>
         <div v-else>
             <br/><br/><br/><br/>
@@ -131,10 +131,14 @@ export default {
             },
             downloadNum:0,
             uploadSingle:'',
+            uploadData_Obj:{
+                goods_json:null
+            },
+
             uploadData:{
                 goods_id: null,
                 is_personal:this.$route.query.is_personal,
-                goods_img:this.$route.query.url,
+                img_list:this.$route.query.imgarr,
                 
             },
 
@@ -155,6 +159,7 @@ export default {
             ]),
     },
     mounted() {
+        console.log(this.uploadData.is_personal == 0 || this.uploadData.is_personal == 1 )
         this.handlegoodsList(this.getGoods)
         this.handlecategory()
     },
@@ -190,11 +195,12 @@ export default {
         changeRadio(index){
             console.log("选中", index)
             this.uploadData.goods_id = index,
+            this.uploadData_Obj.goods_json = JSON.stringify(this.uploadData)
             console.log("选中穿过来得参数", this.uploadData)
         },
         //确定上传自定义
         confirmUpload(){
-            this.handleCustomGoods(this.uploadData)
+            this.handleCustomGoods(this.uploadData_Obj)
         },
         iconxiazaiFun(item, index) {
             this.goodsImgSonArr = item.imgs

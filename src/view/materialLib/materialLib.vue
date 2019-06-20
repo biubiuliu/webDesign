@@ -11,13 +11,17 @@
             <div class="comm_body" v-if="this.bgUrl">
                 <div class="materialBg_title">
                     <span>背景</span>
-                    <span @click="bgAll" class="allCursor">{{isAll?'全部':'取消'}} <i class="iconfont iconyou"></i> </span>
+                    <span v-if="this.bgUrl.length !== 0" @click="bgAll" class="allCursor">{{isAll?'全部':'取消'}} <i class="iconfont iconyou"></i> </span>
+                    <!-- <span v-else class="allCursor"><i class="iconfont iconyou"></i> </span> -->
                 </div>
-                <ul class="reuseUl">
+                <ul class="reuseUl" v-if="this.bgUrl.length !== 0">
                     <li class="reuseLi" v-for="bgImg in bgUrl"  :key="bgImg.id" >
                         <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
                     </li>
                 </ul>
+                <div v-else>
+                    <h4>私人卡暂无背景图片</h4>
+                </div>
             </div>
             <div class="comm_body" v-if="this.materialBgImgArr">
                 <div class="materialBg_title">
@@ -25,29 +29,35 @@
                     <span v-if="this.isAll" ></span>
                     <span @click="bgMateial" v-else class="allCursor" >取消<i class="iconfont iconyou"></i> </span>
                 </div>
-               
-                <ul class="reuseUl" v-show="this.isAll">
+                <ul class="reuseUl" v-if="this.isAll">
                     <li  @click="bgMateial(item)" class="reuseLiCard" v-for="item in materialCardArr" :key='item.id' :class="item.bgColor">
                         <i :class="item.icon"></i>
                         <p>{{item.name}}</p>
                     </li>
                 </ul>
-                 <ul class="reuseUl" v-show="!this.isAll">
+                <div v-else>
+                    <h4>暂无素材</h4>
+                </div>
+                <ul class="reuseUl" v-if="!this.isAll">
                     <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
                         <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
+                
             </div>
             <div class="comm_body" v-if="this.goodsBgImgArr">
                 <div class="materialBg_title">
                     <span>自定义商品</span>
                     <span @click="bgCustom"  class="allCursor">{{isAll?'全部':'取消'}}  <i class="iconfont iconyou"></i> </span>
                 </div>
-                <ul class="reuseUl">
-                    <li class="reuseLi" v-for="item in goodsBgImgArr" :key="item.goods_id">
+                <ul v-if="this.goodsBgImgArr.length !== 0" class="reuseUl">
+                    <li class="reuseLi" v-for="(item,index) in goodsBgImgArr" :key="index">
                         <img :src="item.pic_image" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
+                <div v-else>
+                    <h4>暂无素材</h4>
+                </div>
             </div>
         </div>
         <Spin fix v-if="isShowSpin">
@@ -85,6 +95,7 @@ export default {
                 type: null, 	// 1代表素材列表，2代表背景图列表，3代表自定义商品列表
                 material_type:null, // 获取素材时传对应的分类
             },
+            is_personal:0,
             // 分页
             pages: {
                 total: null, 	      // 总条数
@@ -118,7 +129,7 @@ export default {
         }
     },
     created() {
-        this.handleGetgetmaterial(0)
+        this.handleGetgetmaterial(this.is_personal)
         this.$store.dispatch("setGoodsItem", null)
         // console.log('新建设计2',this.schemeId)
     },
@@ -236,10 +247,11 @@ export default {
                 this.handleGetmaterialList(this.getmaterialData)
                 return;
             }
-            this.handleGetgetmaterial(0)
+            this.handleGetgetmaterial(this.is_personal)
         },
         //bgMateial 全部素材
         bgMateial(item){
+            console.log("全部素材",item.id)
             window.event? window.event.cancelBubble = true : e.stopPropagation();
             this.isAll = !this.isAll
             if(!this.isAll){
@@ -248,7 +260,7 @@ export default {
                 this.handleGetmaterialList(this.getmaterialData)
                 return;
             }
-            this.handleGetgetmaterial(0)
+            this.handleGetgetmaterial(this.is_personal)
         },
         //bgAll 全部自定义
         bgCustom(){
@@ -259,12 +271,13 @@ export default {
                 this.handleGetmaterialList(this.getmaterialData)
                 return;
             }
-            this.handleGetgetmaterial(0)
+            this.handleGetgetmaterial(this.is_personal)
         },
         privateRFun(){
             this.isAll = true
             this.getmaterialData.is_personal = 1
-            this.handleGetgetmaterial(this.getmaterialData.is_personal)
+            this.is_personal = 1
+            this.handleGetgetmaterial(this.is_personal)
             var commonsId = document.getElementById("commonsId")  
             let privateId = document.getElementById("privateId")
             this.addClass(privateId,"active");  
@@ -273,7 +286,8 @@ export default {
         commonsRFun() {
             this.isAll = true
             this.getmaterialData.is_personal = 0
-            this.handleGetgetmaterial(this.getmaterialData.is_personal)
+            this.is_personal = 0
+            this.handleGetgetmaterial(this.is_personal)
             var commonsId = document.getElementById("commonsId")  
             let privateId = document.getElementById("privateId")
             this.removeClass(privateId,"active");  

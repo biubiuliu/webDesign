@@ -6,6 +6,7 @@
                     id="upload"
                     class="uploading"
                     multiple
+                    ref="upload"
                     :format="['jpg','jpeg','png']"
                     :show-upload-list="true"
                     :before-upload="handleUpload"
@@ -16,48 +17,57 @@
                     <Button  class="uploadingBtn" icon="ios-cloud-upload-outline">上传本地图片</Button>
                 </Upload>
                 <br/>
-                <p>支持上传20M以下png/jpg格式的本地图片,可以选择多个文件。</p>
+                <p>支持上传2M以下png/jpg格式的本地图片,可以选择多个文件。</p>
             </div>
+            <!-- :class="{moreChange:changehide==index}" -->
+            <!-- <div class="imgMore">     -->                   
+                <div class="icon_more_box">
+                    <Dropdown trigger="click">
+                        <Button class="icon_moreBtn" type="warning" @click ="moveFun">移动</Button>
+                        <DropdownMenu slot="list">  
+                            <Dropdown placement="bottom-end" @on-click="moveToMaterial">
+                                <DropdownItem>
+                                    <Icon type="ios-people" size='16' color='#666'/>
+                                    移动到素材库-公共
+                                    <Icon type="ios-arrow-forward"></Icon>
+                                </DropdownItem>
+                                <DropdownMenu slot="list">
+                                    <DropdownItem name="background">背景</DropdownItem>
+                                    <DropdownItem name="material1">素材_图形</DropdownItem>
+                                    <DropdownItem name="material2">素材_色卡</DropdownItem>
+                                    <DropdownItem name="material3">素材_灯光</DropdownItem>
+                                    <DropdownItem name="material4">素材_阴影</DropdownItem>
+                                    <DropdownItem name="material5">素材_透视</DropdownItem>
+                                    <DropdownItem name="custom">自定义商品</DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                            <Dropdown placement="bottom-end"  @on-click="moveToMaterial">
+                                <DropdownItem>
+                                    <Icon type="md-person" size='16' color='#666'/>
+                                    移动到素材库-个人
+                                    <Icon type="ios-arrow-forward"></Icon>
+                                </DropdownItem>
+                                <DropdownMenu slot="list">
+                                    <DropdownItem name="background-personal">背景</DropdownItem>
+                                    <DropdownItem name="material-personal1">素材_图形</DropdownItem>
+                                    <DropdownItem name="material-personal2">素材_色卡</DropdownItem>
+                                    <DropdownItem name="material-personal3">素材_灯光</DropdownItem>
+                                    <DropdownItem name="material-personal4">素材_阴影</DropdownItem>
+                                    <DropdownItem name="material-personal5">素材_透视</DropdownItem>
+                                    <DropdownItem name="custom-personal">自定义商品</DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                        </DropdownMenu>
+                    </Dropdown>
+               </div>
+            <!-- </div>  -->
             <ul class="imgBox">
-                <!-- @mouseleave="hideIcongengduo" -->
                 <li class="imgLi" v-for="(img,index) in uploadSrcArr" :key="img.id"  
                     @mouseenter ="showIcongengduo(img,index)" @mouseleave="hideIcongengduo">
                     <img  :src="img" alt="图片丢失">
-                    <div class="imgMore" :class="{moreChange:changehide==index}" >                       
-                        <div class="icon_more_box">
-                            <Dropdown trigger="click">
-                                <i style="margin-left:7px" class="iconfont icongengduo"></i>
-                                <DropdownMenu slot="list">  
-                                    <Dropdown placement="right-start" @on-click="moveToMaterial">
-                                        <DropdownItem>
-                                            <Icon type="ios-people" size='20' color='#666'/>
-                                            移动到素材库-公共
-                                            <Icon type="ios-arrow-forward"></Icon>
-                                        </DropdownItem>
-                                        <DropdownMenu slot="list">
-                                            <DropdownItem name="background">背景</DropdownItem>
-                                            <DropdownItem name="material">素材</DropdownItem>
-                                            <DropdownItem name="custom">自定义商品</DropdownItem>
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                    <Dropdown placement="right-start"  @on-click="moveToMaterial">
-                                        <DropdownItem>
-                                            <Icon type="md-person" size='16' color='#666'/>
-                                            移动到素材库-个人
-                                            <Icon type="ios-arrow-forward"></Icon>
-                                        </DropdownItem>
-                                        <DropdownMenu slot="list">
-                                            <DropdownItem name="background-personal">背景</DropdownItem>
-                                            <DropdownItem name="material-personal">素材</DropdownItem>
-                                            <DropdownItem name="custom-personal">自定义商品</DropdownItem>
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                </DropdownMenu>
-                            </Dropdown>
-                        </div>
-                    </div>
+
                 </li>
-            </ul>           
+            </ul> 
         </div>        
     </div>
 </template>
@@ -75,6 +85,21 @@ export default {
             changehide:0,
             uploadSrcArr:[],
             headers:{},
+            background_Obj:{
+                background_json:null
+            },
+            background_json:{
+                is_personal: null,
+                img_list:[]
+            },
+            material_Obj:{
+                material_json:null
+            },
+            material_json:{
+                material_type:null,
+                is_personal: null,
+                img_list:[]
+            }
         }
     },
     created() {
@@ -101,6 +126,10 @@ export default {
         //showIcongengduo 显示更多
         showIcongengduo(img,index){
             this.changehide = index;
+            
+        },
+        moveFun(){
+            console.log("显示更多", this.uploadSrcArr)
         },
 
         //hideIcongengduo 隐藏更多
@@ -114,18 +143,56 @@ export default {
 
         handleSuccess(file) {
             this.uploadSrcArr.push(file.message);
+            console.log(file)
         },
-
+        //switch 公共方法
+        materialCommonSwitchFun(){
+            this.material_json.is_personal = 0;
+            this.material_json.img_list = this.uploadSrcArr;
+            this.material_Obj.material_json =JSON.stringify(this.material_json )
+        },
+        //switch 私人方法
+        materialpersonalSwitchFun(){
+            this.material_json.is_personal = 1;
+            this.material_json.img_list = this.uploadSrcArr;
+            this.material_Obj.material_json =JSON.stringify(this.material_json )
+        },
         // 点击移入素材
         moveToMaterial(name){
             var img = this.uploadSrcArr[this.changehide];
+            console.log("点击移入素材",name)
             switch (name) {
                 case 'background':
-                    this.addBackgroundImg(0,img);
+                    this.background_json.is_personal = 0;
+                    this.background_json.img_list = this.uploadSrcArr;
+                    this.background_Obj.background_json =JSON.stringify(this.background_json )
+                    this.addBackgroundImg(this.background_Obj);
                     break;
 
-                case 'material':
-                    this.addMaterialImg(0,img);
+                case 'material1':
+                    this.material_json.material_type = 1;
+                    this.materialCommonSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material2':
+                    this.material_json.material_type = 2;
+                    this.materialCommonSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material3':
+                    this.material_json.material_type = 3;
+                    this.materialCommonSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material4':
+                    this.material_json.material_type = 4;
+                    this.materialCommonSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material5':
+                    this.material_json.material_type = 5;
+                    this.materialCommonSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
                     break;  
 
                 case 'custom':
@@ -133,17 +200,42 @@ export default {
                         path: 'goodsLib',     
                         query: { 
                             is_personal:0,  
-                            url: img,                             
+                            imgarr: this.uploadSrcArr,                             
                         }            
                     })  
                     break; 
 
                 case 'background-personal':
-                    this.addBackgroundImg(1,img);
+                    this.background_json.is_personal = 1;
+                    this.background_json.img_list = this.uploadSrcArr;
+                    this.background_Obj.background_json =JSON.stringify(this.background_json )
+                    this.addBackgroundImg(this.background_Obj);
                     break;
 
-                case 'material-personal':
-                    this.addMaterialImg(1,img);
+                case 'material-personal1':
+                    this.material_json.material_type = 1;
+                    this.materialpersonalSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material-personal2':
+                    this.material_json.material_type = 2;
+                    this.materialpersonalSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material-personal3':
+                    this.material_json.material_type = 3;
+                    this.materialpersonalSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material-personal4':
+                    this.material_json.material_type = 4;
+                    this.materialpersonalSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
+                    break;  
+                case 'material-personal5':
+                    this.material_json.material_type = 5;
+                    this.materialpersonalSwitchFun()
+                    this.addMaterialImg(this.material_Obj);
                     break;  
 
                 case 'custom-personal':
@@ -151,7 +243,7 @@ export default {
                         path: 'goodsLib',     
                         query: {  
                             is_personal:1,  
-                            url: img,                            
+                            imgarr: this.uploadSrcArr,                            
                         }            
                     })  
                     break;  
@@ -160,19 +252,12 @@ export default {
                     break;
             }          
         },
-
         // 添加背景图片
-        addBackgroundImg(is_personal,img_url){
-            let data = {
-                img_url:img_url,
-                is_personal:is_personal
-            }
-
-            backgroundImg(data).then(res => {
+        addBackgroundImg(background_Obj){
+            backgroundImg(background_Obj).then(res => {
                 if(res.data.success){
-                        this.$Message.success('移动成功')
-                        var index =  this.uploadSrcArr.indexOf(img_url);
-                        this.uploadSrcArr.splice(index, 1);
+                    this.$Message.success('移动成功')
+                    this.uploadSrcArr = []
                 }else{
                     this.$Message.error(res.data.message);
                 }
@@ -180,17 +265,11 @@ export default {
         },
 
         // 添加素材
-        addMaterialImg(is_personal,img_url){       
-            let data = {
-                material_img:img_url,
-                is_personal:is_personal,
-            }
-
-            addMaterial(data).then(res => {
+        addMaterialImg(material_Obj){       
+            addMaterial(material_Obj).then(res => {
                 if(res.data.success){
                     this.$Message.success('移动成功')
-                    var index =  this.uploadSrcArr.indexOf(img_url);
-                    this.uploadSrcArr.splice(index, 1);
+                    this.uploadSrcArr = []
                 }else{
                     this.$Message.error(res.data.message);
                 }
@@ -245,18 +324,11 @@ export default {
     height: 200px;
 }
 .imgMore{
-    display: none;
-    position: absolute;
-    width: 30px;
-    height: 15px;
-    line-height: 15px;
-    z-index: 999;
-    top: 15px;
-    left: 75px;
-    border-radius: 10px;
-    background: #FF9B03;
     text-align: center;
     color: white;
+}
+.icon_moreBtn{
+    margin-left: 0px
 }
 .moreChange{
     display: block;
@@ -266,9 +338,13 @@ a{
 }
 .div::-webkit-scrollbar { width: 0 !important }
 .icon_more_box{
-    position: fixed; 
+    width: 50%;
     text-align: center;
     z-index:1;
+}
+.icon_more_box /deep/ .ivu-select-dropdown{
+    width: 50% !important;
+
 }
 
 

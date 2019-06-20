@@ -4,7 +4,7 @@ import qs from 'qs'
 export const getmaterial = (is_personal) => {
         return axios.request({
             url: '/api/v1/get/materials',
-            params: is_personal,
+            params: { is_personal },
             method: 'get',
         })
     }
@@ -41,10 +41,10 @@ export const uploadImg = (file) => {
         })
     }
     //上传背景图片
-export const backgroundImg = (params) => {
+export const backgroundImg = (background_Obj) => {
         return axios.request({
             url: '/api/v1/add/backgroundImg',
-            data: params,
+            data: qs.stringify(background_Obj),
             method: 'post',
         })
     }
