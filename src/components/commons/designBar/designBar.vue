@@ -28,7 +28,7 @@
                 <MenuItem name="我的收藏" @click.native="saveScheme" class="layout-user">
                     <Button type="warning">保存方案</Button>
                 </MenuItem>
-                <MenuItem name="导出清单" >
+                <MenuItem name="导出清单" @click.native="getGoodsList">
                     <i  class="iconfont iconxiazai"></i>
                     导出清单
                 </MenuItem>
@@ -117,16 +117,21 @@
                     <Button type="primary" @click="shemeInfoModalok('imgObject')">确定</Button>
                 </div>
         </Modal>
+         <!-- 清单 -->
+        <goodsMerchBill :visible='merchBillModal' :data='goodsList' :loading='tableLoading' v-on:visible="changeVisible"/>
     </div>
-
 </template>
 <script>
 import { mapState, mapGetters, mapActions  } from 'vuex';
 import { getEnumList, getSaveScheme,uploadImg } from '@/api/material.js'
-import { getSchemeInfo } from '@/api/data.js'
+import { getSchemeInfo, getSchemeGoodsList } from '@/api/data.js'
+import goodsMerchBill from '@/components/commons/goodsMerchBill/goodsMerchBill'
 import qs from 'qs'
 export default {
     name: 'designBar',
+    components: {
+        goodsMerchBill
+    },
     data() {
         return {
             msg: '这是我的设计bar',
@@ -177,7 +182,10 @@ export default {
             selectStyleArr:[],
             canvasDataArr:[], //画布数据
             proId:  null, // 方案id
-            loadObj: null
+            loadObj: null,
+            merchBillModal:false,// 清单列表是否显示
+            goodsList:[], // 清单数据
+            tableLoading:false,
         }
     },
     computed: {
@@ -456,6 +464,32 @@ export default {
             }).catch(err => {
                 console.log(err)
             })
+        },
+
+        // 导出清单
+        getGoodsList () {
+            // 先保存
+            //this.saveScheme()
+            this.tableLoading = true;      
+            getSchemeGoodsList(this.schemeId).then(res => {
+                if(res.data.success){ 
+                   this.goodsList = res.data.message;
+                   if(res.data.message.length){
+                       this.merchBillModal = true;
+                   }else{
+                       this.$Message.info('该方案下还没有商品数据哦')
+                   }
+                }                  
+                this.tableLoading = false
+            }).catch(err => {
+                console.log(err)
+                this.tableLoading = false;
+            })
+        },
+
+        // 监听修改列表是否显示
+        changeVisible (event) {
+            this.merchBillModal = event
         },
 
         /**

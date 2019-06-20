@@ -242,9 +242,11 @@ export default {
         window.addEventListener('scroll', this.handleScroll)
     },
     methods: {
+        
         changeVisible (event) {
             this.merchBillModal = event
         },
+
         handleScroll() {
             // 变量scrollTop是滚动条滚动时，距离顶部的距离
        		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
@@ -755,7 +757,7 @@ export default {
     left: 0;
     bottom: 0;
     right: 0;
-    background: rgb(41,48,54,0.12)
+    background: rgb(0,0,0,0.12)
 }
 .item:hover .mask{
    display:block;

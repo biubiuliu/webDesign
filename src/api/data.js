@@ -157,3 +157,14 @@ export const copyScheme = (params) => {
         data:params
     })
 }
+
+// 获取方案收藏关联信息
+export const getCollectRelated = (id) => {
+    return axios.request({
+        url: '/api/v1/get/collectRelated',
+        method: 'get',
+        params:{
+            id
+        }
+    })
+}
