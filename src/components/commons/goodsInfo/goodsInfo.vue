@@ -2,7 +2,7 @@
     <div class="goods_info_container">
         <img :src="goods_info.goods_thumb" alt="">
         <div class="goods_info">
-            <p class="title">{{id}}{{goods_info.goods_name}}</p>
+            <p class="title">{{goods_info.goods_name}}</p>
             <div class="info">
                 <div><span>价格</span> <span style="color:#f90;font-weight:600">￥{{goods_info.shop_price}}</span></div>                               
                 <div><span>风格</span> <span>{{goods_info.style_name||'无'}}</span></div> 
