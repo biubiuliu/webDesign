@@ -267,8 +267,6 @@ export default {
                     // this.imgObject = qs.stringify(this.imgObject)
 
                     this.handleGetSaveScheme(this.imgObject)
-                } else {
-                    this.$Message.error('Fail!');
                 }
             })
         },

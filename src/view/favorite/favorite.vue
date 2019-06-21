@@ -53,20 +53,20 @@
             <img class='scheme_img' :src="scheme_info.done_img_url" alt="">
             <p style="text-align:left;margin-top:24px">单品列表</p>
             <ul>
-               <li v-for="(item,index) in goods_list" :key="index">
-                   <a href="javascript:;" @click="goodsImgDownFun(item)" style="display:block;position:relative">
-                     <img :src="item.goods_img" alt="">                        
-                   </a> 
-                   <div class='hover_div'>
-                        <a class="collect" href="javascript:;"  @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
-                                <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
-                                <i v-else class="iconfont iconshoucang1"></i>
-                        </a>
-                        <a class="down" href="javascript:;"  @click.stop="downImg(item.goods_name,item.goods_img)"> 
-                            <i  class="iconfont iconxiazai"/>
-                        </a>
-                   </div>                                     
-              </li> 
+                <li v-for="(item,index) in goods_list" :key="index">
+                    <a href="javascript:;" @click="goodsImgDownFun(item)" style="display:block;position:relative">
+                        <img :src="item.goods_img" alt="">                        
+                    </a> 
+                    <div class='hover_div'>
+                            <a class="collect" href="javascript:;"  @click.stop="judgeCollect(item.goods_id,2,item.is_collect,index)">
+                                    <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
+                                    <i v-else class="iconfont iconshoucang1"></i>
+                            </a>
+                            <a class="down" href="javascript:;"  @click.stop="downImg(item.goods_name,item.goods_img)"> 
+                                <i  class="iconfont iconxiazai"/>
+                            </a>
+                    </div>                                     
+                </li> 
             </ul>
         </div>
         <Modal
@@ -97,7 +97,7 @@
                 </div>
             </ul>
         </Modal>
-        <Spin fix v-if="this.$store.state.app.isShowSpin">
+        <Spin class="spin" fix v-if="this.$store.state.app.isShowSpin">
                 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                 <div>Loading</div>
         </Spin>
@@ -399,6 +399,9 @@ export default {
 }
 </script>
 <style scoped>
+.spin{
+    background-color:rgba(0, 0, 0, 0) !important;
+}
 .assistor {
     position: relative;  
 }

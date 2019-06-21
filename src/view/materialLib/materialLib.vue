@@ -362,6 +362,7 @@ export default {
     width: 100%;
     height: 160px;
     line-height: 160px;
+    background-image: url("../../assets/defalut.png");
     border: 1px solid rgba(238, 235, 235, 0.363)
 }
 .allCursor{

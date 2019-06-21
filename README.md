@@ -26,4 +26,5 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 插件
 [存储vuex](https://github.com/robinvdvleuten/vuex-persistedstate "存储vuex")
 [瀑布流](https://github.com/lfyfly/vue-waterfall-easy "瀑布流")
+[input tag](https://github.com/matiastucci/vue-input-tag "input tag")
 

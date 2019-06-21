@@ -2,39 +2,50 @@
     <div class="goodList_body">
         <!-- v-if="this.$store.state.app.isShowSpin" -->
         <Spin class="spin" fix  v-if="this.$store.state.app.isShowSpin">
-            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-            <div>Loading</div>
+            <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+            <div>Loading</div> -->
+            <div class="balls" >
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </Spin>
         <div class="goodsSearch">
             <Input search size="large" v-model="keyworldVal" placeholder="搜索你喜欢的" @on-search="searchGoodsList" />
+            
         </div>
+        <div class="bread_box">
+            <Tag color="warning" closable type="border"  v-for="(item,index) in serachTag"  :key="index" @on-close="removeTag(item)" >{{item.name|| item.series_name||item.style_name ||item.cat_name }}</Tag>
+        </div>
+        
         <div class="goodsList">
+            
             <div v-for="(item,index) in goodsListArr" :key=index class="goodsTabs" @click="changeGoodsNav(item.id)" :class="{goodsNavActive:goodsNav==item.id}">{{item.title}}</div>
         </div>
         <div  class="vertical"  v-show="goodsNav == 0">
             <Button class="roomlabel" @click="changeChooseLableFun(1,0)" :class="{choose:brandLableId==0}">全部</Button>
             <Button class="roomlabel" @click="changeChooseLableFun(1,item.bid,item)" :class="{choose:brandLableId==item.bid}" 
-                v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name" v-show="isClassifySon">
+                v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name" v-show="brandLabSon">
                 {{item.name}}
             </Button>
-             <Button v-show="!isClassifySon" class="roomlabel" v-for="m in brandSonArr" :key="m.id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,m.id)">
+            <Button v-show="!brandLabSon" class="roomlabel" v-for="m in brandSonArr" :key="m.id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,m.id,m.id,m)">
                 {{m.series_name}}
             </Button>
         </div>
         <div  class="vertical" v-show="goodsNav == 1">
             <Button class="roomlabel" @click="changeChooseLableFun(0,0)" :class="{choose:styleLableId==0}">全部</Button>
-            <Button class="roomlabel" @click="changeChooseLableFun(0,item.id)" :class="{choose:styleLableId==item.id}" 
+            <Button class="roomlabel" @click="changeChooseLableFun(0,item.id,item)" :class="{choose:styleLableId==item.id}" 
                 v-for="(item,index) in styleArr" :key="index">
                 {{item.name||item.style_name}}
             </Button>
         </div>
         <div class="vertical" v-show="goodsNav == 2">
             <Button class="roomlabel" @click="changeChooseLableFun(2,0,null)" :class="{choose:spaceLabelId==0}">全部</Button>
-            <Button class="roomlabel" @click="changeChooseLableFun(2,item.id||item.cat_id,item)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
+            <Button class="roomlabel" @click="changeChooseLableFun(2,item.id||item.cat_id,item,item)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
                 v-for="(item,index) in classifyArr" :key="index" v-show="isClassifySon" >
                 {{item.name||item.cat_name}}
             </Button>
-            <Button v-show="!isClassifySon" class="roomlabel" v-for="m in classifySonArr" :key="m.cat_id" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,m.parent_id,m.cat_id)">
+            <Button v-show="!isClassifySon" class="roomlabel" v-for="m in classifySonArr" :key="m.cat_id" :class="{series_choose:seriesId==m.cat_id}" @click.stop="changeChooseSeriesFun(2,m.parent_id,m.cat_id,m)">
                 {{m.cat_name}}
             </Button>
         </div>
@@ -113,6 +124,7 @@ export default {
             classifyArr:[],
             classifySonArr:[],
             isClassifySon:true,
+            brandLabSon:true,
             goodsLibModal: false,
             social:[],
             getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null},
@@ -146,6 +158,9 @@ export default {
                 img_list:this.$route.query.imgarr,
                 
             },
+            serachTag:[],
+            serachBrandTag:[],
+            serachBrandSonTag:[]
 
         }
     },
@@ -167,6 +182,7 @@ export default {
         console.log(this.uploadData.is_personal == 0 || this.uploadData.is_personal == 1 )
         this.handlegoodsList(this.getGoods)
         this.handlecategory()
+        // this.onInitialized()
     },
     methods: {
         ...mapActions([
@@ -214,24 +230,29 @@ export default {
         },
                 // 筛选表签
         changeChooseLableFun (type,id,item) {
-            console.log("0.0",type,id)
+            console.log("0.0",item)
+            if(item){this.serachTag.push(item)}
+            console.log("this.serachBrandTag.0",this.serachBrandTag)
             switch (type) {
                 case 0:
                     this.styleLableId=id; 
                     this.ChangeStyleOpt(id)
-                     
                     break;          
                 case 1:
                     this.brandLableId=id; 
                     if(id === 0 ){
-                        this.isClassifySon = true
+                        this.brandLabSon = true
+                        this.getGoods.category_id = null
+                        if(item){this.serachBrandSonTag.push(item)}
                     }else{
-                        this.isClassifySon = false
+                        this.brandLabSon = false
                         this.brandSonArr = item.series_list
+                        if(item){this.serachBrandTag.push(item)}
                     }
                     this.ChangebrandOpt(id)
                     
-                    console.log("品牌 ",this.brandSonArr)
+                    console.log("serachBrandTag ",this.serachBrandTag)
+                    console.log("serachBrandSonTag ",this.serachBrandSonTag)
                     break;                 
                 case 2:
                     this.spaceLabelId=id; 
@@ -291,11 +312,47 @@ export default {
             this.social = []
             console.log("关闭 ")
         },
-        changeChooseSeriesFun (type,id,series_id) {
+        changeChooseSeriesFun (type,id,series_id,item) {
+            console.log("点击 ",item)
+            this.serachBrandSonTag = item
+            // if(item){
+            //     if(this.serachTag.indexOf(item) == -1){
+            //         var index = this.serachTag.indexOf(name);
+            //         console.log("item ",item.id)
+            //             this.serachTag.push(item) 
+            //     }
+                
+            // }
+            console.log("点击 ",this.serachBrandSonTag)
             this.brandLableId = id;
             this.seriesId = series_id
             this.ChangeClassifyOpt(series_id)
         },
+        /**
+         * input tag start
+         */
+        removeTag(name){
+                var index = this.serachTag.indexOf(name);
+                    if(name.bid){
+                        if (index > -1) {
+                            this.serachTag.splice(index, this.serachTag.length);
+                        }
+                    }
+                    if (index > -1) {
+                        this.serachTag.splice(index, 1);
+                        if(this.serachTag.length == 0){
+                            this.brandLabSon = true
+                            this.isClassifySon = true
+                        }
+                    }
+
+                    this.getGoods={}
+                    this.handlegoodsList(this.getGoods)
+                    console.log("removeTag------",this.serachTag)
+        },
+        /**
+         * input tag end
+         */
         //改变nav
         changeGoodsNav(id){
             this.goodsNav = id
@@ -378,6 +435,17 @@ export default {
 }
 </script>
 <style scoped>
+.bread_box{
+    text-align: left;
+    padding: 10px 30px;
+    margin-top: 20px;
+}
+.bread_box /deep/ .ivu-breadcrumb-item-link:hover{
+   color: #f90;
+}
+.bread_box /deep/ .ivu-breadcrumb-item-link{
+   color: rgba(255,255,255,.7);
+}
 .spin{
     height: 100%;
     background-color:rgba(0, 0, 0, 0) !important;
@@ -394,6 +462,7 @@ export default {
     width: 100%;
     height: auto;
     padding: 20px  30px 0;
+    
 }
 .goodsNavActive{
     color: #f90;
@@ -435,16 +504,18 @@ export default {
 .flexLayout{
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-start;
     flex-wrap: wrap;
 }
 .goodsUl{
-    padding: 10px 30px;
+    padding: 10px 20px;
+
     
 }
 .goodsLi{
     position: relative;
     margin-top: 10px;
+    margin-left: 10px;
     background: white
 }
 .goodsLiM{
@@ -561,5 +632,48 @@ i{
 .series_choose{
     background-color: #ff9a00!important;
     color: #fff!important;
+}
+/**
+loading
+*/
+.balls {
+  width: 7.5em;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.balls div {
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 75%;
+  background-color: #f90;
+}
+
+.balls div:nth-of-type(1) {
+  transform: translateX(-100%);
+  animation: left-swing 0.5s ease-in alternate infinite;
+}
+
+.balls div:nth-of-type(3) {
+  transform: translateX(-95%);
+  animation: right-swing 0.5s ease-out alternate infinite;
+}
+
+@keyframes left-swing {
+  50%,
+  100% {
+    transform: translateX(95%);
+  }
+}
+
+@keyframes right-swing {
+  50% {
+    transform: translateX(-95%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 </style>
