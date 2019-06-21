@@ -65,7 +65,8 @@
         </div>
         <div v-else>
             <br/><br/><br/><br/>
-            <h1>抱歉! 没有搜索到{{this.keyworldVal}}</h1>
+            <!-- <h1>加载中</h1> -->
+            <!-- <img src="../../assets/loading.svg" alt="" srcset=""> -->
         </div>
         <div class="goodsModalBox">
             <Modal
@@ -379,6 +380,7 @@ export default {
 <style scoped>
 .spin{
     height: 100%;
+    background-color:rgba(0, 0, 0, 0) !important;
 }
 .goodsList{
     display:flex;
