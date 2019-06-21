@@ -35,54 +35,59 @@
                             </div>
                     </Content>
                 </div>
-                <div slot="waterfall-head" >
-                    <div class="discoverLable">
-                        <!-- <Button  >
-                            Forward
-                            <Icon type="md-close" />
-                        </Button> -->
-                        <div class="vertical">
-                            <span>{{changeblue==0?"空间标签":'分类标签'}} :</span>
-                            <Button class="roomlabel" @click="changeChooseLableFun(0,0)" :class="{choose:spaceLabelId==0}">全部</Button>
-                            <Button class="roomlabel" @click="changeChooseLableFun(0,item.id||item.cat_id)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
-                                v-for="(item,index) in roomLabelArr" :key="index">
-                                {{item.name||item.cat_name}}
-                            </Button>
-                        </div>
-                        <div  class="vertical">
-                            <span>风格标签 :</span>
-                            <Button class="roomlabel" @click="changeChooseLableFun(1,0)" :class="{choose:styleLableId==0}">全部</Button>
-                            <Button class="roomlabel" @click="changeChooseLableFun(1,item.id)" :class="{choose:styleLableId==item.id}" 
-                                v-for="(item,index) in roomStyleArr" :key="index">
-                                {{item.name||item.style_name}}
-                            </Button>
-                        </div>
-                        <div  class="vertical">
-                            <span>品牌标签 :</span>
-                            <Button class="roomlabel" @click="changeChooseLableFun(2,0)" :class="{choose:brandLableId==0}">全部</Button>
-                            <Button class="roomlabel" @click="changeChooseLableFun(2,item.bid)" :class="{choose:brandLableId==item.bid}" 
-                                v-for="(item,index) in brandLabelArr" :key="index">
-                                {{item.name}}
-                                <div class="brand_lable">
-                                    <li v-for="(m,n) in item.series_list" :key="n" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.id)">
-                                        {{m.series_name}}
-                                    </li>
-                                </div>
-                            </Button>
-                        </div>
+
+                <div class="discoverLable">                   
+                    <div class="vertical">
+                        <span>{{changeblue==0?"空间标签":'分类标签'}} :</span>
+                        <Button class="roomlabel" @click="changeChooseLableFun(0,0)" :class="{choose:spaceLabelId==0}">全部</Button>
+                        <Button class="roomlabel" @click="changeChooseLableFun(0,item.id||item.cat_id)" :class="{choose:spaceLabelId==(item.id?item.id:item.cat_id)}" 
+                            v-for="(item,index) in roomLabelArr" :key="index">
+                            {{item.name||item.cat_name}}
+                        </Button>
+                    </div>
+                    <div class="vertical_son" v-if='changeblue&&roomLabelSonArr.length'>
+                        <span class="roomlabel">子类 :</span>
+                        <a class="roomlabel" @click="changeSonLableFun(0)">
+                            全部
+                        </a>
+                        <a class="roomlabel" :class="{choose:spaceLabelSonId==m.cat_id}" v-for="(m,n) in roomLabelSonArr" :key="n" @click="changeSonLableFun(m.cat_id)">
+                        {{m.cat_name}}
+                        </a>
+                    </div>
+                    <div  class="vertical">
+                        <span>风格标签 :</span>
+                        <Button class="roomlabel" @click="changeChooseLableFun(1,0)" :class="{choose:styleLableId==0}">全部</Button>
+                        <Button class="roomlabel" @click="changeChooseLableFun(1,item.id)" :class="{choose:styleLableId==item.id}" 
+                            v-for="(item,index) in roomStyleArr" :key="index">
+                            {{item.name||item.style_name}}
+                        </Button>
+                    </div>
+                    <div  class="vertical">
+                        <span>品牌标签 :</span>
+                        <Button class="roomlabel" @click="changeChooseLableFun(2,0)" :class="{choose:brandLableId==0}">全部</Button>
+                        <Button class="roomlabel" @click="changeChooseLableFun(2,item.bid)" :class="{choose:brandLableId==item.bid}" 
+                            v-for="(item,index) in brandLabelArr" :key="index">
+                            {{item.name}}
+                            <div class="brand_lable">
+                                <li v-for="(m,n) in item.series_list" :key="n" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,item.bid,m.id)">
+                                    {{m.series_name}}
+                                </li>
+                            </div>
+                        </Button>
                     </div>
                 </div>
+            
                 <div slot="waterfall-head">
                     <div class="discoverTitle">搜到{{total}}个结果</div>
                 </div>
-                <div style="padding:10px 170px">
-                    <schemeList :imgsArr = 'imgsArr' :padding='padding'/>
+                <div style="padding:10px 55px">
+                    <schemeList :imgsArr = 'imgsArr' :padding='padding' :maxCol='5'/>
                     <div v-if="imgsArr.length&&page>total_page" class="more">暂无更多数据</div>
                     <div v-if="!imgsArr.length" class="no-scheme">
                         抱歉 没有找到匹配的结果
                     </div>
                 </div>
-                <Spin fix v-if="isShowSpin">
+                <Spin fix v-if="isShowSpin" style="background:rgba(0,0,0,0)">
                     <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                     <div>Loading</div>
                 </Spin>
@@ -114,7 +119,7 @@ export default {
     data() {
         return {
             msg: '创建精彩设计',
-            padding:170,
+            padding:55,
             selectList:[
                 {title:"方案",id:"1"},
                 {title:"单品",id:"2"},
@@ -124,6 +129,7 @@ export default {
             selectDefault:'方案',
             imgsArr: [],
             roomLabelArr:[],
+            roomLabelSonArr:[],
             roomStyleArr:[],
             brandLabelArr:[],
             spaceLabelId:0,// 选择的空间标签id
@@ -136,6 +142,7 @@ export default {
             total_page:1,
             isShowSpin:true,
             loading:false,
+            spaceLabelSonId:0,
         }
     },
     created() {
@@ -186,10 +193,11 @@ export default {
                 project.style.display = 'none';
             this.leftIcon = 'iconfont iconxiala-';
             this.changeblue = index;
-            this.spaceLabelId=0;
-            this.styleLableId=0;
-            this.brandLableId=0;
-            this.seriesId=0;
+            this.spaceLabelId = 0;
+            this.spaceLabelSonId =0;
+            this.styleLableId = 0;
+            this.brandLableId = 0;
+            this.seriesId = 0;
             this.page = 1;
            // this.isShowSpin = true;
             this.keywords = '';
@@ -213,6 +221,7 @@ export default {
 
         // 获取方案
         getMeals(){
+            this.isShowSpin = true;
             let params = {
                 style_type:this.styleLableId,
                 space_type:this.spaceLabelId,
@@ -258,7 +267,7 @@ export default {
                     })
                     this.page=this.page +1;                 
                 }
-                
+                this.isShowSpin = false;
             }).catch(err => {
                 this.loading = false;
                 this.isShowSpin = false;
@@ -268,12 +277,13 @@ export default {
 
         // 获取商品
         getGoods(){
+            this.isShowSpin = true;
             let params = {
                 page:this.page,
                 style_id:this.styleLableId,
                 keywords:this.keywords,
                 brand_id:this.brandLableId,
-                category_id:this.spaceLabelId,
+                category_id:this.spaceLabelSonId?this.spaceLabelSonId:this.spaceLabelId,
                 series_id:this.seriesId,
                 page_size:30
             }
@@ -306,7 +316,8 @@ export default {
                         this.imgsArr.push(setDataObj);                      
                     })
                     this.page = this.page +1;
-                }               
+                } 
+                this.isShowSpin = false;              
             }).catch(err => {
                 this.isShowSpin = false
                 this.loading = false;
@@ -387,6 +398,12 @@ export default {
            switch (type) {
                case 0:
                    this.spaceLabelId=id;
+                   if(this.changeblue&& id){
+                       this.roomLabelSonArr = this.roomLabelArr.find(function (obj) {return obj.cat_id === id}).son                       
+                   }else{
+                       this.roomLabelSonArr = []
+                   } 
+                   this.spaceLabelSonId=0;
                    this.page = 1;
                    //this.total = 1;
                    this.handleGetGoodsType();
@@ -407,6 +424,13 @@ export default {
                default:
                    break;
            }
+       },
+
+       // 筛选子类标签
+       changeSonLableFun (id) {
+           this.spaceLabelSonId=id;
+           this.page = 1;         
+           this.handleGetGoodsType();
        },
 
        changeChooseSeriesFun (type,id,series_id) {
@@ -478,6 +502,8 @@ export default {
     height: auto;
     position: relative;
     border-right: 1px solid #ddd;
+    color:rgb(134, 142, 150);
+    font-size: 14px;
 }
 .alertBox{
     position: absolute;
@@ -522,24 +548,29 @@ export default {
 .waterfall{
      /* height:100vh;  */
     /* overflow: hidden; */
-    background: #fff;
+    background: rgb(237, 240, 242);
 }
 .discoverTitle{
-    font-size: 30px;
-    color: #5a5656;
+    font-size: 24px;
+    color: rgb(134, 142, 150);
     text-align: left;
-    margin: 0 170px;
+    margin: 25px 55px;
 }
 .discoverLable{
+    margin: 50px 55px 10px 55px;
     color: #5a5656;
     text-align: left;
-    margin: 10px 170px;
     font-size: 16px;
+    background: #fff;
+    border-radius: 5px;
+    /* box-shadow:0 1px 4px rgba(6,31,50,.1) */
 }
 .roomlabel{
+    border:none!important;
     margin-left: 10px;
     font-size: 14px;
     position: relative;
+    color: rgb(54, 54, 54);
 }
 .roomlabel:hover .brand_lable{
     display: block
@@ -566,7 +597,7 @@ export default {
     width: 100%;
 }
 .vertical{
-    margin: 20px 0;
+    padding: 20px 30px;
 }
 .vertical span{
     font-size: 12px;
@@ -622,7 +653,7 @@ export default {
     margin-top: 20px;
     font-size: 24px;
     color: #7e8e98;
-    line-height: 400px;
+    line-height: 130px;
 }
 .parent { 
     width:80%;
@@ -658,5 +689,27 @@ export default {
     line-height: 40px;
     width: 150px;
     color: #666;
+}
+.vertical_son{
+    padding-left: 105px;
+    background: rgb(248, 249, 250);
+    border-top: 1px solid rgb(241, 241, 241);
+    border-bottom: 1px solid rgb(241, 241, 241);
+    line-height: 78px;
+}
+.vertical_son .roomlabel{
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    line-height: 1.5;
+    padding: 5px 15px 6px;  
+    font-size: 14px;
+    color: rgb(134, 142, 150);
+    background: rgb(248, 249, 250);   
+}
+.vertical_son .choose{
+    color:#ff9a00
 }
 </style>

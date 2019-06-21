@@ -1,13 +1,19 @@
 <template>
     <Modal v-model="visible" width="1050" :closable="false">
         <a href="javascript:;" class="close" @click="changeVisible">×</a>
-            <Table  :height="tableHeight" :columns="columns" ref="myTable" :data="data" class="table"  :loading="loading" size="large">
-                <template slot="selectRow" slot-scope="props">
-                    <Select style="font-size:14px;color:rgb(134, 142, 150)" @on-change="skuChange($event,props.index)" :value="props.row.skuChoose">
-                        <Option  v-for="(item, index) in props.row.skus" :key="index" :value="item.skuName">{{ item.skuName }}</Option>
-                    </Select>
-                </template>
-            </Table>
+            <div class="table">
+                <Table  :height="tableHeight" :columns="columns" ref="myTable" :data="data"  :loading="loading" size="large">
+                    <template slot="selectRow" slot-scope="props">
+                        <Select style="font-size:14px;color:rgb(134, 142, 150)" @on-change="skuChange($event,props.index)" :value="props.row.skuChoose">
+                            <Option  v-for="(item, index) in props.row.skus" :key="index" :value="item.skuName">{{ item.skuName }}</Option>
+                        </Select>
+                    </template>
+                </Table>
+                <div class="total">
+                    <span>总价</span>
+                    <span>￥{{total}}</span>                    
+                </div>
+            </div>            
             <div slot="footer">
                 <div class="footer_view">
                     <div class="modal_footer">
@@ -172,9 +178,10 @@ export default {
             this.modalVisible = false;
             this.$emit('visible', false)
             this.tableHeight = this.height;
+            document.getElementsByClassName('total')[0].style.display='block';
             setTimeout(function(){
                 var oldstr = document.body.innerHTML;
-                var newstr = document.getElementsByClassName('table')[0].innerHTML
+                var newstr = document.getElementsByClassName('table')[0].innerHTML;              
                 // 2. 复制给body，并执行window.print打印功能
                 document.body.innerHTML = newstr;
                 window.print();
@@ -237,6 +244,17 @@ export default {
 }
 .print:hover{
     color: #fff
+}
+.total{   
+    text-align: right;
+    display: none; 
+    line-height:50px;
+    padding-right:10px;
+}
+.total span:nth-child(2){
+    font-size: 16px;
+    color: #ff9a00;
+    font-weight: 700;
 }
 </style>
 

@@ -16,16 +16,17 @@
                     {{dirSelectList[dirLi].dir_name}}
                     <span><i class="iconfont iconxiala- iconblock"></i></span>
                     <ul class="dir-ul">
-                        <li  v-for="(item, index) in dirSelectList" :key="index"
+                        <li  v-for="(item, index) in dirSelectList" :key="index" style="text-align:left;position:relative"
                             :class="{dirSelect:dirLi==index}" @click="changeSelect(index,item,'dir')">
-                            {{item.dir_name}}
+                            <span>{{item.dir_name}}</span>
+                            <i v-if="item.dir_name!='文件'&&dirLi!=index" class="iconfont iconiconset0137" style="color:#999;font-size:12px" @click.stop='delDir(item)'></i>
                         </li>                       
                     </ul>
                 </a>
             </div>
             <Button type="warning" @click="handleRender" class="add-dir">
                 <i  class="iconfont iconjia"></i>
-                新建文件
+                新建文件夹
             </Button>
         </div>
         <!-- 列表 -->
@@ -50,22 +51,22 @@
                                     <i class="iconfont iconiconset0137" style="color:#fff"></i>
                                 </a>
                                 <a href="javascript:;" class="box" @click.stop="del(item.id,item.name)">
-                                    <i class="iconfont iconshanchu"></i>
+                                    <i class="iconfont iconshanchu" style="font-size: 22px;"></i>
                                 </a>
                                 <a href="javascript:;" class="box" @click.stop="copy(item)">
-                                    <i class="iconfont iconfuzhi1"></i>
+                                    <i class="iconfont iconfuzhi1" style="font-size: 18px;"></i>
                                 </a>                                 
-                                <Dropdown trigger="click" @on-click="operation" style=" position: absolute;right: 63px;top: 100px;z-index:99">
-                                    <a href="javascript:;" class="more_box">
-                                        <i class="iconfont icongengduo" style='color:rgb(134, 142, 150)'></i>
-                                    </a>
+                                <Dropdown trigger="hover" placement="right-start" @on-click="operation" class="dropdown" style="position: absolute;left: 25px;top: 125px;z-index:99;">
+                                    <div href="javascript:;" class="more_box">
+                                        <i class="iconfont icongengduo" style='color:rgb(134, 142, 150);font-size: 26px;'></i>
+                                    </div>
                                     <DropdownMenu slot="list">
-                                        <Dropdown placement="left-start"  v-if='moveDirList.length'>
+                                        <Dropdown placement="right-start"  v-if='moveDirList.length'>
                                             <DropdownItem>
-                                                <i class="iconfont iconzuo"></i>
                                                 移动到
+                                                <i class="iconfont iconyou"></i>
                                             </DropdownItem>
-                                            <DropdownMenu slot="list">
+                                            <DropdownMenu slot="list"  style="height:150px;overflow-y:scroll">
                                                 <DropdownItem  v-for="(m,n) in moveDirList"  :key="n" :name="`${item.id}`+'_'+`${m.id}`" >
                                                     {{m.dir_name}}
                                                 </DropdownItem>                                             
@@ -75,15 +76,15 @@
                                         <DropdownItem :name="'modify-'+item.id">修改信息</DropdownItem>
                                         <DropdownItem :name="'checkList-'+item.id">查看清单</DropdownItem>
                                         <DropdownItem :name="'isOpen-'+item.id+'-'+item.is_personal">{{item.is_personal==1?'公开':'取消公开'}}</DropdownItem>
-                                    </DropdownMenu>
+                                    </DropdownMenu>  
                                 </Dropdown>                               
                             </div>
                         </a>
                      </div>                   
                  </WaterfallItem>
             </Waterfall>      
-            <div class="more"  v-if="imgsArr.length&&page>total_page">暂无更多数据</div>
-            <div class="no-scheme"  v-if="!imgsArr.length">没有设计哦，快去设计吧~</div>
+            <div class="more"  v-if="imgsArr&&imgsArr.length&&page>total_page">暂无更多数据</div>
+            <div class="no-scheme"  v-if="imgsArr&&!imgsArr.length">没有设计哦，快去设计吧~</div>
         </div>
         <!-- 修改方案 -->
         <Modal
@@ -128,6 +129,7 @@
                 </FormItem>
             </Form>
             <div slot="footer">
+                <Button v-if='addDir.id' @click="delDirSure('addDir')">删除文件夹</Button>
                 <Button type="primary" style="background:#f90;border-color: #f90"  @click="addDirOk('addDir')">确定</Button>
                 <Button @click="cancel('addDir')">取消</Button>
             </div>
@@ -135,7 +137,7 @@
         <!-- 清单 -->
         <goodsMerchBill :visible='merchBillModal' :data='goodsList' :loading='tableLoading' v-on:visible="changeVisible"/>
         <!-- loading -->
-        <Spin fix v-if="isShowSpin">
+        <Spin fix v-if="isShowSpin"  style='background:rgba(0,0,0,0)'>
             <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
             <div>Loading</div>
         </Spin>
@@ -190,7 +192,7 @@ export default {
             sortLi:0, // 排序筛选
             dirLi:0, // 文件夹筛选
             modal:false,// 新建文件弹框           
-            imgsArr: [],
+            imgsArr:null,
             page:1, 
             total_page:1,
             shemeInfoModal:false,
@@ -217,6 +219,7 @@ export default {
             },
             addDirModal:false,
             addDir:{
+                id:0,
                 add_dir_name:''
             },
             dirRule: {
@@ -374,9 +377,9 @@ export default {
 
         // 添加文件
         addDirFun (name) {
-            addSchemeDir(name).then(res => {
+            addSchemeDir(name,this.addDir.id,0).then(res => {
                 if(res.data.success){
-                    this.$Message.success('添加成功');
+                    this.$Message.success('操作成功');
                     this.addDir.add_dir_name = '';
                     this.addDirModal = false;
                     this.getDir()
@@ -387,21 +390,55 @@ export default {
             })
         },
 
+        // delDir
+        delDir (item) {            
+            this.addDirModal = true;
+            this.addDir.id = item.id;
+            this.addDir.add_dir_name = item.dir_name;
+        },
+
+        delDirSure (){   
+            let dirInfo  = this.addDir; 
+            console.log(dirInfo);       
+            this.$Modal.confirm({
+                    title: '提示',
+                    content: '<p>是否删除该文件夹？</p>',
+                    onOk: () => {
+                          addSchemeDir(dirInfo.add_dir_name,dirInfo.id,1).then(res => {
+                            if(res.data.success){
+                                this.$Message.success('删除成功');
+                                this.addDir.add_dir_name = '';
+                                this.addDir.id = 0;
+                                this.addDirModal = false;
+                                this.getDir()
+                            }else{
+                                this.$Message.error(res.data.message); 
+                                //this.add_dir_name = ''
+                            }
+                        })                   
+                    },
+                    onCancel: () => {
+
+                    }
+            });
+        },
+
         // 修改方案
         toDetail (item){
-            this.$store.dispatch("setSchemeId", item.id)
-            //this.$router.push({name:'materialLib', query: {id: this.proId} })
+            this.$store.dispatch('updataProDetailVal', item)           
             const {href} = this.$router.resolve({
-                name: 'materialLib',         
+                path: 'proDetail/'+item.id+'/'+item.type,            
             })
-            window.open(href, '_blank')     
+            window.open(href, '_blank')        
         },
 
         toProDetail(item){
-            this.$store.dispatch('updataProDetailVal', item)
-            
+             console.log(item.id)
+            this.$store.dispatch("setSchemeId", item.id)
+            //this.$router.push({name:'materialLib', query: {id: this.proId} })
             const {href} = this.$router.resolve({
-                path: 'proDetail/'+item.id+'/'+item.type,            
+                name: 'materialLib', 
+                query: {id: item.id}        
             })
             window.open(href, '_blank')
         },
@@ -443,7 +480,7 @@ export default {
             }else{
                 this.addDirModal = false
             }
-            
+            this.addDir.id=0
         },
 
         // 删除方案
@@ -482,24 +519,13 @@ export default {
             })
         },
 
-        // 移动到文件夹
-        moveToDir (name) {
-            console.log(name)
-        },
-
         // 下载图片
-        down (name){
-            // this.$Message.info('正在导出请稍等');
-            // var a = document.createElement('a')
-            // var event = new MouseEvent('click') 
-            // a.download = name || '下载图片名称'
+        down (name){          
             this.imgsArr.forEach((item)=>{
                 if(item.id==parseInt(name.split("-")[1])){
-                    //a.href=item.src
                     downloadIamge(item.src,name);
                 }
-            })               
-            //a.dispatchEvent(event)            
+            })                         
         },
 
         // 修改信息
@@ -559,8 +585,7 @@ export default {
                     onCancel: () => {
                         
                     }
-            });
-             
+            });            
         },
 
         operation (name) {
@@ -574,7 +599,6 @@ export default {
                 }else{
                     this.modifyIsOpen(name)
                 }
-
             }else{
                 var reg=/^[\d]+/g;
                 var params = {
@@ -612,7 +636,7 @@ export default {
 <style scoped>
 .mydesignBody{
     height: 93vh;
-    background: #fff;
+    background: rgb(237, 240, 242);
     color: black;
     font-size: 14px;
     position: relative;
@@ -624,7 +648,7 @@ export default {
     left: 0;
     right: 0;
     z-index: 1; 
-    background: #fff;
+    background: rgb(237, 240, 242);
 }
 .flex{
     display: flex;
@@ -704,6 +728,16 @@ export default {
     padding: 0 10px;
     color: #666;
 }
+.dir-ul li{
+    display: flex;
+    justify-content: space-between
+}
+.dir-ul li i{
+   display: none
+}
+.dir-ul li:hover i{
+    display: block;
+}
 .sort-ul li:hover,.dir-ul li:hover{
     background: #f5f7f9!important;
     color: #666!important;
@@ -729,7 +763,7 @@ export default {
 .scheme-img-info .some-info:nth-child(1) {
     flex: 1;
     text-align: left;
-    color: #666;
+    color: #333;
     font-size: 16px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -755,17 +789,17 @@ export default {
     box-shadow:0 1px 4px rgba(6,31,50,.2);
     border: 1px none #444;
 }
-/* .item:hover{
-    box-shadow: 0 1px 5px rgba(6, 31, 50, .2);
-} */
+.item:hover{
+    box-shadow:  0 2px 10px rgba(6, 31, 50, .3);
+}
 .mask{
     display:none;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom:0;
-    background: rgb(0,0,0,0.12)
+    /* bottom:0; */
+    /* background: rgb(0,0,0,0.12) */
 }
 .item:hover .mask{
    display:block;
@@ -780,6 +814,12 @@ export default {
     justify-content: center;
     align-items:center
 }
+.dropdown{
+    position: absolute;
+    left: 25px;
+    top: 125px;
+    z-index:99
+}
 .mask .box i,.more a i{
     color:rgb(134, 142, 150)!important
 }
@@ -791,31 +831,26 @@ export default {
     border-radius: 5px;
     text-align: center;
     position: absolute;
-    left: 10px;
-    top: 10px;
+    right:25px;
+    top: 25px;
 }
 .mask .box:nth-child(2){
     position: absolute;
-    right: 10px;
-    top: 10px;
+    left: 25px;
+    top:25px;
     font-size: 20px;
 }
 .mask .box:nth-child(3){
     position: absolute;
-    right: 10px;
-    top: 60px;
+    left: 25px;
+    top: 75px;
     font-size: 17px;
 }
 .mask .box:nth-child(1){  
     font-size: 22px;
     position: absolute;
-    right: -54px;
+    left: -54px;
     top: -1px;
-}
-.more_box{
-    position: absolute;
-    right: -53px;
-    top: 10px;
 }
 .more{
     display: block;
@@ -835,11 +870,11 @@ export default {
 }
 .space,.style{
     padding:2px 10px;
-    background-color: #f8f9fa;
+    background-color: #b2c0c8;
     border-radius: 4px;
     font-size: 14px;
     font-style: normal;
-    color: #999;
+    color: rgba(255,255,255,0.9);
     text-align: center;
     line-height: 20px;
     margin-right: 10px;

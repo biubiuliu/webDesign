@@ -36,12 +36,14 @@ export const getDirList = () => {
 }
 
 // 添加文件夹
-export const addSchemeDir = (dir_name) => {
+export const addSchemeDir = (dir_name,id,is_delete) => {
     return axios.request({
         url: '/api/v1/add/schemeDir',
         method: 'post',
         data: {
-            dir_name: dir_name
+            dir_name: dir_name,
+            id,
+            is_delete
         },
     })
 }
@@ -89,7 +91,7 @@ export const getSchemeGoodsList = (id) => {
 }
 
 // 获取收藏列表
-export const getCollectList = (type,style_ids,cat_ids) => {
+export const getCollectList = (type,style_ids,cat_ids,kwd) => {
     return axios.request({
         url: '/api/v1/get/collectList',
         method: 'get',
@@ -97,6 +99,7 @@ export const getCollectList = (type,style_ids,cat_ids) => {
             type,
             style_ids,
             cat_ids,
+            kwd
         },
     })
 }

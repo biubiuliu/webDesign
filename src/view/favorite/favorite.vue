@@ -3,12 +3,12 @@
         <div class="parent" v-if="showList">
             <div class="header">
                 <div class="favoriteSearch">
-                    <Input search size="large" v-model="keyworldVal" placeholder="搜索你喜欢的" @on-search="searchGoodsList" />
+                    <Input search size="large" v-model="kwd" placeholder="搜索你喜欢的" @on-search="searchGoodsList" />
                 </div>
                 <div class="favoriteNav">
                     <div v-for="(item,index) in favoriteListArr" :key=index class="goodsTabs" @click="changeGoodsNav(item.id)" :class="{goodsNavActive:favoriteNav==item.id}">{{item.title}}</div>
                 </div>
-                <div  v-if='goodsCollectArr.length&&favoriteNav==2' class="filtrate_collection">
+                <div  v-if='goodsCollectArr&&goodsCollectArr.length&&favoriteNav==2' class="filtrate_collection">
                        <a href="javascript:;" @click="filtrateFun">
                             筛选 <Icon type="md-arrow-dropup" v-if="mycollectModel"/>
                             <Icon type="md-arrow-dropdown" v-else/>
@@ -21,7 +21,7 @@
                         <a href="javascript:;" @click="goodsImgDownFun(item)">
                             <img :src="item.img_url" alt="图片丢失" :id="item.id">
                             <div class="info">
-                                <p>{{item.name}}</p>
+                                <p :title='item.name'>{{item.name}}</p>
                                 <p>￥{{item.shop_price}}</p>
                             </div>
                         </a>
@@ -42,8 +42,8 @@
                         </WaterfallItem>
                     </Waterfall>   
                 </ul>
-                <div class="no-data" v-if="!goodsCollectArr.length">
-                    暂无收藏的数据
+                <div class="no-data" v-if="goodsCollectArr&&!goodsCollectArr.length">
+                    暂无匹配的数据
                 </div>
             </div>            
         </div>
@@ -97,7 +97,7 @@
                 </div>
             </ul>
         </Modal>
-        <Spin class="spin" fix v-if="this.$store.state.app.isShowSpin">
+        <Spin fix v-if="this.$store.state.app.isShowSpin" class="spin">
                 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                 <div>Loading</div>
         </Spin>
@@ -135,7 +135,6 @@ export default {
     data() {
         return {
             msg: '这是收藏',
-            keyworldVal:'',
             favoriteNav:2,
             favoriteListArr:[
                 {title:'商品收藏',id:'2'},
@@ -146,7 +145,7 @@ export default {
                 cat_ids: null,	//商品分类id字符串（多个id用英文逗号隔开）
                 style_ids: null ,	//	商品风格id字符串（多个id用英文逗号隔开）
             },
-            goodsCollectArr:[],
+            goodsCollectArr:null,
             layout:{
                 gutterWidth:8,
                 gutterHeight:8,
@@ -164,7 +163,8 @@ export default {
             beforeSelectStyle:[], 
             scheme_info: {},
             goods_list: [], 
-            showList:true   
+            showList:true,
+            kwd:'' ,
         }
     },
     mounted() {
@@ -178,12 +178,14 @@ export default {
         ]),
         //模糊查询
         searchGoodsList(){
-
+            this.handelgetCollectList();
         },
         //改变nav
         changeGoodsNav(id){
             this.favoriteNav = id
             this.collectListData.type = id
+            this.kwd = ''
+            this.goodsCollectArr = null;
             this.handelgetCollectList()
         },
         // 将商品收藏图片渲染到canvas
@@ -224,7 +226,7 @@ export default {
 
         // 数据重组
         handelgetCollectList (cat_ids,style_type) {
-            var getData = this.favoriteNav == 1 ? getCollectList(1):getCollectList(2,style_type,cat_ids);
+            var getData = this.favoriteNav == 1 ? getCollectList(1,0,0,this.kwd):getCollectList(2,style_type,cat_ids,this.kwd);
             getData.then(res => {   
                 if(res.data.success){ 
                     if(this.favoriteNav==1&& res.data.message.length){
@@ -247,9 +249,11 @@ export default {
                         })
                     }
                     this.goodsCollectArr = res.data.message
-                }                                                 
+                }  
+                                           
             }).catch(err => {
                 console.log(err)
+
             })
         },
 
@@ -512,7 +516,7 @@ export default {
 .no-data{
     text-align: center;
     width: 100%;
-    color: #fff;
+    color: rgba(255,255,255,.5);
     line-height: 50px;
 }
 .filtrate_collection{
@@ -625,5 +629,8 @@ li:hover .hover_div{
 }
 .collectActive{
     color: #f90;
+}
+.spin{
+    background-color:rgba(0, 0, 0, 0) !important;
 }
 </style>

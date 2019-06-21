@@ -41,6 +41,7 @@ export default {
                 fixWidth:'',
                 minCol:5,
                 maxCol:5,
+                goodsCol:5,
                 percent:'',
                 width:340,
             },
@@ -137,7 +138,7 @@ export default {
 .imginfo .some-info:nth-child(1), .scheme-img-info .some-info:nth-child(1) {
     flex: 1;
     text-align: left;
-    color: #666;
+    color: #333;
     font-size: 16px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -192,11 +193,11 @@ export default {
 }
 .space,.style{
     padding:2px 10px;
-    background-color: #f8f9fa;
+    background-color: #b2c0c8;
     border-radius: 4px;
     font-size: 14px;
     font-style: normal;
-    color: #999;
+    color: rgba(255,255,255,0.9);
     text-align: center;
     line-height: 20px;
     margin-right: 10px;
