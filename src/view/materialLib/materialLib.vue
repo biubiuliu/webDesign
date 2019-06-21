@@ -19,8 +19,9 @@
                         <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
                     </li>
                 </ul>
-                <div v-else>
-                    <h4>私人卡暂无背景图片</h4>
+                <div v-else class="materiaHeight">
+                    <h4 v-if="isShowSpin">加载中 ... </h4>
+                    <h4 v-else> 暂无背景</h4>
                 </div>
             </div>
             <div class="comm_body" v-if="this.materialBgImgArr">
@@ -35,14 +36,16 @@
                         <p>{{item.name}}</p>
                     </li>
                 </ul>
-                <div v-else>
-                    <h4>暂无素材</h4>
+                <div v-else  >
+                    <h4 v-if="isShowSpin">加载中 ... </h4> 
+                    <ul v-else class="reuseUl">
+                        <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
+                            <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
+                        </li>
+                    </ul>
+
                 </div>
-                <ul class="reuseUl" v-if="!this.isAll">
-                    <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
-                        <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
-                    </li>
-                </ul>
+                
                 
             </div>
             <div class="comm_body" v-if="this.goodsBgImgArr">
@@ -55,12 +58,13 @@
                         <img :src="item.pic_image" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
-                <div v-else>
-                    <h4>暂无素材</h4>
+                <div v-else class="materiaHeight">
+                    <h4 v-if="isShowSpin">加载中 ... </h4>
+                    <h4 v-else> 暂无自定义商品图</h4>
                 </div>
             </div>
         </div>
-        <Spin fix v-if="isShowSpin">
+        <Spin class="spin" fix v-if="isShowSpin">
                 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                 <div>Loading</div>
         </Spin>
@@ -351,6 +355,15 @@ export default {
 }
 </script>
 <style scoped>
+.spin{
+    background-color:rgba(0, 0, 0, 0) !important;
+}
+.materiaHeight{
+    width: 100%;
+    height: 160px;
+    line-height: 160px;
+    border: 1px solid rgba(238, 235, 235, 0.363)
+}
 .allCursor{
     cursor: pointer
 }
