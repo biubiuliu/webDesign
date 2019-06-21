@@ -31,7 +31,9 @@
                    <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
                         <WaterfallItem  v-for="(item, index) in goodsCollectArr" :key="index" :width='itemWidth'>
                             <a class="item" href="javascript:;" @click="handleGetSchemeInfo(item.id)">
-                                <img :src='item.img_url' alt="加载错误">
+                                <div style="padding:5px 5px 0 5px;background:#fff">
+                                    <img :src='item.img_url' alt="加载错误">
+                                </div>
                                 <div  class="scheme-img-info">
                                     <p class="some-info" :title="item.name">{{item.name}}</p>
                                     <p class="some-info">{{item.time}}</p>
@@ -104,7 +106,7 @@
 <script>
 import { getCollectList,getCollectScreen,getCollectRelated,isCollect } from '@/api/data.js'
 import { mapState, mapGetters, mapActions } from 'vuex'
-import { convertTimeStamp } from '@/libs/util.js'
+import { convertTimeStamp,downloadIamge } from '@/libs/util.js'
 import { Waterfall, WaterfallItem } from 'vue2-waterfall';
 export default {
     name: 'favorite',
@@ -383,7 +385,8 @@ export default {
             // a.href=href;              
             // a.dispatchEvent(event)
             this.goodsImgSonArr = item.imgs
-            this.goodsLibModal = true;            
+            this.goodsLibModal = true;   
+            downloadIamge(href,name)         
         },
 
         // 关闭详情
@@ -567,7 +570,7 @@ export default {
     
 }
 .scheme_parent ul{
-    height: 54%;;
+    height: 56%;;
     margin-top: 10px;
     padding-bottom: 10px;
     /* display: flex;

@@ -177,7 +177,6 @@ export default {
 }
 .bgImg_div{
     width: 100%;
-    min-width: 1920px;
     height: 100vh;
     overflow: hidden;
     position: relative;

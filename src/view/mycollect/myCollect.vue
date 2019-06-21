@@ -156,6 +156,8 @@ export default {
                                 price:item.shop_price,
                                 time:convertTimeStamp(item.created_at),
                                 type:this.isSelect,
+                                // style_name:item.style_name,
+                                // space_name:item.space_name,
                             };
                            this.isSelect == 1 ?this.schemeArr.push(setDataObj):this.goodsArr.push(setDataObj);                                          
                         });

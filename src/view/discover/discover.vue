@@ -250,6 +250,8 @@ export default {
                             time:convertTimeStamp(item.updated_at),                                                   
                             id: item.id,
                             is_personal:item.is_personal,
+                            style_name:item.style_name,
+                            space_name:item.space_name,
                             type:1//1是方案 2是单品
                         };
                         this.imgsArr.push(setDataObj);                      

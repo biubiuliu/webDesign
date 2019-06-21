@@ -123,7 +123,7 @@ export default {
         color:#f90!important
     }
     .dark_back{
-        background: #2e2f34!important
+        background: #33373c!important
     }
     .logo-img{
         width: 100%

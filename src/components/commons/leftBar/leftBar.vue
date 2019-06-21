@@ -47,7 +47,7 @@ export default {
         top: 60px;
         width: 60px;
         height: 100%;;
-        background:  #515A6E;
+        background:  #33373c;
         font-size: 14px;
     }
 

@@ -3,12 +3,16 @@
     <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='maxCol||5' class="vueWaterfall">
         <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
             <a href='javascript:;' class="item"  @click="toDetail(item)">
-                <div style="background:#f2f2f2">
-                    <img :src="item.src" :lazy-src='item.src' alt="加载错误">
+                <div style="background:#fff;padding:15px 15px 0 15px;position:relative">
+                    <img :src="item.src" :lazy-src='item.src' alt="加载错误">                                       
                 </div>
-                <div  class="scheme-img-info">
+                <div  class="scheme-img-info" :class="{imginfo:item.type==1}">
                     <p class="some-info" :title="item.name">{{item.name}}</p>
                     <p class="some-info">{{item.price?"￥"+item.price:item.time}}</p>
+                </div>
+                <div class="space_div" v-if="item.type==1">
+                        <div class="space">{{item.space_name}}</div>
+                        <div class="style">{{item.style_name}}</div>
                 </div>
                 <a v-if="showCollect" href="javascript:;" class="collect_box" @click.stop="judgeCollect(item.id,2,item.is_collect,index)">
                     <i class="iconfont iconshoucang" :class="{collected:item.is_collect}"></i>
@@ -120,13 +124,17 @@ export default {
 }
 </script>
 <style scope>
-.scheme-img-info{
-    padding:10px 25px;
-    /* display: flex; */
+.imginfo{
+    padding:10px 15px;
+    background: #fff;
+    display: flex;
     align-items: center;
+}
+.scheme-img-info{
+    padding:10px 15px; 
     background: #fff;
 }
-.scheme-img-info .some-info:nth-child(1) {
+.imginfo .some-info:nth-child(1), .scheme-img-info .some-info:nth-child(1) {
     flex: 1;
     text-align: left;
     color: #666;
@@ -140,6 +148,9 @@ export default {
     text-align: left;
     color: #999;
     font-size: 14px;
+}
+.imginfo .some-info:nth-child(2){
+    text-align: right;
 }
 .item img{
     width: 100%;
@@ -155,7 +166,7 @@ export default {
     box-shadow:0 1px 4px rgba(6,31,50,.2)
 }
 .item:hover{
-    box-shadow: 0 1px 5px rgba(6, 31, 50, .3);
+    box-shadow: 1px 2px 8px rgba(6, 31, 50, .5);
 }
 .collect_box{
     display: none;
@@ -178,6 +189,23 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.space,.style{
+    padding:2px 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 14px;
+    font-style: normal;
+    color: #999;
+    text-align: center;
+    line-height: 20px;
+    margin-right: 10px;
+}
+.space_div{
+    display: flex;
+    justify-content: flex-start;
+    background: #fff;
+    padding:0 10px 10px 10px;
 }
 </style>
 

@@ -1,6 +1,6 @@
 <template>
     <div :style="{position: 'fixed', width: '100%', minWidth:'800px'}">
-        <Menu mode="horizontal" theme="dark" id="dark" active-name="1">
+        <Menu mode="horizontal" theme="dark" id="dark" active-name="1" style="background:#33373c">
             <div class="layout-nav">
                 <MenuItem name="首页" @click.native="routerHome">
                     <i  class="iconfont iconzuo"></i>

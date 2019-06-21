@@ -33,25 +33,31 @@
             <Waterfall id='vueWaterfall' @loadmore="handleGetList" :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
                  <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
                      <div class="item">
-                        <img :src='item.src' alt="加载错误">
+                        <div style="background:#fff;padding:15px 15px 0 15px">
+                            <img :src='item.src' alt="加载错误">
+                        </div>
                         <div  class="scheme-img-info">
                             <p class="some-info" :title="item.name">{{item.name}}</p>
                             <p class="some-info">{{item.time}}</p>
                         </div>
+                        <div class="space_div" v-if="item.type==1">
+                            <div class="space">{{item.space_name}}</div>
+                            <div class="style">{{item.style_name}}</div>
+                        </div>
                         <a class="mask">
                             <div style="position:relative">
                                 <a class="midify" href="javascript:;" @click.stop="toDetail(item)">
-                                    <i class="iconfont iconiconset0137"></i>
+                                    <i class="iconfont iconiconset0137" style="color:#fff"></i>
                                 </a>
-                                <a href="javascript:;"  @click.stop="del(item.id,item.name)">
+                                <a href="javascript:;" class="box" @click.stop="del(item.id,item.name)">
                                     <i class="iconfont iconshanchu"></i>
                                 </a>
-                                <a href="javascript:;" @click.stop="copy(item)">
+                                <a href="javascript:;" class="box" @click.stop="copy(item)">
                                     <i class="iconfont iconfuzhi1"></i>
                                 </a>                                 
                                 <Dropdown trigger="click" @on-click="operation" style=" position: absolute;right: 63px;top: 100px;z-index:99">
-                                    <a href="javascript:;">
-                                        <i class="iconfont icongengduo"></i>
+                                    <a href="javascript:;" class="more_box">
+                                        <i class="iconfont icongengduo" style='color:rgb(134, 142, 150)'></i>
                                     </a>
                                     <DropdownMenu slot="list">
                                         <Dropdown placement="left-start"  v-if='moveDirList.length'>
@@ -338,6 +344,8 @@ export default {
                             is_personal:item.is_personal,
                             time:convertTimeStamp(item.updated_at),                                                   
                             id: item.id,
+                            space_name:item.space_name,
+                            style_name:item.style_name,
                             type:1// 传详情用
                         };
                         //setDataObj.src = setDataObj.src+"?m="+Math.random()
@@ -481,17 +489,17 @@ export default {
 
         // 下载图片
         down (name){
-            this.$Message.info('正在导出请稍等');
-            var a = document.createElement('a')
-            var event = new MouseEvent('click') 
-            a.download = name || '下载图片名称'
+            // this.$Message.info('正在导出请稍等');
+            // var a = document.createElement('a')
+            // var event = new MouseEvent('click') 
+            // a.download = name || '下载图片名称'
             this.imgsArr.forEach((item)=>{
                 if(item.id==parseInt(name.split("-")[1])){
-                    a.href=item.src
-                    //downloadIamge(item.src,name);
+                    //a.href=item.src
+                    downloadIamge(item.src,name);
                 }
             })               
-            a.dispatchEvent(event)            
+            //a.dispatchEvent(event)            
         },
 
         // 修改信息
@@ -713,8 +721,8 @@ export default {
     padding:0 10px;
 }
 .scheme-img-info{
-    padding:10px 25px;
-    /* display: flex; */
+    padding:10px 15px;
+    display: flex;
     align-items: center;
     background: #fff;
 }
@@ -729,7 +737,7 @@ export default {
 }
 .scheme-img-info .some-info:nth-child(2) {
     flex: 1;
-    text-align: left;
+    text-align: right;
     color: #999;
     font-size: 14px;
 }
@@ -755,12 +763,25 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    bottom: 0;
     right: 0;
+    bottom:0;
     background: rgb(0,0,0,0.12)
 }
 .item:hover .mask{
    display:block;
+}
+.mask .box,.more_box{
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    background: #fff;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items:center
+}
+.mask .box i,.more a i{
+    color:rgb(134, 142, 150)!important
 }
 .midify{
     background: #ff9a00;
@@ -773,26 +794,28 @@ export default {
     left: 10px;
     top: 10px;
 }
-.iconshanchu{
+.mask .box:nth-child(2){
     position: absolute;
     right: 10px;
     top: 10px;
     font-size: 20px;
 }
-.mask a i{
-    color: #fff;
-}
-.iconfuzhi1{
+.mask .box:nth-child(3){
     position: absolute;
     right: 10px;
     top: 60px;
     font-size: 17px;
 }
-.icongengduo{  
+.mask .box:nth-child(1){  
     font-size: 22px;
     position: absolute;
     right: -54px;
     top: -1px;
+}
+.more_box{
+    position: absolute;
+    right: -53px;
+    top: 10px;
 }
 .more{
     display: block;
@@ -809,5 +832,22 @@ export default {
 }
 .waterfall-item{
     box-sizing: content-box!important
+}
+.space,.style{
+    padding:2px 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 14px;
+    font-style: normal;
+    color: #999;
+    text-align: center;
+    line-height: 20px;
+    margin-right: 10px;
+}
+.space_div{
+    display: flex;
+    justify-content: flex-start;
+    background: #fff;
+    padding:0 10px 10px 10px;
 }
 </style>
