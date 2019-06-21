@@ -46,15 +46,15 @@
         <div class="parent">
             <schemeList :imgsArr = 'goodsArr' v-if="isSelect==2"/> 
             <schemeList :imgsArr = 'schemeArr' v-else/>  
-            <Spin fix v-if="isShowSpin" style="top:120px">
+            <Spin fix v-if="isShowSpin" style="top:120px;background:rgba(0,0,0,0)">
                 <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
                 <div>Loading</div>
             </Spin>
         </div>    
-        <div v-if="!goodsArr.length&&isSelect==2" class="no-scheme">
+        <div v-if="goodsArr&&!goodsArr.length&&isSelect==2" class="no-scheme">
                 还没有收藏的商品哦~
         </div> 
-        <div v-if="!schemeArr.length&&isSelect==1" class="no-scheme">
+        <div v-if="schemeArr&&!schemeArr.length&&isSelect==1" class="no-scheme">
                 还没有收藏的方案哦~
         </div>
          
@@ -82,8 +82,8 @@ export default {
         return {
             msg: '这是收藏',
             isSelect:2,
-            goodsArr:[],
-            schemeArr:[],
+            goodsArr:null,
+            schemeArr:null,
             mycollectModel:false,
             selectCatArr:[],
             selectStyleArr:[],   
@@ -156,8 +156,8 @@ export default {
                                 price:item.shop_price,
                                 time:convertTimeStamp(item.created_at),
                                 type:this.isSelect,
-                                // style_name:item.style_name,
-                                // space_name:item.space_name,
+                                style_name:item.style_name,
+                                space_name:item.space_name,
                             };
                            this.isSelect == 1 ?this.schemeArr.push(setDataObj):this.goodsArr.push(setDataObj);                                          
                         });

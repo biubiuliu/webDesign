@@ -10,8 +10,12 @@
         <div>
             <div class="comm_body" v-if="this.bgUrl">
                 <div class="materialBg_title">
-                    <span>背景</span>
-                    <span v-if="this.bgUrl.length !== 0" @click="bgAll" class="allCursor">{{isAll?'全部':'取消'}} <i class="iconfont iconyou"></i> </span>
+                    <span>
+                        <a v-if="this.bgUrl.length !== 0 &&!isAll" @click="bgAll" class="allCursor">
+                            <i class="iconfont iconfanhui"></i> 
+                        </a> &#8194; 背景
+                    </span>
+                    <span v-if="this.bgUrl.length !== 0 &&isAll" @click="bgAll" class="allCursor">全部<i class="iconfont iconyou"></i> </span>
                     <!-- <span v-else class="allCursor"><i class="iconfont iconyou"></i> </span> -->
                 </div>
                 <ul class="reuseUl" v-if="this.bgUrl.length !== 0">
@@ -26,9 +30,13 @@
             </div>
             <div class="comm_body" v-if="this.materialBgImgArr">
                 <div class="materialBg_title">
-                    <span>素材</span>
-                    <span v-if="this.isAll" ></span>
-                    <span @click="bgMateial" v-else class="allCursor" >取消<i class="iconfont iconyou"></i> </span>
+                    <span>
+                        <span v-if="this.isAll" ></span>
+                        <a @click="bgMateial" v-else class="allCursor" >
+                            <i class="iconfont iconfanhui"></i>
+                        </a>  &#8194;
+                        {{isAll?'素材':materialCardArr[getmaterialData.material_type-1].name}}
+                    </span>                  
                 </div>
                 <ul class="reuseUl" v-if="this.isAll">
                     <li  @click="bgMateial(item)" class="reuseLiCard" v-for="item in materialCardArr" :key='item.id' :class="item.bgColor">
@@ -50,8 +58,14 @@
             </div>
             <div class="comm_body" v-if="this.goodsBgImgArr">
                 <div class="materialBg_title">
-                    <span>自定义商品</span>
-                    <span @click="bgCustom"  class="allCursor">{{isAll?'全部':'取消'}}  <i class="iconfont iconyou"></i> </span>
+                    <span>
+                        <a @click="bgCustom"  v-if='!isAll' class="allCursor">
+                            <i class="iconfont iconfanhui"></i>
+                        </a>  &#8194;自定义商品
+                    </span>
+                    <span @click="bgCustom"  v-if='isAll' class="allCursor">全部
+                        <i class="iconfont iconyou"></i>
+                    </span>
                 </div>
                 <ul v-if="this.goodsBgImgArr.length !== 0" class="reuseUl">
                     <li class="reuseLi" v-for="(item,index) in goodsBgImgArr" :key="index">
@@ -348,10 +362,7 @@ export default {
                 console.log(err)
             })
         },
-
-
     },
-    
 }
 </script>
 <style scoped>
@@ -362,7 +373,7 @@ export default {
     width: 100%;
     height: 160px;
     line-height: 160px;
-    border: 1px solid rgba(238, 235, 235, 0.363)
+    /* border: 1px solid rgba(238, 235, 235, 0.363) */
 }
 .allCursor{
     cursor: pointer
@@ -398,6 +409,13 @@ export default {
 .materialBg_title{
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+.materialBg_title span{
+    font-size: 14px;
+}
+.materialBg_title a i{
+    color: rgba(255,255,255,.7)
 }
 .reuseUl{
     width: 100%;
