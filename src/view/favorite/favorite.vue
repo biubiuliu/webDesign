@@ -97,6 +97,7 @@
                 </div>
             </ul>
         </Modal>
+<<<<<<< HEAD
         <Modal
             title="下载的商品"
             v-model="goodsLibModal"
@@ -115,14 +116,12 @@
                 <h4>抱歉! 暂无相关图片</h4>
             </div>
         </Modal>
-        <Spin fix v-if="this.$store.state.app.isShowSpin" class="spin">
-                <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div> -->
-                <div class="balls" >
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                </div>
+        <Spin class="spin" fix  v-if="this.$store.state.app.isShowSpin">
+            <div class="balls" >
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </Spin>
     </div>
 </template>
@@ -131,6 +130,7 @@ import { getCollectList,getCollectScreen,getCollectRelated,isCollect } from '@/a
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { convertTimeStamp,downloadImage } from '@/libs/util.js'
 import { Waterfall, WaterfallItem } from 'vue2-waterfall';
+import "@/assets/css/loading.css"
 export default {
     name: 'favorite',
     computed: {

@@ -1,6 +1,6 @@
 
 <template>
-    <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='maxCol||5' class="vueWaterfall">
+    <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
         <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
             <a href='javascript:;' class="item"  @click="toDetail(item)" :style="'width:'+(itemWidth-20)+'px'">
                 <div style="background:#fff;padding:15px 15px 0 15px;position:relative">
@@ -65,7 +65,7 @@ export default {
         itemWidth(){  
             var width = this.padding*2||120;
             var num = this.maxCol? this.maxCol:5;
-            return ((document.documentElement.clientWidth-width)/num)  //计算宽度
+            return ((document.documentElement.clientWidth-width)/5)  //计算宽度
         },
     },
     created() {

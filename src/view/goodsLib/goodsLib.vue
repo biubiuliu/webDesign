@@ -15,7 +15,9 @@
             
         </div>
         <div class="bread_box">
-            <Tag color="warning" closable type="border"  v-for="(item,index) in serachTag"  :key="index" @on-close="removeTag(item)" >{{item.name|| item.series_name||item.style_name ||item.cat_name }}</Tag>
+            <Tag   color="warning" closable type="border"  @on-close="removeTag(item)"  v-for="(item,value,index) in serachTag.serachBrandAllTag"  :key="index" >{{item.name || item.series_name}}</Tag>            
+            <Tag   color="warning" closable type="border"  @on-close="removeTag(item)"  v-for="(item,value,index) in serachTag.styleAllTag"  :key="index" >{{item.style_name}}</Tag>            
+            <Tag   color="warning" closable type="border"  @on-close="removeTag(item)"  v-for="(item,value,index) in serachTag.isClassifyAllTag"  :key="index" >{{item.cat_name }}</Tag>            
         </div>
         
         <div class="goodsList">
@@ -28,7 +30,7 @@
                 v-for="(item ,index) in brandArr"  :value="item.bid" :key="index" :label="item.name" v-show="brandLabSon">
                 {{item.name}}
             </Button>
-            <Button v-show="!brandLabSon" class="roomlabel" v-for="m in brandSonArr" :key="m.id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(2,m.id,m.id,m)">
+            <Button v-show="!brandLabSon" class="roomlabel" v-for="m in brandSonArr" :key="m.id" :class="{series_choose:seriesId==m.id}" @click.stop="changeChooseSeriesFun(1,m.id,m.id,m)">
                 {{m.series_name}}
             </Button>
         </div>
@@ -50,30 +52,32 @@
             </Button>
         </div>
 
-        
-        <div v-if="this.goodsImgArr.length !== 0">
-            <ul class="goodsUl flexLayout">
-                <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,item.goods_id)"  @mouseleave="mouseleave(item,item.goods_id)">
-                    <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失"  >
-                    <div v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1 ? false :true" class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
-                        <div @click.stop="iconshoucang1Fun(item.goods_id,item.is_collect)" >
-                            <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
-                            <i v-else class="iconfont iconshoucang1"></i>
+        <Scroll class="scrollimg" :distance-to-edge='16' :on-reach-bottom="handleReachBottom"  v-if="this.goodsImgArr.length !== 0">
+            <div>
+                
+                <ul class="goodsUl flexLayout">
+                    <li class="goodsLi" v-for="(item,index) in goodsImgArr" :key="index" @click="goodsImgDownFun(item,index)"  @mouseenter="mouseenter(item,item.goods_id)"  @mouseleave="mouseleave(item,item.goods_id)">
+                        <img class="goodsImg" :src="item.goods_thumb" :id="item.goods_id" :name ="item.goods_id" alt="图片丢失"  >
+                        <div v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1 ? false :true" class="iconBox flexLayout"  :class="{ collectionDownActive:collectionDown==item.goods_id}" >
+                            <div @click.stop="iconshoucang1Fun(item.goods_id,item.is_collect)" >
+                                <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
+                                <i v-else class="iconfont iconshoucang1"></i>
+                            </div>
+                            <div @click.stop="iconxiazaiFun(item,item.goods_id)"><i  class="iconfont iconxiazai"></i></div>
                         </div>
-                        <div @click.stop="iconxiazaiFun(item,item.goods_id)"><i  class="iconfont iconxiazai"></i></div>
-                    </div>
-                    <div v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1"  class="iconBoxSingel">
-                        <div @click.stop="changeRadio(item.goods_id)" >
-                            <RadioGroup v-model="uploadSingle">
-                                <Radio :label="item.goods_id">&nbsp;</Radio>
-                            </RadioGroup>
+                        <div v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1"  class="iconBoxSingel">
+                            <div @click.stop="changeRadio(item.goods_id)" >
+                                <RadioGroup v-model="uploadSingle">
+                                    <Radio :label="item.goods_id">&nbsp;</Radio>
+                                </RadioGroup>
+                            </div>
                         </div>
-                    </div>
-                    
-                </li>
-            </ul>
-            <Button v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1" class="confirmBtn" @click="confirmUpload" type="warning">确定</Button>
-        </div>
+                        
+                    </li>
+                </ul>
+                <Button v-if="uploadData.is_personal == 0 || uploadData.is_personal == 1" class="confirmBtn" @click="confirmUpload" type="warning">确定</Button>
+            </div>
+        </Scroll>
         <div v-else>
             <br/><br/><br/><br/>
             <!-- <h1>加载中</h1> -->
@@ -108,6 +112,7 @@
 import { goodsList, category, isCollect, customGoods } from '@/api/material.js'
 import {mapState, mapGetters, mapActions} from 'vuex'
 import { constants } from 'fs';
+import "@/assets/css/loading.css"
 export default {
     name: 'goodsLib',
     data() {
@@ -127,7 +132,14 @@ export default {
             brandLabSon:true,
             goodsLibModal: false,
             social:[],
-            getGoods:{ page : null, style_id : null, keywords : null, brand_id : null, category_id : null},
+            getGoods:{
+                page : 0,
+                style_id : null,
+                keywords : null,
+                brand_id : null,
+                category_id : null,
+                series_id:  null
+            },
             spaceLabelId:0,// 选择的分类标签id
             styleLableId:0,// 选择的风格标签id
             brandLableId:0,// 选择的品牌标签id
@@ -158,9 +170,17 @@ export default {
                 img_list:this.$route.query.imgarr,
                 
             },
-            serachTag:[],
+            serachTag:{
+                serachBrandAllTag: [],
+                styleAllTag: [],
+                isClassifyAllTag: [],
+            },
             serachBrandTag:[],
-            serachBrandSonTag:[]
+            serachBrandSonTag:[],
+            styleTag:[],
+            isClassifyTag:[],
+            isClassifySonTag:[],
+            scroll: ''
 
         }
     },
@@ -179,7 +199,6 @@ export default {
             ]),
     },
     mounted() {
-        console.log(this.uploadData.is_personal == 0 || this.uploadData.is_personal == 1 )
         this.handlegoodsList(this.getGoods)
         this.handlecategory()
         // this.onInitialized()
@@ -230,44 +249,57 @@ export default {
         },
                 // 筛选表签
         changeChooseLableFun (type,id,item) {
-            console.log("0.0",item)
-            if(item){this.serachTag.push(item)}
-            console.log("this.serachBrandTag.0",this.serachBrandTag)
+            // this.serachTag = []
             switch (type) {
                 case 0:
                     this.styleLableId=id; 
-                    this.ChangeStyleOpt(id)
+                        this.styleAllTag = []
+                        this.styleTag = []
+                        if(item){this.styleTag.push(item)}
+                        this.serachTag.styleAllTag = this.styleTag
+                        this.getGoods.style_id = id
+                        this.handlegoodsList(this.getGoods)
+                        console.log(" switch 0",type,id)
                     break;          
                 case 1:
                     this.brandLableId=id; 
+                    this.getGoods.brand_id=id; 
+
                     if(id === 0 ){
+                        this.serachBrandTag = []
                         this.brandLabSon = true
                         this.getGoods.category_id = null
-                        if(item){this.serachBrandSonTag.push(item)}
+                        if(item){this.serachBrandSonTag.push(item.series_list)}
                     }else{
+                        this.serachBrandTag = []
                         this.brandLabSon = false
                         this.brandSonArr = item.series_list
                         if(item){this.serachBrandTag.push(item)}
+                        this.serachTag.serachBrandAllTag = this.serachBrandTag
                     }
-                    this.ChangebrandOpt(id)
-                    
-                    console.log("serachBrandTag ",this.serachBrandTag)
-                    console.log("serachBrandSonTag ",this.serachBrandSonTag)
+                    console.log(" switch 1",type,id)
                     break;                 
                 case 2:
                     this.spaceLabelId=id; 
+                    this.getGoods.category_id=id;
                     this.seriesId = 0;
                     if(id === 0 ){
                         this.isClassifySon = true
+                        this.isClassifyTag = []
+                        if(item){this.isClassifySonTag.push(item.son)}
                     }else{
+                        this.isClassifyTag = []
                         this.isClassifySon = false
                         this.classifySonArr = item.son
+                        if(item){this.isClassifyTag.push(item)}
+                        this.serachTag.isClassifyAllTag = this.isClassifyTag
                     }
-                    this.ChangeClassifyOpt(id)
+                    console.log(" switch 2",type,id)
                     break;
                 default:
                     break;
             }
+            this.handlegoodsList(this.getGoods)
         },
         //批量下载
 
@@ -313,41 +345,80 @@ export default {
             console.log("关闭 ")
         },
         changeChooseSeriesFun (type,id,series_id,item) {
-            console.log("点击 ",item)
-            this.serachBrandSonTag = item
-            // if(item){
-            //     if(this.serachTag.indexOf(item) == -1){
-            //         var index = this.serachTag.indexOf(name);
-            //         console.log("item ",item.id)
-            //             this.serachTag.push(item) 
-            //     }
-                
-            // }
-            console.log("点击 ",this.serachBrandSonTag)
-            this.brandLableId = id;
             this.seriesId = series_id
-            this.ChangeClassifyOpt(series_id)
+            // this.changeChooseLableFun(type,id,item)
+            console.log("series_id ",series_id)
+            if(type == 1){
+                this.brandLableId = id;
+                this.serachBrandSonTag = item
+                this.getGoods.series_id = series_id
+                this.serachTag.serachBrandAllTag = this.serachBrandTag.concat(this.serachBrandSonTag)
+            }else{
+                this.getGoods.category_id = series_id;
+                //  this.getGoods.series_id = series_id
+                this.isClassifySonTag = item
+                this.serachTag.isClassifyAllTag = this.isClassifyTag.concat(this.isClassifySonTag)
+            }
+            console.log("category_id",this.getGoods.category_id)
+            this.handlegoodsList(this.getGoods)
         },
         /**
          * input tag start
          */
         removeTag(name){
-                var index = this.serachTag.indexOf(name);
-                    if(name.bid){
-                        if (index > -1) {
-                            this.serachTag.splice(index, this.serachTag.length);
+                var BrandIndex = this.serachTag.serachBrandAllTag.indexOf(name);
+                var styleIndex = this.serachTag.styleAllTag.indexOf(name);
+                var isClassifyIndex = this.serachTag.isClassifyAllTag.indexOf(name);
+                    if(name.bid||name.id){
+                        if (BrandIndex > -1) {
+                            console.log("length",this.serachTag.serachBrandAllTag.length)
+                            this.serachTag.serachBrandAllTag.splice(BrandIndex, this.serachTag.serachBrandAllTag.length);
+                            if(name.bid){
+                                console.log("name.bid",name.bid)
+                                this.getGoods.brand_id = name.bid
+                            }else{
+                                this.getGoods.brand_id = null
+                                this.getGoods.series_id = null
+                                console.log("name.id",name.id)
+                            }
                         }
                     }
-                    if (index > -1) {
-                        this.serachTag.splice(index, 1);
-                        if(this.serachTag.length == 0){
-                            this.brandLabSon = true
-                            this.isClassifySon = true
+                    if(name.id){
+                        if (styleIndex > -1) {
+                            this.serachTag.styleAllTag.splice(styleIndex, this.serachTag.styleAllTag.length);
+                            if(name.id){
+                                this.getGoods.style_id = name.id
+                            }else{
+                                this.getGoods.style_id = null
+                            }
                         }
                     }
-
-                    this.getGoods={}
+                    if(name.cat_id || name.parent_id){
+                        if (isClassifyIndex > -1) {
+                            this.serachTag.isClassifyAllTag.splice(isClassifyIndex, this.serachTag.isClassifyAllTag.length);
+                            // this.isClassifySon = true
+                            if(name.cat_id){
+                                this.getGoods.category_id = name.cat_id
+                            }else{
+                                this.getGoods.category_id = null
+                                console.log("name.id",name.id)
+                            }
+                        }
+                    }
+                    if(this.serachTag.serachBrandAllTag.length == 0){
+                        this.getGoods.brand_id = null
+                        this.getGoods.series_id = null
+                        this.brandLabSon = true
+                    }   
+                    if(this.serachTag.isClassifyAllTag.length == 0){
+                        this.getGoods.category_id = null
+                        this.isClassifySon = true
+                    }
+                    if(this.serachTag.styleAllTag.length == 0){
+                        this.getGoods.style_id = null
+                    }
                     this.handlegoodsList(this.getGoods)
+
                     console.log("removeTag------",this.serachTag)
         },
         /**
@@ -364,21 +435,14 @@ export default {
             this.handlegoodsList(this.getGoods)
             console.log('keyworldVal',this.keyworldVal)
         },
-        //品牌列表改变
-        ChangebrandOpt(value){
-            this.getGoods.brand_id = value
-            this.handlegoodsList(this.getGoods)
-        },
-            //风格列表改变
-        ChangeStyleOpt(value){
-            this.getGoods.style_id = value
-            this.handlegoodsList(this.getGoods)
-        },
-            //分类列表改变
-        ChangeClassifyOpt(value){
-            this.getGoods.category_id = value
-            this.handlegoodsList(this.getGoods)
-            // console.log("分类",value)
+        // 触底加载
+        handleReachBottom () {
+            return new Promise(resolve => {
+                this.getGoods.page ++
+                this.handlegoodsList(this.getGoods)
+                console.log("加载********")
+                resolve();
+            });
         },
         /**
          * end function
@@ -386,8 +450,8 @@ export default {
          */
         handlegoodsList(getGoods){
             let getGoods2 = this.getGoods
-            goodsList(getGoods2.page, getGoods2.style_id, getGoods2.keywords, getGoods2.brand_id, getGoods2.category_id).then(res=>{
-                this.goodsImgArr = res.data.message.data
+            goodsList(getGoods2.page, getGoods2.style_id, getGoods2.keywords, getGoods2.brand_id, getGoods2.category_id ,getGoods2.series_id).then(res=>{
+                this.goodsImgArr = this.goodsImgArr.concat(res.data.message.data)
                 // console.log('------------------', this.goodsImgArr)
                 
             }).catch(err=>{
@@ -446,10 +510,7 @@ export default {
 .bread_box /deep/ .ivu-breadcrumb-item-link{
    color: rgba(255,255,255,.7);
 }
-.spin{
-    height: 100%;
-    background-color:rgba(0, 0, 0, 0) !important;
-}
+
 .goodsList{
     display:flex;
     justify-content:space-around;
@@ -493,8 +554,18 @@ export default {
 }
 .goodList_body{
     position: relative;
-    height: 90vh;
+    height: auto;
+    height: 100%;
 }
+.scrollimg /deep/ .ivu-scroll-container{
+    height: 70vh !important;
+}
+.scrollimg /deep/ .ivu-scroll-spinner{
+    display: none !important;
+}
+/* .scrollimg /deep/ .ivu-scroll-content-loading{
+    opacity: 1 !important;
+} */
 .select_box{
     margin-top: 10px;
 }
@@ -508,7 +579,7 @@ export default {
     flex-wrap: wrap;
 }
 .goodsUl{
-    padding: 10px 20px;
+    padding: 10px 10px;
 
     
 }
@@ -584,9 +655,6 @@ i{
     left: 0px;
     color: gold
 }
-.demo-spin-icon-load{
-    animation: ani-demo-spin 1s linear infinite;
-}
 .roomlabel{
     margin-top: 10px;
     margin-left: 10px;
@@ -632,48 +700,5 @@ i{
 .series_choose{
     background-color: #ff9a00!important;
     color: #fff!important;
-}
-/**
-loading
-*/
-.balls {
-  width: 7.5em;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.balls div {
-  width: 1.2em;
-  height: 1.2em;
-  border-radius: 75%;
-  background-color: #f90;
-}
-
-.balls div:nth-of-type(1) {
-  transform: translateX(-100%);
-  animation: left-swing 0.5s ease-in alternate infinite;
-}
-
-.balls div:nth-of-type(3) {
-  transform: translateX(-95%);
-  animation: right-swing 0.5s ease-out alternate infinite;
-}
-
-@keyframes left-swing {
-  50%,
-  100% {
-    transform: translateX(95%);
-  }
-}
-
-@keyframes right-swing {
-  50% {
-    transform: translateX(-95%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
 }
 </style>
