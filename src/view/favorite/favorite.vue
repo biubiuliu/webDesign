@@ -97,9 +97,12 @@
                 </div>
             </ul>
         </Modal>
-        <Spin fix v-if="this.$store.state.app.isShowSpin" class="spin">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
+        <Spin class="spin" fix  v-if="this.$store.state.app.isShowSpin">
+            <div class="balls" >
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </Spin>
     </div>
 </template>
@@ -108,6 +111,7 @@ import { getCollectList,getCollectScreen,getCollectRelated,isCollect } from '@/a
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { convertTimeStamp,downloadIamge } from '@/libs/util.js'
 import { Waterfall, WaterfallItem } from 'vue2-waterfall';
+import "@/assets/css/loading.css"
 export default {
     name: 'favorite',
     computed: {

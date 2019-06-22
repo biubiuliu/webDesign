@@ -78,9 +78,12 @@
                 </div>
             </div>
         </div>
-        <Spin class="spin" fix v-if="isShowSpin">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
+        <Spin class="spin" fix  v-if="this.$store.state.app.isShowSpin">
+            <div class="balls" >
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </Spin>
         <Page v-if="!this.isAll" class="pages" :total="this.pages.total" :page-size="this.pages.per_page" show-elevator size='small' @on-change="nextPage" />
     </div>
@@ -89,7 +92,7 @@
 import { fabric } from 'fabric'
 import {mapState, mapGetters, mapActions} from 'vuex'
 import { getmaterial, getmaterialList} from '@/api/material.js'
-
+import "@/assets/css/loading.css"
 export default {
     name: 'materialLib',
     data() {

@@ -49,7 +49,7 @@ export const backgroundImg = (background_Obj) => {
         })
     }
     //获取商品列表
-export const goodsList = (page, style_id, keywords, brand_id, category_id) => {
+export const goodsList = (page, style_id, keywords, brand_id, category_id, series_id) => {
     return axios.request({
         url: '/api/v1/get/goods',
         params: {
@@ -57,7 +57,8 @@ export const goodsList = (page, style_id, keywords, brand_id, category_id) => {
             style_id,
             keywords,
             brand_id,
-            category_id
+            category_id,
+            series_id
         },
         method: 'get',
     })
