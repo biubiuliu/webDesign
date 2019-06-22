@@ -102,3 +102,12 @@ export const getCollectList = (data) => {
         params: data,
     })
 }
+
+// 删除素材
+export const delMaterialImg = (params) => {
+    return axios.request({
+        url:'/api/v1/delete/delImg',
+        method:'post',
+        data:params
+    })
+}

@@ -91,15 +91,17 @@ export const getSchemeGoodsList = (id) => {
 }
 
 // 获取收藏列表
-export const getCollectList = (type,style_ids,cat_ids,kwd) => {
+export const getCollectList = (page,type,style_ids,cat_ids,kwd,page_size) => {
     return axios.request({
         url: '/api/v1/get/collectList',
         method: 'get',
         params: {
+            page,
             type,
             style_ids,
             cat_ids,
-            kwd
+            kwd,
+            page_size
         },
     })
 }

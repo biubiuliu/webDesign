@@ -20,6 +20,9 @@
                 </div>
                 <ul class="reuseUl" v-if="this.bgUrl.length !== 0">
                     <li class="reuseLi" v-for="bgImg in bgUrl"  :key="bgImg.id" >
+                        <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(bgImg.id,2)">
+                            <i class="iconfont iconshanchu"></i>
+                        </a>
                         <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
                     </li>
                 </ul>
@@ -35,7 +38,8 @@
                         <a @click="bgMateial" v-else class="allCursor" >
                             <i class="iconfont iconfanhui"></i>
                         </a>  &#8194;
-                        {{isAll?'素材':materialCardArr[getmaterialData.material_type-1].name}}
+                        {{ isAll?'素材':materialCardArr&&materialCardArr[getmaterialData.material_type-1]
+                            &&materialCardArr[getmaterialData.material_type-1].name?materialCardArr[getmaterialData.material_type-1].name:''}}
                     </span>                  
                 </div>
                 <ul class="reuseUl" v-if="this.isAll">
@@ -48,6 +52,9 @@
                     <h4 v-if="isShowSpin">加载中 ... </h4> 
                     <ul v-else class="reuseUl">
                         <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
+                            <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(item.id,1)">
+                                <i class="iconfont iconshanchu"></i>
+                            </a>
                             <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
                         </li>
                     </ul>
@@ -69,6 +76,9 @@
                 </div>
                 <ul v-if="this.goodsBgImgArr.length !== 0" class="reuseUl">
                     <li class="reuseLi" v-for="(item,index) in goodsBgImgArr" :key="index">
+                        <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(item.goods_id,3)">
+                            <i class="iconfont iconshanchu"></i>
+                        </a>
                         <img :src="item.pic_image" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
                     </li>
                 </ul>
@@ -88,7 +98,7 @@
 <script>
 import { fabric } from 'fabric'
 import {mapState, mapGetters, mapActions} from 'vuex'
-import { getmaterial, getmaterialList} from '@/api/material.js'
+import { getmaterial, getmaterialList, delMaterialImg } from '@/api/material.js'
 
 export default {
     name: 'materialLib',
@@ -119,9 +129,7 @@ export default {
                 total: null, 	      // 总条数
                 per_page: 40,       // 每页多少条
                 current_page: 1 ,  // 当前第几页
-            },
-
-            
+            },            
         }
     },
     computed: {
@@ -362,6 +370,45 @@ export default {
                 console.log(err)
             })
         },
+
+        // 删除私人库素材
+        delMaterial(id,type){
+            this.$Modal.confirm({
+                    title: '提示',
+                    content: '<p>是否删除该图片？</p>',
+                    onOk: () => {
+                        let params = {
+                           ids:id.toString(),
+                           type:type 
+                        }
+                        delMaterialImg(params).then(res=>{
+                            if(res.data.success){                               
+                                this.operation(id,type)
+                                this.$Message.success(res.data.message);
+                            }
+                        })                       
+                    },
+                    onCancel: () => {
+                        //this.$Message.info('Clicked cancel');
+                    }
+            });
+        },
+
+        operation (id,type){
+            switch (type) {
+                case 1:
+                    this.materialBgImgArr =  this.materialBgImgArr.filter((obj) => (obj.id !== id))
+                    break;
+                case 2:
+                    this.bgUrl =  this.bgUrl.filter((obj) => (obj.id !== id))
+                    break;
+                case 3:
+                    this.goodsBgImgArr =  this.goodsBgImgArr.filter((obj) => (obj.id !== id))
+                    break;
+                default:
+                    break;
+            }
+        },
     },
 }
 </script>
@@ -430,8 +477,8 @@ export default {
     height: 70px;
     background: white;
     list-style: none;
-    margin:10px 0 0 10px
-
+    margin:10px 0 0 10px;
+    position: relative;
 }
 .reuseLiCard{
     width: 70px;
@@ -470,5 +517,23 @@ export default {
     height: 100px;
     position: relative;
     border: 1px solid #eee;
+}
+.delback{
+    display: none;
+    position: absolute;
+    right:3px;
+    top:3px;
+    height: 15px;
+    width:15px;
+    background: #fff;
+    border-radius: 2px;
+}
+.reuseLi:hover .delback{
+    display: block;
+    text-align: center;
+}
+.iconshanchu{
+    color:#666;
+    font-size: 12px;
 }
 </style>
