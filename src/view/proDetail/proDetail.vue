@@ -67,8 +67,11 @@
             </div>            
         </div>
         <Spin fix v-if="isShowSpin">
-            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-            <div>Loading</div>
+            <div class="balls" >
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </Spin>
     </div>
 </template>
