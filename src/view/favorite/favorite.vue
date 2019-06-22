@@ -1,6 +1,6 @@
 <template>
     <div class="assistor">
-        <div class="parent" v-if="showList">
+        <div class="parent" v-if="showList" id='parent'>
             <div class="header">
                 <div class="favoriteSearch">
                     <Input search size="large" v-model="kwd" placeholder="搜索你喜欢的" @on-search="searchGoodsList" />
@@ -28,9 +28,9 @@
                     </li>
                 </ul>
                 <ul v-else style="padding-top:10px">
-                   <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
+                   <Waterfall id='vueWaterfall' :resizable='layout.resizable' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
                         <WaterfallItem  v-for="(item, index) in goodsCollectArr" :key="index" :width='itemWidth'>
-                            <a class="item" href="javascript:;" @click="handleGetSchemeInfo(item.id)">
+                            <a class="item" href="javascript:;" @click="handleGetSchemeInfo(item.id)" :style="'width:'+(itemWidth-8)+'px'">
                                 <div style="padding:5px 5px 0 5px;background:#fff">
                                     <img :src='item.img_url' alt="加载错误">
                                 </div>
@@ -62,7 +62,7 @@
                                     <i v-if="item.is_collect == 1"  class="iconfont iconshoucang1 collectActive"></i>
                                     <i v-else class="iconfont iconshoucang1"></i>
                             </a>
-                            <a class="down" href="javascript:;"  @click.stop="downImg(item.goods_name,item.goods_img)"> 
+                            <a class="down" href="javascript:;"  @click.stop="downImg(item)"> 
                                 <i  class="iconfont iconxiazai"/>
                             </a>
                     </div>                                     
@@ -97,6 +97,25 @@
                 </div>
             </ul>
         </Modal>
+<<<<<<< HEAD
+        <Modal
+            title="下载的商品"
+            v-model="goodsLibModal"
+            @on-ok="goodsLibModalOk" 
+            @on-cancel="goodsLibModalCancel"
+            ok-text="下载"
+            :styles="{left: '80px',top: '180px',margin:'0',width:'350px'}">
+            <ul class="flexLayout" v-if="goodsImgSonArr.length">
+                <li class="goodsLiM" v-for="(item,index) in goodsImgSonArr" :key="index">
+                    <Checkbox  @on-change="CheckboxFun(index,item.checked)" v-model="item.checked" class="checkBoxLeftTop">                      
+                    </Checkbox>                   
+                    <img class="goodsImg" :src="item.pic_image" alt="图片丢失">                   
+                </li>
+            </ul>
+            <div v-else>
+                <h4>抱歉! 暂无相关图片</h4>
+            </div>
+        </Modal>
         <Spin class="spin" fix  v-if="this.$store.state.app.isShowSpin">
             <div class="balls" >
                 <div></div>
@@ -109,7 +128,7 @@
 <script>
 import { getCollectList,getCollectScreen,getCollectRelated,isCollect } from '@/api/data.js'
 import { mapState, mapGetters, mapActions } from 'vuex'
-import { convertTimeStamp,downloadIamge } from '@/libs/util.js'
+import { convertTimeStamp,downloadImage } from '@/libs/util.js'
 import { Waterfall, WaterfallItem } from 'vue2-waterfall';
 import "@/assets/css/loading.css"
 export default {
@@ -153,7 +172,7 @@ export default {
             layout:{
                 gutterWidth:8,
                 gutterHeight:8,
-                resizable:true,
+                resizable:false,
                 align:'left',
                 minCol:2,
                 maxCol:2,
@@ -169,27 +188,61 @@ export default {
             goods_list: [], 
             showList:true,
             kwd:'' ,
+            goodsImgSonArr:[], // 待下载的图片数组
+            goodsLibModal: false, // 待下载的图片选择弹框
+            loading:false,
+            totalPages: null, // 总页数    
+            page: 1 ,   // 当前页  
+            cat_ids:'',
+            style_ids:'',   
         }
     },
     mounted() {
         this.handelgetCollectList()
         this.handleGetEnumList()
-        //this.handleGetSchemeInfo(185)
+        var box = document.getElementById('parent')
+         // 添加滚动事件，检测滚动到页面底部
+        box.addEventListener('scroll', this.handleScroll)
     },
     methods: {
+
         ...mapActions([
             'saveState',
         ]),
-        //模糊查询
+
+        handleScroll() {
+             var box = document.getElementById('parent')
+            // 变量scrollTop是滚动条滚动时，距离顶部的距离
+       		var scrollTop = box.scrollTop;
+       		// 变量windowHeight是可视区的高度
+       		var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+       		// 变量scrollHeight是滚动条的总高度
+       		var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
+            // 滚动条到底部的条件
+            //console.log(scrollTop,windowHeight,scrollHeight)
+            if(scrollTop>scrollHeight){
+                // 写后台加载数据的函数
+         	   this.onReachBottom()
+               return
+            }   
+        },
+
+        // 模糊查询
         searchGoodsList(){
+            this.page = 1;
+            this.cat_ids = '';
+            this.style_ids = '';  
             this.handelgetCollectList();
         },
+
         //改变nav
         changeGoodsNav(id){
             this.favoriteNav = id
             this.collectListData.type = id
             this.kwd = ''
             this.goodsCollectArr = null;
+            this.page=1;
+            this.handleGetEnumList();
             this.handelgetCollectList()
         },
         // 将商品收藏图片渲染到canvas
@@ -229,17 +282,29 @@ export default {
         },
 
         // 数据重组
-        handelgetCollectList (cat_ids,style_type) {
-            var getData = this.favoriteNav == 1 ? getCollectList(1,0,0,this.kwd):getCollectList(2,style_type,cat_ids,this.kwd);
-            getData.then(res => {   
-                if(res.data.success){ 
-                    if(this.favoriteNav==1&& res.data.message.length){
-                        res.data.message.map((item) => {
+        handelgetCollectList () {
+            if(this.page!=1&&this.page> this.totalPages){                    
+                return
+            } 
+             if(this.loading){
+                return;
+            } 
+            this.loading = true;
+
+            var getData = this.favoriteNav == 1 ? getCollectList(this.page,1,0,0,this.kwd,16):
+            getCollectList(this.page,2,this.style_type,this.cat_ids,this.kwd,16);
+            getData.then(res => {
+                this.loading = false;   
+                if(res.data.success){
+                    if(this.page==1){ this.goodsCollectArr = [];}
+                    this.totalPages = res.data.message.last_page 
+                    if(this.favoriteNav==1&& res.data.message.data.length){
+                        res.data.message.data.map((item) => {
                             item.time=convertTimeStamp(item.create_at) 
                         })
                     }
-                    if(this.favoriteNav == 2 && res.data.message.length){
-                        res.data.message.map((item) => {
+                    if(this.favoriteNav == 2 && res.data.message.data.length){
+                        res.data.message.data.map((item) => {
                             item.goods_id = item.id;
                             var imgs = [];
                             item.img_list.map((x)=>{
@@ -252,13 +317,21 @@ export default {
                             item.imgs = imgs;
                         })
                     }
-                    this.goodsCollectArr = res.data.message
+                    this.goodsCollectArr = this.goodsCollectArr.concat(res.data.message.data)
                 }  
                                            
             }).catch(err => {
                 console.log(err)
-
+                this.loading = false;
             })
+        },
+
+        // 滑动到底部
+        onReachBottom(){
+            if (this.page!=1&&this.page>this.totalPages) return;  
+            console.log(111111);
+            this.page++
+            this.handelgetCollectList()
         },
 
         // 确定筛选
@@ -277,7 +350,10 @@ export default {
                     style_type.push(item.style_id.toString())
                 }
             })
-
+            this.page = 1;
+            this.goodsCollectArr = null;
+            this.cat_ids = cat_ids.length?cat_ids.join(','):'';
+            this.style_type =  style_type.length?style_type.join(','):''
             this.handelgetCollectList (cat_ids.length?cat_ids.join(','):'',style_type.length?style_type.join(','):'')
         },
 
@@ -315,7 +391,7 @@ export default {
         },
 
         changeSelectRoom(i,data){
-            this.selectCatArr[i].checked = data;;
+            this.selectCatArr[i].checked = data;
         },
 
         changeSelect(id){
@@ -385,16 +461,36 @@ export default {
             })
         },
         
-        downImg (name,href){
-            // this.$Message.info('正在导出请稍等');
-            // var a = document.createElement('a')
-            // var event = new MouseEvent('click') 
-            // a.download = name || '下载图片名称'
-            // a.href=href;              
-            // a.dispatchEvent(event)
+        downImg (item){
+            item.imgs.map((item)=>{
+                item.checked = false
+            })
             this.goodsImgSonArr = item.imgs
             this.goodsLibModal = true;   
-            downloadIamge(href,name)         
+            //downloadImage(href,name)         
+        },
+
+        goodsLibModalOk (){
+            var num = 0
+             this.goodsImgSonArr.map(item => {
+                 if(item.checked){
+                     num++
+                     downloadImage(item.pic_image,'商品图')
+                 }
+             })
+            if(num==0){
+                this.$Message.info('请选择下载的图片')
+            }else{
+                this.goodsLibModal = false; 
+            }
+        },
+
+        goodsLibModalCancel (){
+            this.goodsLibModal = false; 
+        },
+
+        CheckboxFun (index,checked){
+            this.goodsImgSonArr[index].checked = checked;
         },
 
         // 关闭详情
@@ -468,7 +564,7 @@ export default {
     background: white;
     list-style: none;
     margin:10px 0 0 10px;
-    border-radius:4px;
+    border-radius:3px;
     overflow: hidden;
 }
 .reuseLi img{
@@ -488,7 +584,7 @@ export default {
 }
 .item{
     display: block;
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
 }
 .item img{
@@ -577,7 +673,7 @@ export default {
 }
 .scheme_parent .scheme_img{
     width: 100%;
-    border-radius: 4px;
+    border-radius: 3px;
     
 }
 .scheme_parent ul{
@@ -636,5 +732,29 @@ li:hover .hover_div{
 }
 .spin{
     background-color:rgba(0, 0, 0, 0) !important;
+}
+.goodsLiM{
+    position: relative;
+    margin-top: 10px;
+    background:#F8F8F8;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+}
+.flexLayout{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+.flexLayout li{
+   margin-right: 5px
+}
+.goodsImg{
+    width: 100px;
+    height: 100px;
+}
+.checkBoxLeftTop{
+    position: absolute;
+    right: -3px;
+    top: 3px;
 }
 </style>

@@ -96,7 +96,7 @@ export function mobilePhoneMask(tel) {
 }
 
 // 导出图片
-export function downloadIamge(imgsrc, name) {
+export function downloadImage(imgsrc, name) {
   //下载图片地址和图片名
   var image = new Image();
   // 解决跨域 Canvas 污染问题

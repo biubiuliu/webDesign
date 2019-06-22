@@ -47,10 +47,15 @@
             <schemeList :imgsArr = 'goodsArr' v-if="isSelect==2"/> 
             <schemeList :imgsArr = 'schemeArr' v-else/>  
             <Spin fix v-if="isShowSpin" style="top:120px;background:rgba(0,0,0,0)">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
+                <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div> -->
+                <div class="balls" >
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
             </Spin>
-        </div>    
+        </div>  
         <div v-if="goodsArr&&!goodsArr.length&&isSelect==2" class="no-scheme">
                 还没有收藏的商品哦~
         </div> 
@@ -92,13 +97,38 @@ export default {
             type:1,
             isShowSpin:true,
             loading:false,
+            totalPages: null, // 总页数    
+            page: 1 ,   // 当前页  
+            cat_ids:'',
+            style_ids:'',         
         }
+    },
+    mounted () {
+        // 添加滚动事件，检测滚动到页面底部
+        window.addEventListener('scroll', this.handleScroll)
     },
     created() {
         this.handleGetGoodsType()
         this.handleGetEnumList()
     },
     methods: {
+
+        handleScroll() {
+            // 变量scrollTop是滚动条滚动时，距离顶部的距离
+       		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
+       		// 变量windowHeight是可视区的高度
+       		var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+       		// 变量scrollHeight是滚动条的总高度
+       		var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
+            // 滚动条到底部的条件
+            //console.log(scrollTop+windowHeight,scrollHeight)
+            if(scrollTop+windowHeight==scrollHeight){
+                // 写后台加载数据的函数
+         	   this.onReachBottom()
+               return
+            }   
+        },
+
         imgError(item) {
             item.src = require('../../assets/defalut.png');
         },
@@ -114,6 +144,11 @@ export default {
         changeSelect(id){
             this.isSelect = id;
             this.page=1;
+            id==1?this.schemeArr=null:this.goodsArr=null; 
+            this.isShowSpin = true;
+            this.cat_ids ='';
+            this.style_type = '';
+            this.handleGetEnumList()
             this.handleGetGoodsType();
         },
 
@@ -140,34 +175,50 @@ export default {
         },
 
         // 数据重组
-        handleGetGoodsType (cat_ids,style_type) {
-            this.isShowSpin = true;
-            var getData = this.isSelect == 1 ? getCollectList(this.isSelect):getCollectList(this.isSelect,style_type,cat_ids);
+        handleGetGoodsType () {
+            if(this.page!=1&&this.page> this.totalPages){                    
+                return
+            } 
+             if(this.loading){
+                return;
+            } 
+            this.loading = true;
+            var getData = this.isSelect == 1 ? getCollectList(this.page,this.isSelect):
+            getCollectList(this.page,this.isSelect,this.style_type,this.cat_ids);
             getData.then(res => {   
-                if(res.data.success){ 
-                    this.isSelect == 1 ?this.schemeArr=[]:this.goodsArr=[];                                            
-                    if(res.data.message.length){                                                
-                        res.data.message.map((item,i)=>{                      
-                            var  setDataObj = {
-                                src: item.img_url,
-                                href: item.img_url,  
-                                name: item.name,                                                  
-                                id: item.id,
-                                price:item.shop_price,
-                                time:convertTimeStamp(item.created_at),
-                                type:this.isSelect,
-                                style_name:item.style_name,
-                                space_name:item.space_name,
-                            };
-                           this.isSelect == 1 ?this.schemeArr.push(setDataObj):this.goodsArr.push(setDataObj);                                          
+                if(res.data.success){
+                    this.loading = false;
+                    if( this.page==1 ){
+                        this.schemeArr=[];
+                        this.goodsArr=[]; 
+                    } 
+                    
+                    this.totalPages = res.data.message.last_page;                                          
+                    if(res.data.message.data.length){                                                
+                        res.data.message.data.map((item,i)=>{                                            
+                                item.src=item.img_url;
+                                item.href=item.img_url;  
+                                item.price=item.shop_price;
+                                item.time=convertTimeStamp(item.created_at);
+                                item.type=this.isSelect;                                                                        
                         });
+                        this.isSelect == 1 ?this.schemeArr=this.schemeArr.concat( res.data.message.data):
+                        this.goodsArr=this.goodsArr.concat( res.data.message.data); 
                     }  
                 }   
                 this.isShowSpin =false;                                             
             }).catch(err => {
+                this.loading = false;
                 console.log(err)
                 this.isShowSpin = false;
             })
+        },
+
+        // 滑动到底部
+        onReachBottom(){
+            if (this.page!=1&&this.page>this.totalPages) return;  
+            this.page++
+            this.handleGetGoodsType()
         },
 
         // 确定筛选
@@ -186,8 +237,12 @@ export default {
                     style_type.push(item.style_id.toString())
                 }
             })
-
-            this.handleGetGoodsType (cat_ids.length?cat_ids.join(','):'',style_type.length?style_type.join(','):'')
+            this.page = 1;
+            this.goodsArr = null;
+            this.isShowSpin = true;
+            this.cat_ids = cat_ids.length?cat_ids.join(','):'';
+            this.style_type =  style_type.length?style_type.join(','):''
+            this.handleGetGoodsType ()
         },
 
         // 取消筛选 
@@ -372,5 +427,4 @@ export default {
     color: #666;
     font-size: 16px;
 }
-
 </style>

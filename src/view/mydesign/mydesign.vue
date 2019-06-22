@@ -19,7 +19,7 @@
                         <li  v-for="(item, index) in dirSelectList" :key="index" style="text-align:left;position:relative"
                             :class="{dirSelect:dirLi==index}" @click="changeSelect(index,item,'dir')">
                             <span>{{item.dir_name}}</span>
-                            <i v-if="item.dir_name!='文件'&&dirLi!=index" class="iconfont iconiconset0137" style="color:#999;font-size:12px" @click.stop='delDir(item)'></i>
+                            <i v-if="item.dir_name!='文件'&&dirLi!=index" class="iconfont iconicon-pencil" style="color:#999;font-size:12px" @click.stop='delDir(item)'></i>
                         </li>                       
                     </ul>
                 </a>
@@ -138,15 +138,20 @@
         <goodsMerchBill :visible='merchBillModal' :data='goodsList' :loading='tableLoading' v-on:visible="changeVisible"/>
         <!-- loading -->
         <Spin fix v-if="isShowSpin"  style='background:rgba(0,0,0,0)'>
-            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-            <div>Loading</div>
+            <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+            <div>Loading</div> -->
+            <div class="balls" >
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </Spin>
      </div>   
 </template>
 <script>
 import { getMeals, getDirList, addSchemeDir, modifySchemeInfo, getSchemeInfo, getSchemeGoodsList, delScheme, copyScheme } from '@/api/data.js'
 import { getEnumList } from  '@/api/material.js'
-import { convertTimeStamp,downloadIamge } from '@/libs/util.js'
+import { convertTimeStamp,downloadImage } from '@/libs/util.js'
 import {Waterfall, WaterfallItem} from 'vue2-waterfall';
 import discoverVue from '../discover/discover.vue';
 import goodsMerchBill from '@/components/commons/goodsMerchBill/goodsMerchBill'
@@ -523,7 +528,7 @@ export default {
         down (name){          
             this.imgsArr.forEach((item)=>{
                 if(item.id==parseInt(name.split("-")[1])){
-                    downloadIamge(item.src,name);
+                    downloadImage(item.src,name);
                 }
             })                         
         },

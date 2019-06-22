@@ -21,22 +21,19 @@
                     </div>
                 </div>
             </div>
-            <div slot="waterfall-head">
-                <div class="discoverTitle" v-if="goods_list.length">
-                    <div>单品列表</div>
-                    <div class="parent">                         
-                        <schemeList :imgsArr='goods_list' :padding='padding' :showCollect='true' :isPro='true'/>
-                    </div>
+            <div class="discoverTitle" v-if="goods_list.length">
+                <div>单品列表</div>
+                <div class="parent">                         
+                    <schemeList :imgsArr='goods_list' :padding='padding' :showCollect='true' :isPro='true'/>
                 </div>
             </div>
-            <div slot="waterfall-head">
-                <div class="discoverTitle" v-if="recommend_list.length">
-                    <div>推荐方案</div>
-                    <div class="parent">
-                        <schemeList :imgsArr='recommend_list' :padding='padding' :isPro='true'/>
-                    </div>
+
+            <div class="discoverTitle" v-if="recommend_list.length">
+                <div>推荐方案</div>
+                <div class="parent">
+                    <schemeList :imgsArr='recommend_list' :padding='padding' :isPro='true'/>                    
                 </div>
-            </div>
+            </div>            
         </div>
         
         <div class="waterfall" v-else>

@@ -81,15 +81,20 @@
                     <div class="discoverTitle">搜到{{total}}个结果</div>
                 </div>
                 <div style="padding:10px 55px">
-                    <schemeList :imgsArr = 'imgsArr' :padding='padding' :maxCol='5'/>
+                    <schemeList :imgsArr = 'imgsArr' :padding='padding' :maxCol='changeblue?6:5'/>
                     <div v-if="imgsArr.length&&page>total_page" class="more">暂无更多数据</div>
                     <div v-if="!imgsArr.length" class="no-scheme">
                         抱歉 没有找到匹配的结果
                     </div>
                 </div>
                 <Spin fix v-if="isShowSpin" style="background:rgba(0,0,0,0)">
-                    <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                    <div>Loading</div>
+                    <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                    <div>Loading</div> -->
+                    <div class="balls" >
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                 </Spin>
         </div>
     </div>
