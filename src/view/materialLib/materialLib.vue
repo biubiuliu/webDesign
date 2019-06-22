@@ -18,14 +18,16 @@
                     <span v-if="this.bgUrl.length !== 0 &&isAll" @click="bgAll" class="allCursor">全部<i class="iconfont iconyou"></i> </span>
                     <!-- <span v-else class="allCursor"><i class="iconfont iconyou"></i> </span> -->
                 </div>
-                <ul class="reuseUl" v-if="this.bgUrl.length !== 0">
-                    <li class="reuseLi" v-for="bgImg in bgUrl"  :key="bgImg.id" >
-                        <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(bgImg.id,2)">
-                            <i class="iconfont iconshanchu"></i>
-                        </a>
-                        <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
-                    </li>
-                </ul>
+                <Scroll class="scrollimg" :distance-to-edge='16' :on-reach-bottom="handleReachBottom"   v-if="this.bgUrl.length !== 0">
+                    <ul class="reuseUl">
+                        <li class="reuseLi" v-for="bgImg in bgUrl"  :key="bgImg.id" >
+                            <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(bgImg.id,2)">
+                                <i class="iconfont iconshanchu"></i>
+                            </a>
+                            <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
+                        </li>
+                    </ul>
+                </Scroll>
                 <div v-else class="materiaHeight">
                     <h4 v-if="isShowSpin">加载中 ... </h4>
                     <h4 v-else> 暂无背景</h4>
@@ -327,6 +329,15 @@ export default {
         nextPage(e) {
             this.getmaterialData.page = e
             this.handleGetmaterialList(this.getmaterialData)
+        },
+        // 触底加载
+        handleReachBottom () {
+            return new Promise(resolve => {
+                this.getGoods.page ++
+                this.handlegoodsList(this.getGoods)
+                console.log("加载********")
+                resolve();
+            });
         },
     
         //请求素材库api

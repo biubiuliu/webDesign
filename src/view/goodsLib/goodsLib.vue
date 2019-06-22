@@ -228,6 +228,8 @@ export default {
             this.isCollectData.id = index
             is_collect == 0 ? this.isCollectData.is_cancel = 0 : this.isCollectData.is_cancel = 1
             this.handleGetisCollect(this.isCollectData);
+            this.goodsImgArr = []
+            this.getGoods.page = 0 
             this.handlegoodsList(this.getGoods);
             console.log("is_collect", is_collect)
             console.log("收藏", this.isCollectData.is_cancel)
@@ -258,6 +260,8 @@ export default {
                         if(item){this.styleTag.push(item)}
                         this.serachTag.styleAllTag = this.styleTag
                         this.getGoods.style_id = id
+                        this.goodsImgArr = []
+                        this.getGoods.page = 0 
                         this.handlegoodsList(this.getGoods)
                         console.log(" switch 0",type,id)
                     break;          
@@ -299,6 +303,8 @@ export default {
                 default:
                     break;
             }
+            this.goodsImgArr = []
+            this.getGoods.page = 0 
             this.handlegoodsList(this.getGoods)
         },
         //批量下载
@@ -360,6 +366,8 @@ export default {
                 this.serachTag.isClassifyAllTag = this.isClassifyTag.concat(this.isClassifySonTag)
             }
             console.log("category_id",this.getGoods.category_id)
+            this.goodsImgArr = []
+            this.getGoods.page = 0 
             this.handlegoodsList(this.getGoods)
         },
         /**
@@ -417,6 +425,8 @@ export default {
                     if(this.serachTag.styleAllTag.length == 0){
                         this.getGoods.style_id = null
                     }
+                    this.goodsImgArr = []
+                    this.getGoods.page = 0 
                     this.handlegoodsList(this.getGoods)
 
                     console.log("removeTag------",this.serachTag)
@@ -432,6 +442,8 @@ export default {
         //搜索商品
         searchGoodsList(){
             this.getGoods.keywords = this.keyworldVal
+            this.goodsImgArr = []
+            this.getGoods.page = 0 
             this.handlegoodsList(this.getGoods)
             console.log('keyworldVal',this.keyworldVal)
         },
@@ -439,8 +451,9 @@ export default {
         handleReachBottom () {
             return new Promise(resolve => {
                 this.getGoods.page ++
+                // this.goodsImgArr = this.goodsImgArr.concat(this.goodsImgArr)
                 this.handlegoodsList(this.getGoods)
-                console.log("加载********")
+                console.log("加载********",this.goodsImgArr)
                 resolve();
             });
         },
