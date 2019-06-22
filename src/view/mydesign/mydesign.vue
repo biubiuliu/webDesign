@@ -138,8 +138,13 @@
         <goodsMerchBill :visible='merchBillModal' :data='goodsList' :loading='tableLoading' v-on:visible="changeVisible"/>
         <!-- loading -->
         <Spin fix v-if="isShowSpin"  style='background:rgba(0,0,0,0)'>
-            <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-            <div>Loading</div>
+            <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+            <div>Loading</div> -->
+            <div class="balls" >
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </Spin>
      </div>   
 </template>

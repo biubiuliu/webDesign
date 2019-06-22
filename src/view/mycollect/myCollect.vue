@@ -47,8 +47,13 @@
             <schemeList :imgsArr = 'goodsArr' v-if="isSelect==2"/> 
             <schemeList :imgsArr = 'schemeArr' v-else/>  
             <Spin fix v-if="isShowSpin" style="top:120px;background:rgba(0,0,0,0)">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
+                <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div> -->
+                <div class="balls" >
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
             </Spin>
         </div>  
         <div v-if="goodsArr&&!goodsArr.length&&isSelect==2" class="no-scheme">
@@ -184,25 +189,21 @@ export default {
                 if(res.data.success){
                     this.loading = false;
                     if( this.page==1 ){
-                         this.isSelect == 1?this.schemeArr=[]:this.goodsArr=[]; 
+                        this.schemeArr=[];
+                        this.goodsArr=[]; 
                     } 
                     
                     this.totalPages = res.data.message.last_page;                                          
                     if(res.data.message.data.length){                                                
-                        res.data.message.data.map((item,i)=>{                      
-                            var  setDataObj = {
-                                src: item.img_url,
-                                href: item.img_url,  
-                                name: item.name,                                                  
-                                id: item.id,
-                                price:item.shop_price,
-                                time:convertTimeStamp(item.created_at),
-                                type:this.isSelect,
-                                style_name:item.style_name,
-                                space_name:item.space_name,
-                            };
-                           this.isSelect == 1 ?this.schemeArr.push(setDataObj):this.goodsArr.push(setDataObj);                                          
+                        res.data.message.data.map((item,i)=>{                                            
+                                item.src=item.img_url;
+                                item.href=item.img_url;  
+                                item.price=item.shop_price;
+                                item.time=convertTimeStamp(item.created_at);
+                                item.type=this.isSelect;                                                                        
                         });
+                        this.isSelect == 1 ?this.schemeArr=this.schemeArr.concat( res.data.message.data):
+                        this.goodsArr=this.goodsArr.concat( res.data.message.data); 
                     }  
                 }   
                 this.isShowSpin =false;                                             
@@ -426,5 +427,4 @@ export default {
     color: #666;
     font-size: 16px;
 }
-
 </style>

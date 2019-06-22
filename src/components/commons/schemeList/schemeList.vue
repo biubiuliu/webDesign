@@ -2,7 +2,7 @@
 <template>
     <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='maxCol||5' class="vueWaterfall">
         <WaterfallItem  v-for="(item, index) in imgsArr" :key="index" :width='itemWidth'>
-            <a href='javascript:;' class="item"  @click="toDetail(item)">
+            <a href='javascript:;' class="item"  @click="toDetail(item)" :style="'width:'+(itemWidth-20)+'px'">
                 <div style="background:#fff;padding:15px 15px 0 15px;position:relative">
                     <img :src="item.src" :lazy-src='item.src' alt="加载错误">                                       
                 </div>

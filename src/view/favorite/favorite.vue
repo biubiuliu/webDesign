@@ -28,9 +28,9 @@
                     </li>
                 </ul>
                 <ul v-else style="padding-top:10px">
-                   <Waterfall id='vueWaterfall' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
+                   <Waterfall id='vueWaterfall' :resizable='layout.resizable' :gutterWidth="layout.gutterWidth" :gutterHeight='layout.gutterHeight' :align='layout.align' :minCol='layout.maxCol' :maxCol='layout.maxCol' class="vueWaterfall">
                         <WaterfallItem  v-for="(item, index) in goodsCollectArr" :key="index" :width='itemWidth'>
-                            <a class="item" href="javascript:;" @click="handleGetSchemeInfo(item.id)">
+                            <a class="item" href="javascript:;" @click="handleGetSchemeInfo(item.id)" :style="'width:'+(itemWidth-8)+'px'">
                                 <div style="padding:5px 5px 0 5px;background:#fff">
                                     <img :src='item.img_url' alt="加载错误">
                                 </div>
@@ -116,8 +116,13 @@
             </div>
         </Modal>
         <Spin fix v-if="this.$store.state.app.isShowSpin" class="spin">
-                <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                <div>Loading</div>
+                <!-- <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                <div>Loading</div> -->
+                <div class="balls" >
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                </div>
         </Spin>
     </div>
 </template>
@@ -167,7 +172,7 @@ export default {
             layout:{
                 gutterWidth:8,
                 gutterHeight:8,
-                resizable:true,
+                resizable:false,
                 align:'left',
                 minCol:2,
                 maxCol:2,
@@ -559,7 +564,7 @@ export default {
     background: white;
     list-style: none;
     margin:10px 0 0 10px;
-    border-radius:4px;
+    border-radius:3px;
     overflow: hidden;
 }
 .reuseLi img{
@@ -579,7 +584,7 @@ export default {
 }
 .item{
     display: block;
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
 }
 .item img{
@@ -668,7 +673,7 @@ export default {
 }
 .scheme_parent .scheme_img{
     width: 100%;
-    border-radius: 4px;
+    border-radius: 3px;
     
 }
 .scheme_parent ul{
