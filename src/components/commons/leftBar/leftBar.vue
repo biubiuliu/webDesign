@@ -1,28 +1,10 @@
 <template>
     <div class="leftBar">
         <ul class="leftBar_box">
-            <li>
-                <router-link to="/designHome/materialLib" tag="div">
-                    <i  class="iconfont iconsucaiku"></i>
-                    素材库
-                </router-link>
-            </li>
-            <li>
-                <router-link to="/designHome/goodsLib" tag="div">
-                    <i  class="iconfont iconshangpin"></i>
-                    商品库
-                </router-link>
-            </li>
-            <li>
-                <router-link to="/designHome/favorite" tag="div">
-                        <i  class="iconfont iconshoucang1"></i>
-                        收藏
-                </router-link>
-            </li>
-            <li>
-                <router-link to="/designHome/uploading" tag="div">
-                        <i  class="iconfont iconupload"></i>
-                        上传
+            <li v-for="(item, index) in nav" :key="index" @click="routerLink(index, item.path)" :class=" navIndex === index ? 'router_active' : ''" >
+                <router-link :to="item.path" tag="div">
+                    <i  :class="item.icon"></i>
+                    {{item.title}}
                 </router-link>
             </li>
             <li class="leftBar_bottom">快捷键</li>
@@ -34,10 +16,46 @@ export default {
     name: 'leftBar',
     data() {
         return {
-            msg: '这是内容侧边导航'
+            msg: '这是内容侧边导航',
+            nav: [
+                    {title: '素材库', icon: 'iconfont iconsucaiku', path: '/designHome/materialLib'},
+                    {title: '商品库', icon: 'iconfont iconshangpin', path: '/designHome/goodsLib'},
+                    {title: '收藏', icon: 'iconfont iconshoucang1', path: '/designHome/favorite'},
+                ],
+            navIndex: 0,
         }
     },
-    
+    watch: {
+        "$route"() {
+            // 获取当前路径
+            let path = this.$route.path;
+            // 检索当前路径
+            this.checkRouterLocal(path);
+        }
+    },
+    methods: {
+    /**
+     * 路由跳转
+     * @param index
+     * @param link
+    */
+        routerLink(index, path) {
+            // 点击哪个路由就赋值给自定义的下下标
+            this.navIndex = index;
+            // 路由跳转
+            this.$router.push(path)
+        },
+
+    /**
+     * 检索当前路径
+     * @param path
+    */
+        checkRouterLocal(path) {
+        // 查找当前路由下标高亮
+            this.navIndex = this.nav.findIndex(item => item.path === path);
+        }
+    },
+        
 }
 </script>
 <style scoped>
@@ -68,13 +86,12 @@ export default {
     .leftBar_box>li>div{
         display: flex;
         flex-direction: column;
-       
-
-    }
-    .leftBar_box>li:hover{
-        color: white;
     }
     .leftBar_bottom{
         margin-bottom: auto;
+    }
+    .router_active{
+        color: #f90;
+
     }
 </style>
