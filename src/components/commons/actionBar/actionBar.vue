@@ -14,6 +14,7 @@
             <Tooltip class="aliIcon" content="变形"><i @click="skewControl" class="iconfont iconbianxing"></i></Tooltip>
             <Tooltip class="aliIcon" content="复制图层"><i @click="copy" class="iconfont iconfuzhi"></i></Tooltip>
             <Tooltip class="aliIcon" content="旋转30°"><i @click="rotateObject" class="iconfont iconxuanzhuan"></i></Tooltip>
+            <Tooltip class="aliIcon" content="透明度"><i @click="alphaObject" class="iconfont icondiaojiekongzhi2"></i></Tooltip>
             <Tooltip class="aliIcon" content="锁定" v-if="isLocking"><i @click="lockObject" class="iconfont iconsuoding1"></i></Tooltip>
             <Tooltip class="aliIcon" content="取消锁定" v-else><i @click="cancellockObject" class="iconfont iconjiesuo1"></i></Tooltip>
             <Tooltip class="aliIcon" content="删除"><i @click="removeObject" class="iconfont iconshanchu"></i></Tooltip>
@@ -31,6 +32,19 @@
         <Slider v-model="skewYModelValue" input-size='small' @on-change="skewYControl" @on-input="skewYControl" :min='-100' :max='200' show-input></Slider>
         <div slot="footer">
             <Button type="primary" @click="skewModelOk">确定</Button>
+        </div>
+        <canvas class="canvasCut" style="visibility: hidden; background:red" id="canvas_crop"></canvas>
+    </Modal>
+    <Modal
+        v-model="alphaModel"
+        title="透明度"
+        draggable
+        width="300"
+        :closable="false"
+        slot="footer">
+        <Slider v-model="alphaModelValue" input-size='small' @on-change="alphaControl" @on-input="alphaControl" :min='1' :max='10' show-input></Slider>
+        <div slot="footer">
+            <Button type="primary" @click="alphaModelOk">确定</Button>
         </div>
         <canvas class="canvasCut" style="visibility: hidden; background:red" id="canvas_crop"></canvas>
     </Modal>
@@ -61,7 +75,9 @@ export default {
             isLock:true,
             skewXModelValue: 0,
             skewYModelValue: 0,
+            alphaModelValue: 10,
             skewModel:false,
+            alphaModel:false,
             cutModel:true,
             test:null,
             //裁剪
@@ -84,10 +100,12 @@ export default {
         // console.log("0.0",this.selectedObj)
         if(this.selectedObj == null){
             this.skewModel = false;
+            this.alphaModel = false;
             return
         }
         this.skewXModelValue = this.selectedObj.skewX,
         this.skewYModelValue = this.selectedObj.skewY
+        this.alphaModelValue = this.selectedObj.opacity*10
     },
     computed: {
         ...mapState({
@@ -308,6 +326,17 @@ export default {
             this.skewYControl();
             this.skewModel = false;
         },
+        //透明度modal
+        alphaModelOk(){
+            this.alphaModel = false;
+        },
+        alphaControl(){
+            this.selectedObj.set({
+                opacity: this.alphaModelValue/10
+            })
+            this.card.renderAll()
+            this.saveState()
+        },
         skewModelCancel(){
             
         },
@@ -330,6 +359,13 @@ export default {
         rotateObject() {
             this.selectedObj.rotate(this.selectedObj.angle === 360 ? 90 : this.selectedObj.angle + 90)
             // console.log('this.selectobj',this.selectedObj)
+            this.card.renderAll()
+            this.saveState()
+        },
+        // 透明度
+        alphaObject() {
+            this.alphaModel = true
+            this.alphaControl()
             this.card.renderAll()
             this.saveState()
         },

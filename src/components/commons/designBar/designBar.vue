@@ -9,6 +9,9 @@
                 <MenuItem name="画布尺寸" class="canvasSize" @click.native="isShowCvsFun">
                     画布尺寸
                 </MenuItem>
+                <MenuItem name="自动保存..." class="canvasAtuo" v-if="waitFun">
+                    自动保存...
+                </MenuItem>
                 <MenuItem name="恢复" class="layout-user" @click.native="_redo" >
                     <i  class="iconfont iconchexiao1"></i>
                     恢复 
@@ -70,6 +73,8 @@
         </Modal>
         <Modal
             v-model="shemeInfoModal"
+            :mask-closable="false"
+            :closable='false'
             title="填写方案">
             <div>
                 <Form :model="imgObject"  ref="imgObject" :rules="imgRuleValidate">
@@ -142,7 +147,6 @@ export default {
             imgObject:{
                 id: null, // 方案id（编辑方案使用）
                 done_img_url: '', // 方案大图url 1
-                canvas_type: null, // 方案id（编辑方案使用）1
                 canvas_type: null, // 画布类型（1：1:1，2：A3横排，3：A3竖排，4：16:9）1
                 is_personal: 0,//	公开类型（0：公共（默认）， 1：个人）1
                 scheme_name: "", // 方案名称1
@@ -152,7 +156,8 @@ export default {
                 phone: "", // 手机1
                 address: "", //	地址1
                 customer_name: null,
-                img_site_json:null
+                img_site_json:null,
+                is_auto:1 //自动保存 ( 0:否（默认)，1:是 )
                 
             },
             // 表单验证
@@ -186,6 +191,9 @@ export default {
             merchBillModal:false,// 清单列表是否显示
             goodsList:[], // 清单数据
             tableLoading:false,
+            timer: null,
+            isCvsNull:null,
+            waitFun:false,
         }
     },
     computed: {
@@ -216,14 +224,23 @@ export default {
             'redoList',
         ])
     },
-    beforeCreate() {
-        
+    created() {
+        // console.log("this.card",this.card._objects)
+        // if(){
+            this.saveSchemeAtuo()
+        // }
+    },
+    updated() {
+        // console.log("this.card",this.card._objects)
     },
     mounted() {
         this.proId = this.proDetailVal.id
         this.handleGetEnumList()
         this.isProIdfun()
         
+    },
+    destroyed() {
+        clearInterval(this.timer);
     },
     methods: {
         ...mapActions([
@@ -263,14 +280,17 @@ export default {
                     this.toJson()
                     this.imgObject.id = this.schemeId ? this.schemeId : null
                     this.imgObject.canvas_type = parseInt(this.vertical) 
+                    this.imgObject.is_auto = 0 
                     // this.imgObject.background_id = parseInt(this.selectedObj.backgroundImgId) 
                     // this.imgObject = qs.stringify(this.imgObject)
-
+                    this.imgObject.is_auto = 0;
                     this.handleGetSaveScheme(this.imgObject)
+                    // this.saveSchemeAtuo()
                 }
             })
         },
         shemeInfoModalcancel () {
+            this.saveSchemeAtuo(),
             this.shemeInfoModal = false,
             this.$Message.info('你取消保存');
         },
@@ -279,9 +299,38 @@ export default {
             this.imgObject.is_personal = this.switchVal?0:1
             // console.log("是否公开",this.imgObject.is_personal)
         },
+        // 自动保存方案
+        saveSchemeAtuo(){
+            // 自动保存
+            this.timer = setInterval(() =>{  
+                if(this.card._objects.length == 0) return
+                console.log("自动保存 0.0",this.card) 
+                this.imgObject.canvas_type = parseInt(this.vertical) 
+                this.imgObject.is_auto = 1 
+                this.saveSchemeAuto()
+                setTimeout(() => {
+                    this.handleGetSaveSchemeAtuo(this.imgObject) 
+                }, 1000);                          
+            }, 30000); 
+        },
         //保存方案
-        saveScheme(){
+        saveScheme(){         
+            clearInterval(this.timer);                                    
             this.shemeInfoModal = true;
+            // this.toJson()
+            this.canvasDataArr = this.objJSON.objects
+            this.imgObject.img_site_json =  JSON.stringify(this.objJSON)
+            //通过toJson数据获取背景素材自定义商品图片
+            // console.log("____________",this.objJSON)
+
+            this.useBase64Fun()
+            let formData = new FormData();
+            // 向 formData 对象中添加文件
+            formData.append('file',this.imgFile);
+            this.handleGetUploadImg(formData)
+        },
+        saveSchemeAuto(){
+            this.waitFun = true
             // this.toJson()
             this.canvasDataArr = this.objJSON.objects
             this.imgObject.img_site_json =  JSON.stringify(this.objJSON)
@@ -415,13 +464,28 @@ export default {
         //添加,保存方案
         handleGetSaveScheme(data) {
             getSaveScheme(data).then(res => {
-                console.log('添加,保存方案', res.data.success)
+                // console.log('添加,保存方案', res.data.success)
                 if(!res.data.success) {
                     this.shemeInfoModal = true
                     this.$Message.error(res.data.message);
                 }else{
                     this.$router.push({name:'mydesign'})
                     this.$Message.info(res.data.message);
+                } 
+            }).catch(err =>{
+                console.log(err)
+            })
+        },
+        //添加,保存方案(自动保存)
+        handleGetSaveSchemeAtuo(data) {
+            getSaveScheme(data).then(res => {
+                console.log('添加,保存方案', res.data.success)
+                if(!res.data.success) {
+                    // this.$Message.error(res.data.message);
+                }else{
+                    // this.$Message.info(res.data.message.msg);
+                    this.imgObject.id = res.data.message.id
+                    this.waitFun = false
                 } 
             }).catch(err =>{
                 console.log(err)
@@ -471,12 +535,12 @@ export default {
             this.tableLoading = true;      
             getSchemeGoodsList(this.schemeId).then(res => {
                 if(res.data.success){ 
-                   this.goodsList = res.data.message;
-                   if(res.data.message.length){
-                       this.merchBillModal = true;
-                   }else{
-                       this.$Message.info('该方案下还没有商品数据哦')
-                   }
+                    this.goodsList = res.data.message;
+                    if(res.data.message.length){
+                        this.merchBillModal = true;
+                    }else{
+                        this.$Message.info('该方案下还没有商品数据哦')
+                    }
                 }                  
                 this.tableLoading = false
             }).catch(err => {
@@ -506,6 +570,11 @@ export default {
     .canvasSize{
         position: relative;
     }
+    .canvasAtuo{
+        position: absolute;
+        left: 200px;
+    }
+
     .canvasCard{
         position: absolute;
         top: 60px;

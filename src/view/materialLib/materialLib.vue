@@ -18,19 +18,39 @@
                     <span v-if="this.bgUrl.length !== 0 &&isAll" @click="bgAll" class="allCursor">全部<i class="iconfont iconyou"></i> </span>
                     <!-- <span v-else class="allCursor"><i class="iconfont iconyou"></i> </span> -->
                 </div>
-                <Scroll class="scrollimg" :distance-to-edge='16' :on-reach-bottom="handleReachBottom"   v-if="this.bgUrl.length !== 0">
-                    <ul class="reuseUl">
-                        <li class="reuseLi" v-for="bgImg in bgUrl"  :key="bgImg.id" >
+                <div  v-if="this.bgUrl.length !== 0">
+                    <ul class="reuseUl" v-if="!this.bgGoodsBool">
+                        <li class="reuseLi" v-for="(bgImg,index) in bgUrl"  :key="index" >
                             <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(bgImg.id,2)">
                                 <i class="iconfont iconshanchu"></i>
                             </a>
                             <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
                         </li>
                     </ul>
-                </Scroll>
-                <div v-else class="materiaHeight">
-                    <h4 v-if="isShowSpin">加载中 ... </h4>
-                    <h4 v-else> 暂无背景</h4>
+                    <Scroll v-else  class="scrollimg" :distance-to-edge='16' :on-reach-bottom="handleReachBottom" >
+                        <ul class="reuseUl">
+                            <li class="reuseLi" v-for="(bgImg, index) in bgUrl"  :key="index" >
+                                <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(bgImg.id,2)">
+                                    <i class="iconfont iconshanchu"></i>
+                                </a>
+                                <img :src="bgImg.img_url" alt="图片丢失" :id="bgImg.id"  @click="selectDecorate"  crossorigin="anonymous">
+                            </li>
+                        </ul>
+                    </Scroll> 
+                </div>
+                <div v-else>
+                    <ul v-if="isShowSpin" class="reuseUl">
+                        <li  class="reuseLiCard background_bgColor">
+                            <i class="iconfont icontupian"></i>
+                            <p>加载中...</p>
+                        </li>
+                    </ul>
+                    <ul v-else class="reuseUl">
+                        <li  class="reuseLiCard background_bgColor">
+                            <i class="iconfont icontupian"></i>
+                            <p>暂无图片</p>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="comm_body" v-if="this.materialBgImgArr">
@@ -44,25 +64,26 @@
                             &&materialCardArr[getmaterialData.material_type-1].name?materialCardArr[getmaterialData.material_type-1].name:''}}
                     </span>                  
                 </div>
-                <ul class="reuseUl" v-if="this.isAll">
-                    <li  @click="bgMateial(item)" class="reuseLiCard" v-for="item in materialCardArr" :key='item.id' :class="item.bgColor">
-                        <i :class="item.icon"></i>
-                        <p>{{item.name}}</p>
-                    </li>
-                </ul>
-                <div v-else  >
-                    <h4 v-if="isShowSpin">加载中 ... </h4> 
-                    <ul v-else class="reuseUl">
-                        <li class="reuseLi" v-for="item in materialBgImgArr" :key="item.id">
-                            <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(item.id,1)">
-                                <i class="iconfont iconshanchu"></i>
-                            </a>
-                            <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
-                        </li>
-                    </ul>
-
+                <div v-if="this.materialBgImgArr">
+                    <div v-if="!this.materialGoodsBool">
+                        <ul class="reuseUl">
+                            <li  @click="bgMateial(item)" class="reuseLiCard" v-for="item in materialCardArr" :key='item.id' :class="item.bgColor">
+                                <i :class="item.icon"></i>
+                                <p>{{item.name}}</p>
+                            </li>
+                        </ul>  
+                    </div>
+                    <Scroll  v-else  class="scrollimg" :distance-to-edge='16' :on-reach-bottom="handleReachMater" >
+                        <ul class="reuseUl">
+                            <li class="reuseLi" v-for="(item,index) in materialBgImgArr" :key="index">
+                                <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(item.id,1)">
+                                    <i class="iconfont iconshanchu"></i>
+                                </a>
+                                <img :src="item.material_img" :id="item.id"   @click="selectDecorateMaterial" alt="图片丢失"  crossorigin="anonymous">
+                            </li>
+                        </ul>
+                    </Scroll>
                 </div>
-                
                 
             </div>
             <div class="comm_body" v-if="this.goodsBgImgArr">
@@ -76,17 +97,30 @@
                         <i class="iconfont iconyou"></i>
                     </span>
                 </div>
-                <ul v-if="this.goodsBgImgArr.length !== 0" class="reuseUl">
-                    <li class="reuseLi" v-for="(item,index) in goodsBgImgArr" :key="index">
-                        <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(item.goods_id,3)">
-                            <i class="iconfont iconshanchu"></i>
-                        </a>
-                        <img :src="item.pic_image" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
-                    </li>
-                </ul>
-                <div v-else class="materiaHeight">
-                    <h4 v-if="isShowSpin">加载中 ... </h4>
-                    <h4 v-else> 暂无自定义商品图</h4>
+                <div v-if="this.goodsBgImgArr.length !== 0">
+                    <ul v-if="this.goodsBgImgArr.length !== 0" class="reuseUl">
+                        <li class="reuseLi" v-for="(item,index) in goodsBgImgArr" :key="index">
+                            <a href="javascript:;" class="delback" v-if="!isAll&&is_personal" @click.stop="delMaterial(item.goods_id,3)">
+                                <i class="iconfont iconshanchu"></i>
+                            </a>
+                            <img :src="item.pic_image" :id="item.goods_id" :name ="item.id"  @click="selectDecorateGoods" alt="图片丢失"  crossorigin="anonymous">
+                        </li>
+                    </ul>
+                </div>
+                
+                <div v-else>
+                    <ul v-if="isShowSpin" class="reuseUl">
+                        <li  class="reuseLiCard background_bgColor">
+                            <i class="iconfont icontupian"></i>
+                            <p>加载中...</p>
+                        </li>
+                    </ul>
+                    <ul v-else class="reuseUl">
+                        <li  class="reuseLiCard background_bgColor">
+                            <i class="iconfont icontupian"></i>
+                            <p>暂无图片</p>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -97,7 +131,6 @@
                 <div></div>
             </div>
         </Spin>
-        <Page v-if="!this.isAll" class="pages" :total="this.pages.total" :page-size="this.pages.per_page" show-elevator size='small' @on-change="nextPage" />
     </div>
 </template>
 <script>
@@ -130,12 +163,10 @@ export default {
                 material_type:null, // 获取素材时传对应的分类
             },
             is_personal:0,
-            // 分页
-            pages: {
-                total: null, 	      // 总条数
-                per_page: 40,       // 每页多少条
-                current_page: 1 ,  // 当前第几页
-            },            
+            bgGoodsBool:false,
+            materialGoodsBool:false,
+            customGoodsBool:false
+          
         }
     },
     computed: {
@@ -164,11 +195,13 @@ export default {
         this.handleGetgetmaterial(this.is_personal)
         this.$store.dispatch("setGoodsItem", null)
         // console.log('新建设计2',this.schemeId)
+
     },
     methods: {
         ...mapActions([
             'saveState',
         ]),
+ 
         // 选择装饰
         // 将背景图片渲染到canvas
         selectDecorate(e) {
@@ -272,29 +305,36 @@ export default {
         },
         //bgAll 全部背景
         bgAll(){
+            this.bgUrl =[]
+            this.getmaterialData.page = 1
             window.event? window.event.cancelBubble = true : e.stopPropagation();
             this.isAll = !this.isAll
             if(!this.isAll){
                 this.getmaterialData.type = 2
+                this.bgGoodsBool = true
                 this.handleGetmaterialList(this.getmaterialData)
                 return;
             }
+            this.bgGoodsBool = false
             this.handleGetgetmaterial(this.is_personal)
         },
         //bgMateial 全部素材
         bgMateial(item){
-            console.log("全部素材",item.id)
+            this.materialBgImgArr =[]
+            this.getmaterialData.page = 1
             window.event? window.event.cancelBubble = true : e.stopPropagation();
             this.isAll = !this.isAll
             if(!this.isAll){
                 this.getmaterialData.type = 1
+                this.materialGoodsBool = true   
                 this.getmaterialData.material_type = item.id
                 this.handleGetmaterialList(this.getmaterialData)
                 return;
             }
+            this.materialGoodsBool = false
             this.handleGetgetmaterial(this.is_personal)
         },
-        //bgAll 全部自定义
+        // 全部自定义
         bgCustom(){
             window.event? window.event.cancelBubble = true : e.stopPropagation();
             this.isAll = !this.isAll
@@ -325,17 +365,21 @@ export default {
             this.removeClass(privateId,"active");  
             this.addClass(commonsId,"active"); 
         },
-        // 分页
-        nextPage(e) {
-            this.getmaterialData.page = e
-            this.handleGetmaterialList(this.getmaterialData)
-        },
-        // 触底加载
+        // 触底加载(背景)
         handleReachBottom () {
             return new Promise(resolve => {
-                this.getGoods.page ++
-                this.handlegoodsList(this.getGoods)
-                console.log("加载********")
+                this.getmaterialData.page++
+                this.handleGetmaterialList(this.getmaterialData)
+                resolve();
+            });
+        },
+        // 触底加载(素材)
+        handleReachMater () {
+            console.log('触底加载素材',this.getmaterialData.page)
+            return new Promise(resolve => {
+                this.getmaterialData.page++
+                this.handleGetmaterialList(this.getmaterialData)
+                // console.log("加载********",this.materialBgImgArr)
                 resolve();
             });
         },
@@ -356,23 +400,24 @@ export default {
             getmaterialList(getmaterialData).then(res => {
                 switch (this.getmaterialData.type) {
                     case 1:
-                        this.materialBgImgArr = res.data.message.meater.data
-                        this.pages.total = res.data.message.meater.total
-                        this.pages.per_page = res.data.message.meater.per_page
+                        this.materialBgImgArr = this.materialBgImgArr.concat(res.data.message.meater.data)
+                        if(res.data.message.meater.data.length == 0){
+                            this.getmaterialData.page--
+                        }
+                        console.log("materialBgImgArr",this.materialBgImgArr)
                         this.bgUrl = null
                         this.goodsBgImgArr = null
                         break;
                     case 2:
-                        this.bgUrl = res.data.message.backgroundImg.data
-                        this.pages.total = res.data.message.backgroundImg.total
-                        this.pages.per_page = res.data.message.backgroundImg.per_page
+                        if(res.data.message.backgroundImg.data.length == 0){
+                            this.getmaterialData.page--
+                        }
+                        this.bgUrl = this.bgUrl.concat(res.data.message.backgroundImg.data)
                         this.materialBgImgArr = null
                         this.goodsBgImgArr = null
                         break;
                     case 3:
                         this.goodsBgImgArr = res.data.message.goods.data
-                        this.pages.total = res.data.message.goods.total
-                        this.pages.per_page = res.data.message.goods.per_page
                         this.materialBgImgArr = null
                         this.bgUrl = null
                         break;
@@ -503,6 +548,9 @@ export default {
     margin:10px 0 0 10px
 
 }
+.background_bgColor{
+    background: #3F454D;
+}
 .reuserLibgColor0{
     background: #58BA8B;
 }
@@ -550,5 +598,14 @@ export default {
 .iconshanchu{
     color:#666;
     font-size: 12px;
+}
+.scrollimg{
+    margin-top: 10px;
+}
+.scrollimg /deep/ .ivu-scroll-container{
+    height: 77vh !important;
+}
+.scrollimg /deep/ .ivu-scroll-spinner{
+    display: none !important;
 }
 </style>

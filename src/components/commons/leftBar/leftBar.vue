@@ -21,6 +21,7 @@ export default {
                     {title: '素材库', icon: 'iconfont iconsucaiku', path: '/designHome/materialLib'},
                     {title: '商品库', icon: 'iconfont iconshangpin', path: '/designHome/goodsLib'},
                     {title: '收藏', icon: 'iconfont iconshoucang1', path: '/designHome/favorite'},
+                    {title: '上传', icon: 'iconfont iconcaozuo-shangchuan-upload', path: '/designHome/uploading'},
                 ],
             navIndex: 0,
         }

@@ -226,13 +226,15 @@ export default {
         },
         iconshoucang1Fun(index,is_collect) {
             this.isCollectData.id = index
-            is_collect == 0 ? this.isCollectData.is_cancel = 0 : this.isCollectData.is_cancel = 1
-            this.handleGetisCollect(this.isCollectData);
             this.goodsImgArr = []
-            this.getGoods.page = 0 
-            this.handlegoodsList(this.getGoods);
-            console.log("is_collect", is_collect)
-            console.log("收藏", this.isCollectData.is_cancel)
+            // this.getGoods.page = 0 
+            // is_collect == 0 ? this.isCollectData.is_cancel = 0 : this.isCollectData.is_cancel = 1
+            this.isCollectData.is_cancel =  is_collect
+            this.handleGetisCollect(this.isCollectData);
+   
+        
+            console.log("this.isCollectData.is_cancel", this.isCollectData.is_cancel)
+            console.log( this.isCollectData.is_cancel?"收藏":'取消收藏')
         },
         changeRadio(index){
             console.log("选中", index)
@@ -453,7 +455,6 @@ export default {
                 this.getGoods.page ++
                 // this.goodsImgArr = this.goodsImgArr.concat(this.goodsImgArr)
                 this.handlegoodsList(this.getGoods)
-                console.log("加载********",this.goodsImgArr)
                 resolve();
             });
         },
@@ -485,7 +486,7 @@ export default {
         //收藏
         handleGetisCollect(data){
             isCollect(data).then( res => {
-                // console.log(res)
+                this.handlegoodsList(this.getGoods);
             }).catch( err => {
                 console.log(err)
             })
@@ -569,6 +570,9 @@ export default {
     position: relative;
     height: auto;
     height: 100%;
+}
+.scrollimg{
+    margin-top: 10px;
 }
 .scrollimg /deep/ .ivu-scroll-container{
     height: 70vh !important;
